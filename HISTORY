@@ -2,6 +2,13 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
 		
+26.06.2017 3.1.0	ARD - Funktion SingleSendung: Ersatz von https durch http in m3u8- und mp4-Dateien
+					(wie schon beim ZDF, https bei ARD erstmals am 26.6.2017 beoachtet).
+					ARD - Funktion SingleSendung: Qualität "auto" für .mp4-Dateien berücksichtigt
+					(führte zu 2 fehlerhaften Zeichen vor der Url).	
+					ARD - Funktion img_urlScheme: neue Endung '?mandant=ard' bei Bedarf hinzugefügt.
+					Funktion CreateVideoClipObject: Austausch title gegen url für rating_key (eindeutiger 
+					rating_key als url bei ARD-Videos nicht gewährleistet).
 	
 08.06.2017 3.0.9	Downloadbereich: wget als Alternative für curl implementiert. Anlass: curl-Problem auf
 					Debian-System. Betroffen: Icon Dir-curl.png/Dir-curl-wget.png, Funktionen: 

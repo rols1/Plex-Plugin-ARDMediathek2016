@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.0.9'		
-VDATE = '08.06.2017'
+VERSION =  '3.1.0'		
+VDATE = '26.06.2017'
 
 # 
 #	
@@ -1222,7 +1222,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 		Log('vor parseLinks_Mp4_Rtmp')
 		page = HTTP.Request(path).content  # als Text, nicht als HTML-Element. 
 		link_path,link_img, m3u8_master = parseLinks_Mp4_Rtmp(page)	# link_img kommt bereits mit thumb, außer bei Podcasts						
-		Log(link_img); Log(m3u8_master); Log(link_path); 
+		Log('m3u8_master: ' + m3u8_master); Log(link_img); Log(link_path); 
 		if thumb == None or thumb == '': 
 			thumb = link_img
 
@@ -1240,6 +1240,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 	if m3u8_master:	  		  								# nicht bei rtmp-Links (ohne master wie m3u8)
 		title = 'Bandbreite und Auflösung automatisch'			# master.m3u8
 		Codecs = ''
+		m3u8_master = m3u8_master.replace('https', 'http')	# 26.01.2017: nun auch ARD mit https
 		oc.add(CreateVideoStreamObject(url=m3u8_master, title=title, rtmp_live='nein',
 			summary='automatische Auflösung | Auswahl durch den Player', tagline=title, meta=Codecs, thumb=thumb, 
 			resolution=''))			
@@ -1250,46 +1251,51 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 	# ab hier Auswertung der restlichen mp4-Links bzw. rtmp-Links (aus parseLinks_Mp4_Rtmp)
 	# Format: 0|http://mvideos.daserste.de/videoportal/Film/c_610000/611560/format706220.mp4
 	# 	oder: rtmp://vod.daserste.de/ardfs/mp4:videoportal/mediathek/...
+	# Achtung: ARD-Videos kommen manchmal mit der selben Url für verschiedene Qualitäten. Daher
+	#	muss CreateVideoClipObject als rating_key den Titel als eindeutige Kennz. in der Trackliste verwenden
 	href_quality_S 	= ''; href_quality_M 	= ''; href_quality_L 	= ''; href_quality_XL 	= ''
 	download_list = []		# 2-teilige Liste für Download: 'title # url'
 	for i in range(len(link_path)):
 		s = link_path[i]
-		#Log(s)
+		href = s.split('|')[1].strip() # Bsp.: auto|http://www.hr.. / 0|http://pd-videos.daserste.de/..
+		Log('s: ' + s)
 		if s[0:4] == "auto":	# m3u8_master bereits entfernt. Bsp. hier: 	
 			# http://tagesschau-lh.akamaihd.net/z/tagesschau_1@119231/manifest.f4m?b=608,1152,1992,3776 
 			#	Platzhalter für künftige Sendungen, z.B. Tagesschau (Meldung in Original-Mediathek:
 			# 	'dieser Livestream ist noch nicht verfügbar!'
-			href_quality_Auto = s[2:]	
+			#	auto aber auch bei .mp4-Dateien beobachtet, Bsp.: http://www.ardmediathek.de/play/media/40043626
+			# href_quality_Auto = s[2:]	
+			href_quality_Auto = href	# auto auch bei .mp4-Dateien möglich (s.o.)
 			title = 'Qualität AUTO'
 			url = href_quality_Auto
 			resolution = ''
 		if s[0:1] == "0":			
-			href_quality_S = s[2:]
+			href_quality_S = href
 			title = 'Qualität SMALL'
 			url = href_quality_S
 			resolution = 240
 			download_list.append(title + '#' + url)
 		if s[0:1] == "1":			
-			href_quality_M = s[2:]
+			href_quality_M = href
 			title = 'Qualität MEDIUM'
 			url = href_quality_M
 			resolution = 480
 			download_list.append(title + '#' + url)
 		if s[0:1] == "2":			
-			href_quality_L = s[2:]
+			href_quality_L = href
 			title = 'Qualität LARGE'
 			url = href_quality_L
 			resolution = 540
 			download_list.append(title + '#' + url)
 		if s[0:1] == "3":			
-			href_quality_XL = s[2:]
+			href_quality_XL = href
 			title = 'Qualität EXTRALARGE'
 			url = href_quality_XL
 			resolution = 720
 			download_list.append(title + '#' + url)
 			
 
-		Log('url ' + title + ': ' + url); 
+		Log('title: ' + title); Log('url: ' + url); 
 		if url:
 			if url.find('.m3u8') >= 9:
 				del link_path[i]			# 1. master.m3u8 entfernen, oben bereits abgehandelt
@@ -1301,10 +1307,13 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 					summary=summary, tagline=title, meta=path, thumb=thumb, duration=duration, rtmp_live='nein', 
 					resolution=''))					
 			else:
-				summary = Format			# 3. mp4-Links, Podcasts mp3-Links
+				summary = Format			# 3. Podcasts mp3-Links, mp4-Links
 				if ID == 'PODCAST':
 					oc.add(CreateTrackObject(url=url, title=title, summary=summary, fmt='mp3', thumb=thumb))	
 				else:
+					# 26.01.2017: nun auch ARD mit https - aber: bei den mp4-Videos liefern die Server auch
+					#	mit http, während bei m3u8-Url https durch http ersetzt werden MUSS. 
+					url = url.replace('https', 'http')	
 					oc.add(CreateVideoClipObject(url=url, title=title, 
 						summary=summary, meta=path, thumb=thumb, tagline='', duration=duration, resolution=''))
 	Log(download_list)
@@ -1851,7 +1860,7 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Textseite .mp4- und rtmp-Links 
 		for i in range(len(s)):
 			s1 =  s[i]
 			s2 = ''
-			Log(s1)
+			Log(s1)						# Bsp.: 1,"_server":"","_cdn":"akamai","_stream":"http://avdlswr-..
 				
 			if s1.find('rtmp://') >= 0: # rtmp-Stream 
 				Log('s1: ' + s1)
@@ -1860,20 +1869,20 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Textseite .mp4- und rtmp-Links 
 				s2 = t1 + t2	# beide rtmp-Teile verbinden
 				#Log(s2)				# nur bei Bedarf
 			
-			if s1.find('http://') >= 0: # http: master.m3u8 + mp4
+			if 'http' in s1: 			# http / https: master.m3u8 + mp4
 				if s1.find('master.m3u8') >= 0 :
 					#s2 = teilstring(s1, 'http://','master.m3u8' )	# als Endung nicht sicher, auch vorkommend:
 					s2 = stringextract('stream\":\"','\"', s1)		# 	../master.m3u8?__b__=200
 					m3u8_master = s2
 					Log(s2); Log(s1)				# nur bei Bedarf
 				elif s1.find('.mp4')  >= 0:
-					s2 = teilstring(s1, 'http://','.mp4' )
+					s2 = teilstring(s1, 'http', '.mp4' )
 					#Log(s2)
 				elif s1.find('master.m3u8') == -1 and s1.find('.mp4') == -1: # Video-Urls ohne Extension
 					#s2 = stringextract('_stream\":\"', '\"}]}]', s1) 
 					s2 = stringextract('_stream\":\"', '\"}]', s1) 
-					#Log(s2)				# nur bei Bedarf
-					
+					#Log(s2)					# nur bei Bedarf
+				
 			#Log(s2); Log(len(s2))				# nur bei Bedarf
 			
 			if len(s2) > 9:						# schon url gefunden? Dann Markierung ermitteln
@@ -2050,6 +2059,8 @@ def img_urlScheme(text, dim, ID):
 		img_src = img_src + str(dim)					# dim getestet: 160,265,320,640
 		if ID == 'PODCAST':								# Format Quadrat klappt nur bei PODCAST,
 			img_src = img_src.replace('16x9', '16x16')	# Sender liefert Ersatz, falls n.v.
+		if '?mandant=ard' in text:						# Anhang bei manchen Bildern
+			img_src =img_src + '?mandant=ard' 
 		Log('img_urlScheme: ' + img_src)
 		img_alt = img_alt.decode(encoding="utf-8", errors="ignore")	 # kommt vor:  utf8-decode-error bate 0xc3
 		Log('img_urlScheme: ' + img_alt[0:40])
@@ -2504,7 +2515,8 @@ def CreateVideoClipObject(url, title, summary, tagline, meta, thumb, duration, r
 	videoclip_obj = VideoClipObject(
 		key = Callback(CreateVideoClipObject, url=url, title=title, summary=summary, tagline=tagline,
 		meta=meta, thumb=thumb, duration=duration, resolution=resolution, include_container=True),
-		rating_key = url,
+		# rating_key = url,				# eindeutiger rating_key als url bei ARD-Videos nicht gewährleistet 
+		rating_key = title,
 		title = title,
 		summary = summary,
 		tagline = tagline,
