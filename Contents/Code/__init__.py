@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.0'		
-VDATE = '26.06.2017'
+VERSION =  '3.1.1'		
+VDATE = '01.07.2017'
 
 # 
 #	
@@ -2807,19 +2807,20 @@ def PlayAudio(url, location=None, includeBandwidths=None, autoAdjustQuality=None
 	if url is None or url == '':		# sollte hier nicht vorkommen
 		Log('Url fehlt!')
 		return ObjectContainer(header='Error', message='Url fehlt!') # Web-Player: keine Meldung
-		
-	req = urllib2.Request(url)						# Test auf Existenz, SSLContext für HTTPS erforderlich,
-	gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  	#	Bsp.: SWR3 https://pdodswr-a.akamaihd.net/swr3
-	ret = urllib2.urlopen(req, context=gcontext)
 	
-	Log('PlayAudio: ' + str(ret.code))
-	if ret.code != 200:
-		error_txt = 'Server meldet: ' + str(ret.code)
+	try:
+		req = urllib2.Request(url)						# Test auf Existenz, SSLContext für HTTPS erforderlich,
+		gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)  	#	Bsp.: SWR3 https://pdodswr-a.akamaihd.net/swr3
+		ret = urllib2.urlopen(req, context=gcontext)
+		Log('PlayAudio: ' + str(ret.code))
+	except Exception as exception:	
+		error_txt = 'Server meldet: ' + str(exception)
 		error_txt = error_txt + '\r\n' + url			 			 	 
 		msgH = 'Error'; msg = error_txt
 		msg =  msg.decode(encoding="utf-8", errors="ignore")
 		Log(msg)
-		return ObjectContainer(header=msgH, message=msg)
+		return ObjectContainer(header=msgH, message=msg) # Framework fängt ab - keine Ausgabe
+			
 	return Redirect(url)
 		
 ####################################################################################################
@@ -2831,6 +2832,7 @@ def PlayAudio(url, location=None, includeBandwidths=None, autoAdjustQuality=None
 # def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 #	query = urllib2.quote(query, "utf-8")
+	query = query.strip()
 	query = query.replace(' ', '+')		# Leer-Trennung bei ZDF-Suche mit +
 	Log('ZDF_Search'); Log(query); Log(pagenr); Log(s_type)
 
@@ -3394,12 +3396,19 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 	# key = 'page_GZVS'											# entf., in get_formitaeten nicht mehr benötigt
 	# Dict[key] = page	
 	docId = stringextract("docId: \'", "\'", page)				# Bereich window.zdfsite
-	formitaeten = get_formitaeten(sid=docId)					# Video-URL's ermitteln
+	formitaeten, duration = get_formitaeten(sid=docId)			# Video-URL's ermitteln
 	# Log(formitaeten)
 	if formitaeten == '':										# Nachprüfung auf Videos
-		msg = 'Videoquellen zur Zeit nicht erreichbar'  + ' Seite:\r' + url
+		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
+		msg = msg.decode(encoding="utf-8", errors="ignore")		
 		return ObjectContainer(header='Error', message=msg)
-		
+				
+	if tagline:
+		if 'min' in tagline == False:	# schon enthalten (aus ZDF_get_content)?
+			tagline = tagline + " | " + duration
+	else:
+		tagline = duration
+
 	only_list = ["h264_aac_ts_http_m3u8_http"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,
 		thumb=thumb, only_list=only_list)		  
@@ -3424,12 +3433,19 @@ def ZDFotherSources(title, tagline, thumb, docId):
 	oc = ObjectContainer(title2=title, view_group="InfoList")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 		
-	formitaeten = get_formitaeten(sid=docId)				# Video-URL's ermitteln
+	formitaeten, duration = get_formitaeten(sid=docId)		# Video-URL's ermitteln
 	# Log(formitaeten)
 	if formitaeten == '':									# Nachprüfung auf Videos
-		msg = 'Videoquellen zur Zeit nicht erreichbar'  + ' Seite:\r' + url
+		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
+		msg = msg.decode(encoding="utf-8", errors="ignore")		
 		return ObjectContainer(header='Error', message=msg)
 	
+	if tagline:
+		if 'min' in tagline == False:	# schon enthalten (aus ZDF_get_content)?
+			tagline = tagline + " | " + duration
+	else:
+		tagline = duration
+
 	only_list = ["h264_aac_mp4_http_na_na", "vp8_vorbis_webm_http_na_na", "vp8_vorbis_webm_http_na_na"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title_org, formitaeten=formitaeten, tagline=tagline,
 		thumb=thumb, only_list=only_list)		  
@@ -3456,7 +3472,7 @@ def get_formitaeten(sid, ID=''):
 	profile_url = 'https://api.zdf.de/content/documents/%s.json?profile=player'	% sid
 	Log(profile_url)
 	if sid == '':														# Nachprüfung auf Videos
-		return ''
+		return '',''
 	
 	# apiToken (Api-Auth) : bei Änderungen des  in configuration.json neu ermitteln (für NEO: HAR-Analyse mittels chrome)
 	# Api-Auth + Host reichen manchmal, aber nicht immer! 
@@ -3484,7 +3500,7 @@ def get_formitaeten(sid, ID=''):
 	videodat = stringextract('"uurl": "', '"', request_part)	# Bsp.: 161118_clip_5_hsh
 	if videodat == '':												# fehlt manchmal, dann auch kein Video verfügbar
 		Log('videodat: nicht in request_part enthalten')
-		return ''
+		return '',''
 	
 	# videodat_url = 'https://api.zdf.de/tmd/2/%s/vod/ptmd/mediathek/' % (ptmd_player) 	# ptmd_player injiziert - (noch) nicht benötigt, s.o.
 	videodat_url = 'https://api.zdf.de/tmd/2/portal/vod/ptmd/mediathek/'  
@@ -3493,14 +3509,26 @@ def get_formitaeten(sid, ID=''):
 
 	# ab 28.05.2017: Verwendung JSON.ObjectFromURL - Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich
 	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei
-	request = JSON.ObjectFromURL(videodat_url, headers=headers)				
-	request = json.dumps(request, sort_keys=True, indent=2, separators=(',', ': '))  # sortierte Ausgabe
-	request = str(request)				# json=dict erlaubt keine Stringsuche, json.dumps klappt hier nicht
-	page = request.decode('utf-8', 'ignore')
+	try:
+		request = JSON.ObjectFromURL(videodat_url, headers=headers)				
+		request = json.dumps(request, sort_keys=True, indent=2, separators=(',', ': '))  # sortierte Ausgabe
+		request = str(request)				# json=dict erlaubt keine Stringsuche, json.dumps klappt hier nicht
+		page = request.decode('utf-8', 'ignore')
+	except:
+		page = ""
 
-	if page == '':
+	if page == '':	# Alternative ngplayer_2_3 versuchen
+		try:
+			request = JSON.ObjectFromURL(old_videodat_url, headers=headers)				
+			request = json.dumps(request, sort_keys=True, indent=2, separators=(',', ': '))  # sortierte Ausgabe
+			request = str(request)				# json=dict erlaubt keine Stringsuche, json.dumps klappt hier nicht
+			page = request.decode('utf-8', 'ignore')
+		except:
+			page = ""
+		
 		Log('videodat_url: Laden fehlgeschlagen')
-		return ''
+		return '', ''
+		
 	Log(page[:20])	# "{..attributes" ...
 		
 	'''
@@ -3520,9 +3548,16 @@ def get_formitaeten(sid, ID=''):
 	#	dto. Eintrag des Servers zdfvodnone-vh.akamaihd.net in der hosts-Datei.
 	#	Abhilfe: https -> http beim m3u8-Link in show_formitaeten - klappt bei allen angebotenen Formaten
 	#	
+	duration = stringextract('duration',  'fsk', page)	# Angabe im Kopf, sec/1000
+	duration = stringextract('"value":',  '}', duration).strip()
+	Log(duration)	
+	if duration:
+		duration = (int(duration) / 1000) / 60			# Rundung auf volle Minuten reicht hier 
+		duration = str(duration) + " min"	
+	Log('duration: ' + duration)		
 	formitaeten = blockextract('formitaeten', page)		# Video-URL's ermitteln
 
-	return formitaeten
+	return formitaeten, duration
 
 #-------------------------
 # 	Ausgabe der Videoformate
@@ -3531,7 +3566,7 @@ def show_formitaeten(oc, title_call, formitaeten, tagline, thumb, only_list):
 	Log('show_formitaeten')
 	Log(only_list)
 	# Log(formitaeten)		# bei Bedarf
-
+	
 	i = 0 	# Titel-Zähler für mehrere Objekte mit dem selben Titel (manche Clients verwerfen solche)
 	download_list = []		# 2-teilige Liste für Download: 'summary # url'	
 	for rec in formitaeten:									# Datensätze gesamt

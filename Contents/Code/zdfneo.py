@@ -62,8 +62,7 @@ def neo_content(path, ID, offset=0):
 			datetime = stringextract('datetime="">', '</time>', rec)# datetime="">07.09.2016</time>
 		else:
 			datetime = stringextract('datetime="', '</time>', rec)		# ="2017-05-18 18:10">18.05.2017</time>
-			datetime = datetime[11:]									# 1. Datum abschneiden
-			datetime = datetime.replace('">', ', ')
+			datetime = datetime[18:]									# 1. Datum + (falsche) Uhrzeit abschneiden
 		Log('neuer Satz:')
 		Log(url);Log(img);Log(title);Log(dataplayer);Log(sid);Log(datetime);
 		title = title.decode(encoding="utf-8", errors="ignore")
@@ -90,11 +89,18 @@ def GetNeoVideoSources(url, sid, title, summary, tagline, thumb):
 	oc = ObjectContainer(title2='Videoformate', view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 
-	formitaeten = get_formitaeten(sid=sid, ID='NEO')		# Video-URL's ermitteln
+	formitaeten, duration = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
 	if formitaeten == '':									# Nachprüfung auf Videos
-		msg = 'Videoquellen zur Zeit nicht erreichbar'  + ' Seite:\r' + url
+		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
+		msg = msg.decode(encoding="utf-8", errors="ignore")		
 		return ObjectContainer(header='Error', message=msg)
 			
+	if tagline:
+		if 'min' in tagline == False:	# schon enthalten?
+			tagline = tagline + " | " + duration
+	else:
+		tagline = duration
+
 	only_list = ["h264_aac_ts_http_m3u8_http"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,
 		thumb=thumb, only_list=only_list)		  
@@ -119,10 +125,17 @@ def NEOotherSources(title, tagline, thumb, sid):
 	oc = ObjectContainer(title2='Videoformate', view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 	
-	formitaeten = get_formitaeten(sid=sid, ID='NEO')		# Video-URL's ermitteln
+	formitaeten, duration = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
 	if formitaeten == '':										# Nachprüfung auf Videos
-		msg = 'Video leider nicht mehr vorhanden'  + ' Seite:\r' + url
+		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
+		msg = msg.decode(encoding="utf-8", errors="ignore")		
 		return ObjectContainer(header='Error', message=msg)
+	
+	if tagline:
+		if 'min' in tagline == False:	# schon enthalten?
+			tagline = tagline + " | " + duration
+	else:
+		tagline = duration
 	
 	only_list = ["h264_aac_mp4_http_na_na", "vp8_vorbis_webm_http_na_na", "vp8_vorbis_webm_http_na_na"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,

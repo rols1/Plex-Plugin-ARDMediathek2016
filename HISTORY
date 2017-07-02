@@ -1,604 +1,615 @@
 CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
+	
+	
+01.07.2017 3.1.1	Funktion get_formitaeten (ZDF): Ladefehler abgefangen (videodat_url) + 2. Alternative
+	   		für videodat_url (ngplayer_2_3).
+			Funktion get_formitaeten (ZDF): Ermittlung der Sendungsdauer hinzugefügt - entspr.
+	   		Anpassungen (tagline) in GetZDFVideoSources, ZDFotherSources, zdfneo/GetNeoVideoSources, 
+	   		zdfneo/NEOotherSources. 
+	   		Podcast / PlayAudio: Fehlerbehandlung für Logausgabe verbessert (Exception as exception).
+	   		Funktion zdfneo/neo_content: falsche Uhrzeitangabe (immer 18:15) entfernt. 	
 		
 26.06.2017 3.1.0	ARD - Funktion SingleSendung: Ersatz von https durch http in m3u8- und mp4-Dateien
-					(wie schon beim ZDF, https bei ARD erstmals am 26.6.2017 beoachtet).
-					ARD - Funktion SingleSendung: Qualität "auto" für .mp4-Dateien berücksichtigt
-					(führte zu 2 fehlerhaften Zeichen vor der Url).	
-					ARD - Funktion img_urlScheme: neue Endung '?mandant=ard' bei Bedarf hinzugefügt.
-					Funktion CreateVideoClipObject: Austausch title gegen url für rating_key (eindeutiger 
-					rating_key als url bei ARD-Videos nicht gewährleistet).
+			(wie schon beim ZDF, https bei ARD erstmals am 26.6.2017 beoachtet).
+			ARD - Funktion SingleSendung: Qualität "auto" für .mp4-Dateien berücksichtigt
+			(führte zu 2 fehlerhaften Zeichen vor der Url).	
+			ARD - Funktion img_urlScheme: neue Endung '?mandant=ard' bei Bedarf hinzugefügt.
+			Funktion CreateVideoClipObject: Austausch title gegen url für rating_key (eindeutiger 
+			rating_key als url bei ARD-Videos nicht gewährleistet).
 	
 08.06.2017 3.0.9	Downloadbereich: wget als Alternative für curl implementiert. Anlass: curl-Problem auf
-					Debian-System. Betroffen: Icon Dir-curl.png/Dir-curl-wget.png, Funktionen: 
-					DownloadExtern, DownloadsTools, DirectoryNavigator. 
-					Funktion SingleSendung: Korrektur Home-Button für ID=PODCAST.
+			Debian-System. Betroffen: Icon Dir-curl.png/Dir-curl-wget.png, Funktionen: 
+			DownloadExtern, DownloadsTools, DirectoryNavigator. 
+			Funktion SingleSendung: Korrektur Home-Button für ID=PODCAST.
 	
 04.06.2017 3.0.8	PodFavoriten(Pod_Content): Korrekturen in Scheme_ARD (Seiten ohne Seitenkontrolle) und
-					Scheme_rbb (Umlaute-Behandlung, mp3-Pfad-Ermittlung).
-					PodFavoriten(Pod_Content): verlässlichere Ermittlung der Seitennummern bei Mehrfachseiten.	
-					PodFavoriten (podcast-favorits.txt): hr-iNFO Cybercrime hinzugfügt, Seiten thematisch geordnet.
+			Scheme_rbb (Umlaute-Behandlung, mp3-Pfad-Ermittlung).
+			PodFavoriten(Pod_Content): verlässlichere Ermittlung der Seitennummern bei Mehrfachseiten.	
+			PodFavoriten (podcast-favorits.txt): hr-iNFO Cybercrime hinzugfügt, Seiten thematisch geordnet.
 	
 02.06.2017 3.0.7	ARD-Bereich / Verpasst Woche: einzelne Senderwahl ermöglicht (wie Originalseite) + fehlenden
-					Tag ergänzt (zeigte nur 6 Tage).	
+			Tag ergänzt (zeigte nur 6 Tage).	
 	
 30.05.2017 3.0.6	Funktion get_formitaeten (ZDF): Laden der videodat_url umbestellt auf JSON.ObjectFromURL,
-  					Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich, Nutzung einer Zertifikatsdatei
-  					entfällt.
-  					Funktion show_formitaeten: Anpassung der Stringfunktionen an das geänderte Textformat durch
-  					JSON.ObjectFromURL in formitaeten			
+			Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich, Nutzung einer Zertifikatsdatei
+			entfällt.
+			Funktion show_formitaeten: Anpassung der Stringfunktionen an das geänderte Textformat durch
+			JSON.ObjectFromURL in formitaeten			
 	
 27.05.2017 3.0.5	PodFavoriten(Pod_Content): Korrektur in Scheme_ARD (Fehler bei Ermittlung mp3-Url).
-					PodFavoriten(Pod_Content): Sätze ohne Url überspringen + Sammeldownloads
-					abschalten bei Mehrfachseiten.
-					kleinere Korrekturen in Beschriftungen (title,summary, tagline.)
+			PodFavoriten(Pod_Content): Sätze ohne Url überspringen + Sammeldownloads
+			abschalten bei Mehrfachseiten.
+			kleinere Korrekturen in Beschriftungen (title,summary, tagline.)
 	
 26.05.2017 3.0.4	Funktion img_urlScheme (ARD-Bereich): Basispfad für Icons nur noch dort ergänzt,
-					wo er fehlt (führte vorher manchmal zu doppeltem Basispfad im Icon).  
-					Funktion SinglePage: fehlendes Icon für Podcasts ergänzt. 
+			wo er fehlt (führte vorher manchmal zu doppeltem Basispfad im Icon).  
+			Funktion SinglePage: fehlendes Icon für Podcasts ergänzt. 
 	
 25.05.2017 3.0.3	Integration der "NeoMagazin Royale"-Videos auf https://www.neo-magazin-royale.de/zdi/ -
-					erreichbar über Buchstabe N in AZ-Funktion + Integration in die Ladekette im ZDF-Bereich
-					(show_formitaeten) + Integration in die Downloadfunktionen.
-					Renovierung Funktionen GetZDFVideoSources + ZDFotherSources: Auslagerung der kritischen
-  					Ladekette in die gemeinsame Funktion get_formitaeten.
-  					Radio-Live: Anpassung livesenderRadio.xml an Positionswechsel Sender WDR 5 kiraka.
-  					Radio-Live: Anpassung livesenderRadio.xml an geänderte Schreibweisen der 
-  					MDR-Sender MDR SCHLAGERWELT und MDR SACHSEN.	
+			erreichbar über Buchstabe N in AZ-Funktion + Integration in die Ladekette im ZDF-Bereich
+			(show_formitaeten) + Integration in die Downloadfunktionen.
+			Renovierung Funktionen GetZDFVideoSources + ZDFotherSources: Auslagerung der kritischen
+			Ladekette in die gemeinsame Funktion get_formitaeten.
+			Radio-Live: Anpassung livesenderRadio.xml an Positionswechsel Sender WDR 5 kiraka.
+			Radio-Live: Anpassung livesenderRadio.xml an geänderte Schreibweisen der 
+			MDR-Sender MDR SCHLAGERWELT und MDR SACHSEN.	
 15.05.2017 3.0.2	Funktion ZDFotherSources: Workaround mit Zertifikat ca-bundle.pem von profile_url
-					auf videodat_url verlegt (gleiche Position wie in GetZDFVideoSources) - an dieser
-					Stelle notwendig für bestimmte Linux-Clients, z.b. OpenMediaVault (Debian-basiert).		
+			auf videodat_url verlegt (gleiche Position wie in GetZDFVideoSources) - an dieser
+			Stelle notwendig für bestimmte Linux-Clients, z.b. OpenMediaVault (Debian-basiert).		
 		
 09.05.2017 3.0.1	Pluginstart: Option zum Anzeigen neuer Updates hinzugefügt.
-					Radio-Live: Anpassung für umbenannte Sender in livesenderRadio.xml, einschl. neue
-					Sender-Logos. Betroffene Sender MDR Sachsen, MDR Sachsen-Anhalt, Deutschlandfunk,
-					Deutschlandfunk Nova.
+			Radio-Live: Anpassung für umbenannte Sender in livesenderRadio.xml, einschl. neue
+			Sender-Logos. Betroffene Sender MDR Sachsen, MDR Sachsen-Anhalt, Deutschlandfunk,
+			Deutschlandfunk Nova.
 			
 03.05.2017 3.0.0	Funktion Pod_content/Scheme_ARD: Index-Fehler für subtitle abgefangen.
-					Funktion Update_ARD_Path: Test auf Erreichbarkeit BASE_URL hinzugefügt, Positionsfehler
-					bei Ermittlung des temporären Pfades beseitigt.
-					Funktion GetZDFVideoSources: Abfangen nicht mehr vorhandener Seiten, Videolänge in
-					tagline hinzugefügt.		
+			Funktion Update_ARD_Path: Test auf Erreichbarkeit BASE_URL hinzugefügt, Positionsfehler
+			bei Ermittlung des temporären Pfades beseitigt.
+			Funktion GetZDFVideoSources: Abfangen nicht mehr vorhandener Seiten, Videolänge in
+			tagline hinzugefügt.		
 			
 01.05.2017 2.9.9	Funktion ZDFotherSources: falsche Variablenbezeichnung korrigiert (page -> request) -
-					führte dazu, dass unter Windows keine weiteren Videoformate geladen werden konnten.
-					Downloads: Berücksichtigung von .webm-Videos (ZDF) in den Funktionen DownloadExtern,
-					DownloadsTools, DownloadsList,und VideoTools.
-					Downloads: Test auf vorhandene Textdatei in DownloadsDelete, DownloadsMove.
+			führte dazu, dass unter Windows keine weiteren Videoformate geladen werden konnten.
+			Downloads: Berücksichtigung von .webm-Videos (ZDF) in den Funktionen DownloadExtern,
+			DownloadsTools, DownloadsList,und VideoTools.
+			Downloads: Test auf vorhandene Textdatei in DownloadsDelete, DownloadsMove.
 					
-30.04.2017 2.9.8	Podcasts: Anpassung für Plex Home Theater - Verzicht auf Home-Button (wie bei Radio-Live)						
+30.04.2017 2.9.8	Podcasts: Anpassung für Plex Home Theater - Verzicht auf Home-Button (wie bei Radio-Live)				
 					
 29.04.2017 2.9.7	DownloadsTools: Anpassung an fehlende Textbeschreibungen bei Sammeldownloads 
-					(Abspielen lokaler Dateien nicht möglich, Kürzung Dateinamen in Buttons)
-					Ressources/icon-bild-fehlt.png: Anpassung an Breitformat
+			(Abspielen lokaler Dateien nicht möglich, Kürzung Dateinamen in Buttons)
+			Ressources/icon-bild-fehlt.png: Anpassung an Breitformat
 
 25.04.2017 2.9.6	PODCAST-Favoriten: Indexfehler in Seitenkontrolle abgestellt (Rekursion
-					ab Seite 10)
+			ab Seite 10)
 
 23.04.2017 2.9.5	Funktion ZDFotherSources: urllib2.urlopen unterschiedlich wie im Update vom 17.04.2017
 
 22.04.2017 2.9.4	PODCAST: Sammeldownload ermöglicht (alle angezeigten Podcasts), beteiligte Funktionen
-					angepasst
-					PODCAST: Option "Dateinamen aus dem Titel erzeugen (statt Download_{Datum}_{Uhrzeit})"
-					PODCAST-Favoriten: Indexfehler für Seiten von www.ardmediathek.de/radio abgestellt
+			angepasst
+			PODCAST: Option "Dateinamen aus dem Titel erzeugen (statt Download_{Datum}_{Uhrzeit})"
+			PODCAST-Favoriten: Indexfehler für Seiten von www.ardmediathek.de/radio abgestellt
 
 18.04.2017 2.9.3	PODCAST: Integration der Favoriten in die Download-Funktion
 
 17.04.2017 2.9.2	Funktion GetZDFVideoSources: unterschiedliche urllib2.urlopen für linux2- und andere
-					System-Plattformen, Verwendung System-SSL-Certifikat bei Linux-Systemen (spez. für
-					OpenMediaVault)
+			System-Plattformen, Verwendung System-SSL-Certifikat bei Linux-Systemen (spez. für
+			OpenMediaVault)
 
 16.04.2017 2.9.1	PODCAST: Ergänzung der Favoriten-Funktion um die Podcasts von www.ardmediathek.de/radio
-					und Auswertungs-Schemata für RBB, WDR, NDR mit Beispielen in podcast-favorits.txt
+			und Auswertungs-Schemata für RBB, WDR, NDR mit Beispielen in podcast-favorits.txt
 
 14.04.2017 2.9.0	PODCAST: Erweiterung um Favoriten für Podcast-Seiten der einzelnen ARD-Radio-Sender, 
-					Basis Textliste (erweiterbar) 	
+			Basis Textliste (erweiterbar) 	
 
 08.04.2017 2.8.9	Funktion CreateTrackObject: Zufallswert für rating_key, utf-8-encoding für title + summary
-					PODCAST: Fehler beim Löschen des Downloads abgestellt				
+			PODCAST: Fehler beim Löschen des Downloads abgestellt				
 
 07.04.2017 2.8.8	PODCAST-Erweiterung, einschl. Downloads
-					Funktion Search (ARD- und neuer Podcastbereich): UND-Verknüpfung bei mehrteiligen
-					Suchbegriffen, urllib2.quote-Behandlung für Umlaute
-					Funktion PlayAudio: Test auf Existenz der Url eingefügt (genauer: Returncode 200)
-					Debugging: sys.platform eingefügt in Main() und CreateVideoStreamObject()
+			Funktion Search (ARD- und neuer Podcastbereich): UND-Verknüpfung bei mehrteiligen
+			Suchbegriffen, urllib2.quote-Behandlung für Umlaute
+			Funktion PlayAudio: Test auf Existenz der Url eingefügt (genauer: Returncode 200)
+			Debugging: sys.platform eingefügt in Main() und CreateVideoStreamObject()
 
 30.03.2017 2.8.7	Funktion Parseplaylist: unterschiedliche Behandlung von http- und https-Url's. Das
-					Laden der m3u8-Datei mittels ssl.SSLContext führt auf manchen Systemen zu Problemen
-					bei http-Url's (github:dkappe issue #1)
-					Funktion test_downloads: Abfangen, falls Downloadverzeichnis unbelegt
-					Ordner Ressources: Grafiken > 300 KByte behandelt (überflüssige Farben entfernt)
+			Laden der m3u8-Datei mittels ssl.SSLContext führt auf manchen Systemen zu Problemen
+			bei http-Url's (github:dkappe issue #1)
+			Funktion test_downloads: Abfangen, falls Downloadverzeichnis unbelegt
+			Ordner Ressources: Grafiken > 300 KByte behandelt (überflüssige Farben entfernt)
 
 26.03.2017 2.8.6	Funktionen CreateTrackObject, PlayAudio: kwargs-Parameter hinzugefügt (verhindert Plugin-Crash
-					bei unbekannten Extra-Parametern)
+			bei unbekannten Extra-Parametern)
 			
 19.03.2017 2.8.5	EPG-Modul: erweitert zum Blättern (12 Tage gesamt)
-					Bereinigung Kommentare (div. Stellen): Korrekturen, Einrückungen usw. 	
+			Bereinigung Kommentare (div. Stellen): Korrekturen, Einrückungen usw. 	
 
 16.03.2017 2.8.4	Funktion CreateTrackObject: Parameter wie in PlayAudio ergänzt (für ältere Android-Clients)	
 
 15.03.2017 2.8.3	Funktion PlayAudio: von Android-Clients vermisste Parameter ergänzt (location=None, 
-					includeBandwidths=None, autoAdjustQuality=None, hasMDE=None)	
+			includeBandwidths=None, autoAdjustQuality=None, hasMDE=None)	
 
 11.03.2017 2.8.2	EPG-Modul: Daten von tvtoday.de, EPG-Anzeige 05 - 05 Uhr für die TV-Livesender, Kennzeichnung der
-					laufenden Sendung + Sprung zum Live-Streaming. Alten Code für die einzelnen EPG-Abfragen bei den 
-					Webseiten der Sender entfernt
-					TV-Livesender / Funktion Parseplaylist: Parameter für tagline in den Auflösungsstufen belegt
-					(für PHT erforderlich)
-					TV-Livesender ARTE: bisherigen Spezialcode entfernt. Artes neuere m3u8-Links enthalten nun
-					keine relativen Links mehr. Den jetzt erforderlichen SSL-Handshake in Parseplaylist
-					eingefügt
-					Resources/livesenderTV.xml: Anpassung an EPG-Modul (u.a. Parameter <EPG_ID>)
-					Funktionen CreateVideoClipObject + CreateVideoStreamObject hintereinander gestellt 
-					(Codepflege: übersichtlicher) 
-					Funktion NeuInMediathek: Blocklänge korrigiert (Kontext war zu weit gefasst) + in ZDF_get_content
-					letzten Block entfernt (hier störender Verweis auf "Sendung verpasst")
-					ARD-Suche: Anpassung für mehrteilige Suchbegriffe und Sortierung nach Datum
-					Funktion MakeDetailText: 'Qualität' auf 'Qualitaet' geändert (Umlaut verfälscht Formatierung %s)
+			laufenden Sendung + Sprung zum Live-Streaming. Alten Code für die einzelnen EPG-Abfragen bei den 
+			Webseiten der Sender entfernt
+			TV-Livesender / Funktion Parseplaylist: Parameter für tagline in den Auflösungsstufen belegt
+			(für PHT erforderlich)
+			TV-Livesender ARTE: bisherigen Spezialcode entfernt. Artes neuere m3u8-Links enthalten nun
+			keine relativen Links mehr. Den jetzt erforderlichen SSL-Handshake in Parseplaylist
+			eingefügt
+			Resources/livesenderTV.xml: Anpassung an EPG-Modul (u.a. Parameter <EPG_ID>)
+			Funktionen CreateVideoClipObject + CreateVideoStreamObject hintereinander gestellt 
+			(Codepflege: übersichtlicher) 
+			Funktion NeuInMediathek: Blocklänge korrigiert (Kontext war zu weit gefasst) + in ZDF_get_content
+			letzten Block entfernt (hier störender Verweis auf "Sendung verpasst")
+			ARD-Suche: Anpassung für mehrteilige Suchbegriffe und Sortierung nach Datum
+			Funktion MakeDetailText: 'Qualität' auf 'Qualitaet' geändert (Umlaut verfälscht Formatierung %s)
 
 29.02.2017 2.8.1	Radio-Livestreams: Icon für neuen MDR-Sender "MDR Schlagerwelt" erstellt. Datei livesenderRadio.xml
-					angepasst (Icons, geänderte Sendernamen in MDR, SR + SWF)
-					Codebereinigung Funktion CreateVideoClipObject: Strukturierung des MediaObject's
-					an die Struktur in CreateVideoStreamObject
-					Zusätzliche Home-Buttons für die Ebenen ARD und ZDF
+			angepasst (Icons, geänderte Sendernamen in MDR, SR + SWF)
+			Codebereinigung Funktion CreateVideoClipObject: Strukturierung des MediaObject's
+			an die Struktur in CreateVideoStreamObject
+			Zusätzliche Home-Buttons für die Ebenen ARD und ZDF
 
 25.02.2017 2.8.0	ZDF-Bereich: zusätzliches Menü "Neu in der Mediathek" (-> Funktion NeuInMediathek)
 
 22.02.2017 2.7.9	TV-Livesender: Spezialbehandlung für N24 - Test auf Verfügbarkeit der Lastserver (1-4),
-					neben N24-Livestream zusätzlich N24-News aufgenommen			
-					Funktion PlayVideo: "HTTP.Request(url).content" entfernt (überflüssig)
+			neben N24-Livestream zusätzlich N24-News aufgenommen			
+			Funktion PlayVideo: "HTTP.Request(url).content" entfernt (überflüssig)
 
 20.02.2017 2.7.8	ZDFMediathek nach HTTP Error 403: Umstellung der JSON-Requests in GetZDFVideoSources 
-					und ZDFotherSources auf urllib2.Request mit SSL-Handshake. Der Header-Parameter 'Api-Auth'
-					bleibt 'hardcoded', da bisher unverändert - dynamische Ermittlung im Code vorgesehen, aber
-					auskommentiert (Performancegründe). Stringoperationen bei den vorherigen JSON-Extrakten
-					angepasst
-					Funktion VerpasstWoche (Bereich ZDF Mediathek): Home-Button angepasst für ZDF Mediathek - führte
-					vorher zum Hauptmenü ARD-Bereich zurück
+			und ZDFotherSources auf urllib2.Request mit SSL-Handshake. Der Header-Parameter 'Api-Auth'
+			bleibt 'hardcoded', da bisher unverändert - dynamische Ermittlung im Code vorgesehen, aber
+			auskommentiert (Performancegründe). Stringoperationen bei den vorherigen JSON-Extrakten
+			angepasst
+			Funktion VerpasstWoche (Bereich ZDF Mediathek): Home-Button angepasst für ZDF Mediathek - führte
+			vorher zum Hauptmenü ARD-Bereich zurück
 10.02.2017 2.7.7	livesenderRadio.xml: defekten Link für N24 ausgetauscht. Hinweis: Ziffer 4 in index_4_av-p.m3u8
-					liefert höchste Auflösung, 3=mittlere, 2=kleine
-					Funktion SenderLiveListe: tagline ergänzt, falls EPG abgewählt
+			liefert höchste Auflösung, 3=mittlere, 2=kleine
+			Funktion SenderLiveListe: tagline ergänzt, falls EPG abgewählt
 
 30.01.2017 2.7.6	TV-Live-Sender N24: Link aktualisiert. Funktioniert nur noch mit autom. Anpassung/Auflösung,
-					Einzelauflösungen nicht darstellbar	
+			Einzelauflösungen nicht darstellbar	
 
 26.01.2017 2.7.5	Funktion DownloadsTools: Verschieben unterdrückt, falls Verschiebeverz. nicht belegt		
-					MIT-Lizenz am 17.01.2017 hinzugefügt
-					ARD-Bereich: Videos der Rubrik "must see" sichtbar gemacht (fehlenden Subtitel durch
-					Bildbeschreibung ersetzt)	
+			MIT-Lizenz am 17.01.2017 hinzugefügt
+			ARD-Bereich: Videos der Rubrik "must see" sichtbar gemacht (fehlenden Subtitel durch
+			Bildbeschreibung ersetzt)	
 
 11.01.2017 2.7.4	DirectoryNavigator komplett überarbeitet (überflüssigen Code entfernt, Fehler beseitigt)
-					Rücksprung-Buttons im Download-Bereich nach Löschen/Verschieben, einschl. Fehler
-					Home-Button im Download-Bereich: Rückkehr zum Hauptmenü (vorher Menü ARD)
-					RadioAnstalten: unescape Subtitel (enthielt manchmal das Zeichen " html-quotiert)
+			Rücksprung-Buttons im Download-Bereich nach Löschen/Verschieben, einschl. Fehler
+			Home-Button im Download-Bereich: Rückkehr zum Hauptmenü (vorher Menü ARD)
+			RadioAnstalten: unescape Subtitel (enthielt manchmal das Zeichen " html-quotiert)
 
 05.01.2017 2.7.3	Radio-Livestreams: Icon für neuen WDR-Sender Cosmo erstellt, Abfangen nicht vorh. Icons	
 
 01.01.2017 2.7.2	Funktion DownloadsTools: Anbieten aller verfügbaren Qualitäten zum Download (ARD+ZDF) 
-					Funktion DownloadsTools: Titel vereinheitlicht für Verschieben + Löschen,
-					abgefangen: leeres Downloadverz. löschen
-					Funktion parseLinks_Mp4_Rtmp: Berücksichtigung von m3u8-Url's, die hinter der
-					Dateiextension noch weitere Zeichen enthalten(Bsp.: master.m3u8?__b__=200)
-					Funktion SearchUpdate: HTML-Zeichen in tagline entfernt
+			Funktion DownloadsTools: Titel vereinheitlicht für Verschieben + Löschen,
+			abgefangen: leeres Downloadverz. löschen
+			Funktion parseLinks_Mp4_Rtmp: Berücksichtigung von m3u8-Url's, die hinter der
+			Dateiextension noch weitere Zeichen enthalten(Bsp.: master.m3u8?__b__=200)
+			Funktion SearchUpdate: HTML-Zeichen in tagline entfernt
 
 31.12.2016 2.7.1	DirectoryNavigator: Verzeichnis-Separator korrigiert (plattformunabhängig),
-					fehlerhafte Verzeichnispfade vor dem Auslesen abgefangen
-					Downloadoption: Verschieben aller Dateien ins Verschiebe-Verzeichnis
-					Downloadoption: Tools zum Bearbeiten der Videos getrennt von den Einstellungen:
-					Menü DownloadsDir umbenannt-> DownloadsTools, neues Menü DownloadsList listet die
-					Videos zum Bearbeiten in neuer Funktion VideoTools
-					Downloadoption: Vorbelegung für DirectoryNavigator mit den voreingestellten
-					Pfaden für Curl-Pfad und Downloadverzeichnis-Pfad
-					Funktion DownloadsDir: data.strip() für /library/sections - unter Windows fehlt
-					sonst alles nach erstem Linefeed
+			fehlerhafte Verzeichnispfade vor dem Auslesen abgefangen
+			Downloadoption: Verschieben aller Dateien ins Verschiebe-Verzeichnis
+			Downloadoption: Tools zum Bearbeiten der Videos getrennt von den Einstellungen:
+			Menü DownloadsDir umbenannt-> DownloadsTools, neues Menü DownloadsList listet die
+			Videos zum Bearbeiten in neuer Funktion VideoTools
+			Downloadoption: Vorbelegung für DirectoryNavigator mit den voreingestellten
+			Pfaden für Curl-Pfad und Downloadverzeichnis-Pfad
+			Funktion DownloadsDir: data.strip() für /library/sections - unter Windows fehlt
+			sonst alles nach erstem Linefeed
 
 30.12.2016 2.7.0	Funktion SingleSendung: Variable download_url leer vorbelegt (erforderlich bei
-					nicht für den Download geeigneten Videos)
-					Funktion DirectoryNavigator: Drive-Ermittlung bei Windows-Systemen, wenn Pfad=leer
+			nicht für den Download geeigneten Videos)
+			Funktion DirectoryNavigator: Drive-Ermittlung bei Windows-Systemen, wenn Pfad=leer
 
 30.12.2016 2.6.9	Funktion DownloadsDelete: fehlerhafte Variable ausgestauscht (url/dlpath)
 
 29.12.2016 2.6.8	Downloadoption auf ZDF-Bereich erweitert
-					Zusätzl. Modul Directory (Blättern in Verzeichnissen)
-					Menü Bearbeiten (Videos): Ansehen, Löschen, Verschieben
-					Menü Downloadverzeichnis: Pfade Curl-PRG + Downloadverz., Downloadverz. leeren,
-					Videos bearbeiten
-					Downloadfunktion: Code für internen Download wieder entfernt (Timeout-Problem
-					nicht abstellbar)
+			Zusätzl. Modul Directory (Blättern in Verzeichnissen)
+			Menü Bearbeiten (Videos): Ansehen, Löschen, Verschieben
+			Menü Downloadverzeichnis: Pfade Curl-PRG + Downloadverz., Downloadverz. leeren,
+			Videos bearbeiten
+			Downloadfunktion: Code für internen Download wieder entfernt (Timeout-Problem
+			nicht abstellbar)
 
 22.12.2016 2.6.7	Nicht auf Github - Downloadfunktion: Info- und Fehlermeldungen optisch verbessert
 			Downloadfunktion: Option Download mittels Curl in externes Verzeichnis
 
 20.12.2016 2.6.6	Downloadfunktion: zusätzliche Textdatei mit Details zum Video (Ablage Downloadverz. im Plugin),
-					Verlegung des HTTP-Requests in die Download-Funktion (vorher in get_page)
+			Verlegung des HTTP-Requests in die Download-Funktion (vorher in get_page)
 
 19.12.2016 2.6.5	Downloadfunktion: Fehler in Dateinamen abgestellt (unter Windows kein : erlaubt)
 
 18.12.2016 2.6.4	Downloadfunktion: Fehler in Pfadbehandlung beim Speichern abgestellt
 
 18.12.2016 2.6.3	Downloadfunktion (zunächst nur ARD-Bereich, nur mp4-Videos): Einstellungen (ein/aus), Button 
-					in der Liste der Videoformate, Ablage im Pluginverzeichnis (../Contents/Downloads). Aus der
-					Liste wird die höchste verfügbare Qualität verwendet
-					RadioAnstalten: Umstellung von xpath auf blockextract (fehlte noch in v2.6.1)
-					Neue Funktion get_page: Fehlermeldung bei Connect-Problemen	
+			in der Liste der Videoformate, Ablage im Pluginverzeichnis (../Contents/Downloads). Aus der
+			Liste wird die höchste verfügbare Qualität verwendet
+			RadioAnstalten: Umstellung von xpath auf blockextract (fehlte noch in v2.6.1)
+			Neue Funktion get_page: Fehlermeldung bei Connect-Problemen	
 
 12.12.2016 2.6.2	TV-Live-Sender: Ersatz für insolventen Sender Joiz: ServusTV
-					ARD-Menü 'Meist Gesehen' hinzugefügt
-					ARD-Menü 'neueste Videos' hinzugefügt
-					ARD-Menü 'am besten bewertet' hinzugefügt
-					Funktion ARDThemenRubrikenSerien in ARDMore integriert
-					ARD-Bereich: Aktualsierung der Zugriffspfade beim Pluginstart - neue Funktion 
-					Update_ARD_Path- die ARD ändert offensichtlich ab und zu die in den Pfaden enthaltene 
-					documentId, z.B. für ARD_FilmeAll oder ARD_DokusAll
-					Menüs Themen / Serien vertauscht (ARD-Reihenfolge)
-					Funktion cleanhtml: HTML-Tags werden nun durch Leerzeichen ersetzt statt durch Leerstring - 
-					das verhindert Wortverklebungen 
+			ARD-Menü 'Meist Gesehen' hinzugefügt
+			ARD-Menü 'neueste Videos' hinzugefügt
+			ARD-Menü 'am besten bewertet' hinzugefügt
+			Funktion ARDThemenRubrikenSerien in ARDMore integriert
+			ARD-Bereich: Aktualsierung der Zugriffspfade beim Pluginstart - neue Funktion 
+			Update_ARD_Path- die ARD ändert offensichtlich ab und zu die in den Pfaden enthaltene 
+			documentId, z.B. für ARD_FilmeAll oder ARD_DokusAll
+			Menüs Themen / Serien vertauscht (ARD-Reihenfolge)
+			Funktion cleanhtml: HTML-Tags werden nun durch Leerzeichen ersetzt statt durch Leerstring - 
+			das verhindert Wortverklebungen 
 
 10.12.2016 2.6.1	Umstellung von xpath auf blockextract - beim Webdesign der ARD sind Stringfunktionen
-					pflegeleichter
-					Funktion PageControl: Escapesequenzen im Pfad gefiltert - Folgeseiten von Suchergebnissen
-					führten zur ersten Seite. 
-					Umfangreiche Logausgaben auskommentiert / begrenzt in Funktionen: parseLinks_Mp4_Rtmp,
-					PageControl, SingleSendung
-					Funktion SinglePage: Ausschnittbildung für relevante Inhalte (Steuerung: 'mode=...')
-					Funktionen Search, ARDThemenRubrikenSerien, ARDMore: Test auf Störungsseite der ARD 
-					Menü Einslike entfernt (Sendeformat von ARD eingestellt)
-					Funktion img_urlScheme: Korrekturen, Ermittlung der Bildbeschreibung, Berücksichtigung
-					zweier Orte für die Markierung 'urlScheme'.
-					Funktion transl_umlaute: fehlendes 'ö' ergänzt.
-					Funktion VerpasstWoche: iDate / iWeekday gedreht (besser lesbar)
+			pflegeleichter
+			Funktion PageControl: Escapesequenzen im Pfad gefiltert - Folgeseiten von Suchergebnissen
+			führten zur ersten Seite. 
+			Umfangreiche Logausgaben auskommentiert / begrenzt in Funktionen: parseLinks_Mp4_Rtmp,
+			PageControl, SingleSendung
+			Funktion SinglePage: Ausschnittbildung für relevante Inhalte (Steuerung: 'mode=...')
+			Funktionen Search, ARDThemenRubrikenSerien, ARDMore: Test auf Störungsseite der ARD 
+			Menü Einslike entfernt (Sendeformat von ARD eingestellt)
+			Funktion img_urlScheme: Korrekturen, Ermittlung der Bildbeschreibung, Berücksichtigung
+			zweier Orte für die Markierung 'urlScheme'.
+			Funktion transl_umlaute: fehlendes 'ö' ergänzt.
+			Funktion VerpasstWoche: iDate / iWeekday gedreht (besser lesbar)
 
 24.11.2016 2.6.0	ZDF_get_content: weitere Filterung nicht verwertbarer Seiten (Bsp. Liveticker), Erkennung
-					von Bildgalerien in Folgeseiten, eindeutige Kennzeichnung von Video-Beiträgen, Korrekturen 
-					in Titel- und Beschreibungstexten
-					livesenderRadio.xml: Escapezeichen in Senderlinks entfernt (waren problemlos, aber unnötig)
+			von Bildgalerien in Folgeseiten, eindeutige Kennzeichnung von Video-Beiträgen, Korrekturen 
+			in Titel- und Beschreibungstexten
+			livesenderRadio.xml: Escapezeichen in Senderlinks entfernt (waren problemlos, aber unnötig)
 
 23.11.2016 2.5.9	Anpassung Homebutton für ARD + ZDF (2 Ebenen)  
-					ZDF_get_content: zwei Anwesenheitsmerkmale für Videos gefunden + integriert.
-					Hilfsroutine cleanhtml für Beschreibungstexte (insbes. im ZDF-Bereich): löscht HTML-Tags
-					unter Verzicht weiterer Bibliotheken wie z.B. BeautifulSoup.
-					Korrektur get_airing (Stellenzahl airing_date) - Datumstag war falsch
+			ZDF_get_content: zwei Anwesenheitsmerkmale für Videos gefunden + integriert.
+			Hilfsroutine cleanhtml für Beschreibungstexte (insbes. im ZDF-Bereich): löscht HTML-Tags
+			unter Verzicht weiterer Bibliotheken wie z.B. BeautifulSoup.
+			Korrektur get_airing (Stellenzahl airing_date) - Datumstag war falsch
 
 22.11.2016 2.5.8	Livesender TV ntv: alte Serveradresse nicht mehr erreichbar. Austausch des Direktlinks 
-					zu p.live.fra.n-tv.de gegen lokale m3u8-Datei "liveTV_ntvlive-ipadakamai.m3u8" in
-					livesenderTV.xml 
-					ZDF_Bildgalerie: weitere Bildstrecke am Dokumentfuß integriert, z.B. ZDF-Korrespondenten
-					Vorauswertung in ZDF_get_content + GetZDFVideoSources.
+			zu p.live.fra.n-tv.de gegen lokale m3u8-Datei "liveTV_ntvlive-ipadakamai.m3u8" in
+			livesenderTV.xml 
+			ZDF_Bildgalerie: weitere Bildstrecke am Dokumentfuß integriert, z.B. ZDF-Korrespondenten
+			Vorauswertung in ZDF_get_content + GetZDFVideoSources.
 
 21.11.2016 2.5.7	Überarbeitung in Funktion GetZDFVideoSources (HTTP-Header, Formatierung der json-Ergebnisse,
-					Ermittlung einer alternativen Videoquelle).
-					ZDF_Bildgalerie: Integration von Bildstrecken, die nicht als Galerie deklariert sind.	
+			Ermittlung einer alternativen Videoquelle).
+			ZDF_Bildgalerie: Integration von Bildstrecken, die nicht als Galerie deklariert sind.	
 
 19.11.2016 2.5.6	Debugging Error_log PLEX_VIP_LOUNGE (Plex-Forum): in Funktion GetVideoSources die 
 					Ermittlung von apiToken wieder eingeschaltet - apiToken schien bisher immer identisch,
 					außerhalb Deutschlands aber möglicherweise nicht.
 
 18.11.2016 2.5.5	Start Barrierearme Angebote, zunächst ZDF-Bereich.
-					ZDF-Bereich: Ermittlung der Untertitel-Quellen, falls verfügbar, in 
-					Funktion GetZDFVideoSources - bisher ohne Verwendung in Plex (keine
-					Unterstützung von Subtitles bei Channels).
-					Barrierearme Angebote: Info-Videos - auskomentiert
-					Barrierearme Angebote: Hörfassungen 
-					Barrierearme Angebote: Untertitel - Startcode wieder auskommentiert, da in Plex noch 
-					keine Untertitel möglich. 
-					Zusätzliche Funktion: "Meist gesehen (1 Woche)" (ZDF-Bereich). 
-					Zusätzliches Menü: Bilderserien (direkte Suche nach Bildstrecken)
-					Debugging: Log(Client.Platform) in CreateVideoClipObject + CreateVideoStreamObject
-					Funktion ZDF_get_content: Austausch Titel/Tagline wenn Client = PHT
+			ZDF-Bereich: Ermittlung der Untertitel-Quellen, falls verfügbar, in 
+			Funktion GetZDFVideoSources - bisher ohne Verwendung in Plex (keine
+			Unterstützung von Subtitles bei Channels).
+			Barrierearme Angebote: Info-Videos - auskomentiert
+			Barrierearme Angebote: Hörfassungen 
+			Barrierearme Angebote: Untertitel - Startcode wieder auskommentiert, da in Plex noch 
+			keine Untertitel möglich. 
+			Zusätzliche Funktion: "Meist gesehen (1 Woche)" (ZDF-Bereich). 
+			Zusätzliches Menü: Bilderserien (direkte Suche nach Bildstrecken)
+			Debugging: Log(Client.Platform) in CreateVideoClipObject + CreateVideoStreamObject
+			Funktion ZDF_get_content: Austausch Titel/Tagline wenn Client = PHT
 
 13.11.2016 2.5.4	nicht auf Github
-					ZDF-Bereich: zusätzl. Funktion get_airing zur Ermittlung von Datum + Uhrzeit aus Strings vom 
-					Format "2016-11-12T21:45:00.000+01:00", Verwendung in tagline in CreateVideoStreamObject +
-					CreateVideoClipObject
-					CreateVideoStreamObject + CreateVideoClipObject: tagline hinzugefügt, um Datum + Uhrzeit aus 
-					airing anzuzeigen.
-					ARD-Bereich: in Funktion get_sendungen replace in Variable subtitel (| für HTML-Tag br)
+			ZDF-Bereich: zusätzl. Funktion get_airing zur Ermittlung von Datum + Uhrzeit aus Strings vom 
+			Format "2016-11-12T21:45:00.000+01:00", Verwendung in tagline in CreateVideoStreamObject +
+			CreateVideoClipObject
+			CreateVideoStreamObject + CreateVideoClipObject: tagline hinzugefügt, um Datum + Uhrzeit aus 
+			airing anzuzeigen.
+			ARD-Bereich: in Funktion get_sendungen replace in Variable subtitel (| für HTML-Tag br)
 
 08.11.2016 2.5.3	ZDF-Bereich: crossdomain-Error für m3u8-Streaming abgestellt (Umstellung des
-					Server-Request auf http statt wie vom ZDF vorgegeben https) 
-					Radio-Livestreams: für neuen Sender "NDR Plus" neues Logo im Verzeichnis Ressources hinzugefügt, 
-					Datei livesenderRadio.xml angepasst.
+			Server-Request auf http statt wie vom ZDF vorgegeben https) 
+			Radio-Livestreams: für neuen Sender "NDR Plus" neues Logo im Verzeichnis Ressources hinzugefügt, 
+			Datei livesenderRadio.xml angepasst.
 
 07.11.2016 2.5.2	ZDF-Bereich: Unterstützung für mehrteilige Suchbegriffe.
-					ZDF-Bereich: Unterstützung von Bildgalerien
-					ZDF-Bereich: Auswahl kleiner Senderlogos (240x270) zur Verminderung der Netzwerklast. Weitere 
-					Fehlerbereinigung in ZDF_get_content
-					ZDF_Search: Überflüssige Abfrage auf leere Inhalte gelöscht (erfolgt nun in ZDF_get_content)
-					Fehlerbereinigung in ZDF_Bildgalerie (mögliche Begrenzer für Textstrings erweitert)
+			ZDF-Bereich: Unterstützung von Bildgalerien
+			ZDF-Bereich: Auswahl kleiner Senderlogos (240x270) zur Verminderung der Netzwerklast. Weitere 
+			Fehlerbereinigung in ZDF_get_content
+			ZDF_Search: Überflüssige Abfrage auf leere Inhalte gelöscht (erfolgt nun in ZDF_get_content)
+			Fehlerbereinigung in ZDF_Bildgalerie (mögliche Begrenzer für Textstrings erweitert)
 
 04.11.2016 2.5.1	ZDF-Bereich: Fehlerbereinigung in ZDF_get_content + Integration von ZDF_get_contentRubriken.
 
 03.11.2016 2.5.0	EPG-Daten: neue Funktion get_epg_ZDF für Live-TV-Sender ZDF, ZDFinfo, ZDFneo
-					Cachebeschränkung aufgehoben + dadurch EPG-Daten beschleunigt
-					Test-Vorbelegung für heute-show (Titel + Bild) in GetZDFVideoSources wieder entfernt	
+			Cachebeschränkung aufgehoben + dadurch EPG-Daten beschleunigt
+			Test-Vorbelegung für heute-show (Titel + Bild) in GetZDFVideoSources wieder entfernt	
 
 02.11.2016 2.4.9	Fertigstellung neue Funktionen ZDF_Verpasst, ZDFSendungenAZ, SendungenAZList, ZDF_Sendungen, 
-					Rubriken, RubrikSingle, ZDF_get_contentRubriken
+			Rubriken, RubrikSingle, ZDF_get_contentRubriken
 
 31.10.2016 2.4.8	nicht auf Github
-					Fertigstellung neue Funktionen ZDF_Search, ZDF_get_content, GetZDFVideoSources.
+			Fertigstellung neue Funktionen ZDF_Search, ZDF_get_content, GetZDFVideoSources.
 
 30.10.2016 2.4.7	nicht auf Github
-					Aufdecken der Videoquellen (Chrome-Tools) + diverse Tests der verfügbaren Formate. 
-					Neue Funktion GetZDFVideoSources.
+			Aufdecken der Videoquellen (Chrome-Tools) + diverse Tests der verfügbaren Formate. 
+			Neue Funktion GetZDFVideoSources.
 	
 29.10.2016 2.4.6	nicht auf Github
-					ZDF-Funktionen: Erfassung neue Struktur + Konzept für Codierung. Neue Funktionsrümpfe.
+			ZDF-Funktionen: Erfassung neue Struktur + Konzept für Codierung. Neue Funktionsrümpfe.
 
 28.10.2016 2.4.5	Hauptmenü: Hinweis auf Ausfall aller ZDF-Funktionen (nach aktuellem Relaunch
-					des ZDF-Mediathek-Internetangebots)
+			des ZDF-Mediathek-Internetangebots)
 
 03.10.2016 2.4.4	TV-Livestreams (Live-Sender Überregional): Ersatz des eingestellten Senders ZDFkultur durch den
-					ARD-Sender ONE (löst bei der ARD EinsFestival ab).
-					Hinweis auf eingestellten Sender EinsLike im Menü Main_ARD + Rücksprung zum Menü in Funktion EinsLike.
+			ARD-Sender ONE (löst bei der ARD EinsFestival ab).
+			Hinweis auf eingestellten Sender EinsLike im Menü Main_ARD + Rücksprung zum Menü in Funktion EinsLike.
 			
-01.10.2016 2.4.3 EPG-Daten ARD-Sender: Umstellung auf neue Quelle http://programm.ard.de/TV/ARD-Mediathek/Programmkalender/.
-					Anpassungen der Datensätze in livesenderTV.xml (Feld epg_url). Anpassungen in Funktion SenderLiveListe
-					und get_epg_ARD. Wegfall der Funktionen get_epg_KIKA und get_epg_Phoenix.
-					Funktion get_epg_ARD undget_epg_ZDF: bis-Zeit hinzugefügt (Anfangszeit Folgesendung).
-					Hinweis auf eingestellten Sender ZDFkultur in livesenderTV.xml (Verbleib im Plugin bis auf Weiteres). 
+01.10.2016 2.4.3 	EPG-Daten ARD-Sender: Umstellung auf neue Quelle http://programm.ard.de/TV/ARD-Mediathek/Programmkalender/.
+			Anpassungen der Datensätze in livesenderTV.xml (Feld epg_url). Anpassungen in Funktion SenderLiveListe
+			und get_epg_ARD. Wegfall der Funktionen get_epg_KIKA und get_epg_Phoenix.
+			Funktion get_epg_ARD undget_epg_ZDF: bis-Zeit hinzugefügt (Anfangszeit Folgesendung).
+			Hinweis auf eingestellten Sender ZDFkultur in livesenderTV.xml (Verbleib im Plugin bis auf Weiteres). 
 
-27.09.2016 2.4.2 TV-Livesender Arte: nach Änderungen der Player-Datei (Datensatz-ID's und Sender-URL's) Anpassungen in
-					der Funktion Arteplaylist. Die rtmp-URL's entfallen; es verbleiben zwei (neue) HLS-URL's 
-					deutsch/französisch.
-					Funktion get_epg_DW: Filterung deutscher Inhalte vor Auswertung der Uhrzeiten, um Überschneidungen
-					zu vermeiden.
+27.09.2016 2.4.2 	TV-Livesender Arte: nach Änderungen der Player-Datei (Datensatz-ID's und Sender-URL's) Anpassungen in
+			der Funktion Arteplaylist. Die rtmp-URL's entfallen; es verbleiben zwei (neue) HLS-URL's 
+			deutsch/französisch.
+			Funktion get_epg_DW: Filterung deutscher Inhalte vor Auswertung der Uhrzeiten, um Überschneidungen
+			zu vermeiden.
 
-27.09.2016 2.4.1 Update		EPG-Daten von Deutscher Welle: Datensatz Deutsche Welle in livesenderTV.xmlgeändert 
-					(Sender-URL und EPG-URL). Sender-URL zeigte vorher auf spanische Inhalte. 
-					Funktion get_epg_DW: für den Zeitvergleich wird nun "time local" ausgewertet statt 
-					wie vorher "time" (UTC-Zeit, 2 Std. zurück).
-					Neue Hilfsroutine blockextract - Verwendung, falls (wie bei den EPG-Daten hier)
-					xpath nicht funktioniert 
+27.09.2016 2.4.1 		EPG-Daten von Deutscher Welle: Datensatz Deutsche Welle in livesenderTV.xmlgeändert 
+			(Sender-URL und EPG-URL). Sender-URL zeigte vorher auf spanische Inhalte. 
+			Funktion get_epg_DW: für den Zeitvergleich wird nun "time local" ausgewertet statt 
+			wie vorher "time" (UTC-Zeit, 2 Std. zurück).
+			Neue Hilfsroutine blockextract - Verwendung, falls (wie bei den EPG-Daten hier)
+			xpath nicht funktioniert 
 				
-25.09.2016 2.4.0 Update		EPG-Daten von Deutscher Welle geändert / Absturz TV-Live-Sender: 
-					Fehler bis zur Bereinigung  abgefangen 
-07.09.2016 2.3.9 Update		Fehlende Suchfunktion für ZDF Mediathek nachgerüstet.
-					Suchfunktion für ZDF Mediathek: Fehleroutine bereinigt + verbessert (Rücksprung zum Menü ZDF)
-					ZDF Mediathek: THUMBNAIL-Liste um aktuell verwendete Formate erweitert.
-					ZDF Mediathek (Funktion Sendungen): Anpassungen im Code für Verarbeitung von Suchergebnissen,
-					fehleranfällige THUMBNAIL-Ermittlung korrigiert
-05.08.2016 2.3.8 Update		weitere Anapssung an OpenPHT: Vorbelegung summary und Codec in AudioStreamObjekt für
-					rtmp-Streams
-28.07.2016 2.3.7 Update		livesenderTV.xml (Resources): .m3u8-Link für N24 erneuert (alter Link produzierte
-					Endlosschleife)
-06.07.2016 2.3.6 Update		Funktion RadioAnstalten: Einfügen Homebutton, falls Client ungleich 
-					"Plex Home Theater" - Steuerung über Client.Platform 
+25.09.2016 2.4.0 	EPG-Daten von Deutscher Welle geändert / Absturz TV-Live-Sender: 
+			Fehler bis zur Bereinigung  abgefangen 
+07.09.2016 2.3.9 	Fehlende Suchfunktion für ZDF Mediathek nachgerüstet.
+			Suchfunktion für ZDF Mediathek: Fehleroutine bereinigt + verbessert (Rücksprung zum Menü ZDF)
+			ZDF Mediathek: THUMBNAIL-Liste um aktuell verwendete Formate erweitert.
+			ZDF Mediathek (Funktion Sendungen): Anpassungen im Code für Verarbeitung von Suchergebnissen,
+			fehleranfällige THUMBNAIL-Ermittlung korrigiert
+05.08.2016 2.3.8 	weitere Anapssung an OpenPHT: Vorbelegung summary und Codec in AudioStreamObjekt für
+			rtmp-Streams
+28.07.2016 2.3.7 	livesenderTV.xml (Resources): .m3u8-Link für N24 erneuert (alter Link produzierte
+			Endlosschleife)
+06.07.2016 2.3.6 	Funktion RadioAnstalten: Einfügen Homebutton, falls Client ungleich 
+			"Plex Home Theater" - Steuerung über Client.Platform 
 
-05.07.2016 2.3.5 Update		Radio-Live-Streams in PHT verwendbar gemacht: div. Anpassungen in den
-				Funktionen RadioAnstalten + CreateTrackObject
+05.07.2016 2.3.5 	Radio-Live-Streams in PHT verwendbar gemacht: div. Anpassungen in den
+			Funktionen RadioAnstalten + CreateTrackObject
   
-04.07.2016 2.3.4 Korrek. 	weitere Anpassung an PHT: cbkey in Funktionen SendungenAZ + Einslike vorbelegt
-					(Error 'Had trouble breaking cbKey')
-					Funktion SinglePage: unescape für summary wegen HTML-Zeichen in Beschreibung
-					Test-Button ARD-Rubriken (doppelt vorhanden, führte zum Abbruch) wieder entfernt 
+04.07.2016 2.3.4 . 	weitere Anpassung an PHT: cbkey in Funktionen SendungenAZ + Einslike vorbelegt
+			(Error 'Had trouble breaking cbKey')
+			Funktion SinglePage: unescape für summary wegen HTML-Zeichen in Beschreibung
+			Test-Button ARD-Rubriken (doppelt vorhanden, führte zum Abbruch) wieder entfernt 
 				
-03.07.2016 2.3.3 Update/Korrek. Anpassung an den Player Plex Home Theater (PHT) - getestet mit PHT 1.4.1
-					und OpenPHT 1.6.2: 
-					Funktionen CreateVideoStreamObject und CreateVideoClipObject:
-					Parameter resolution und meta vorbelegt für MediaObject/PartObject
-					Funktion Main_Options (Einstellungen): Beschreibung in Bool-Button ergänzt 
+03.07.2016 2.3.3  Anpassung an den Player Plex Home Theater (PHT) - getestet mit PHT 1.4.1
+			und OpenPHT 1.6.2: 
+			Funktionen CreateVideoStreamObject und CreateVideoClipObject:
+			Parameter resolution und meta vorbelegt für MediaObject/PartObject
+			Funktion Main_Options (Einstellungen): Beschreibung in Bool-Button ergänzt 
 
-29.06.2016 2.3.2 Update/Korrek.	Einstellungsoptionen integriert (Funktion Main_Options + Hilfsfunktionen): 
-					- EPG-Daten für Live-TV-Sender verwenden / Umsetzung in SenderLiveListe
-					- TV-Livestreams: alle verfügbaren Bandbreiten anzeigen, nur die erste anzeigen
-					EGP-Daten: get_epg_ZDF - leere Listenelemente bereinigt
-					EPG-Daten (epg_text): Log-Ausgabe erfolgt jetzt utf8-kodiert (sonst UnicodeDecodeError
-					möglich)
-					SinglePage: störendes | bei leerer dachzeile entfernt
-					Log: Client.Platform eingefügt, um Clientspezifische Fehler zu erkennen 	
+29.06.2016 2.3.2	Einstellungsoptionen integriert (Funktion Main_Options + Hilfsfunktionen): 
+			- EPG-Daten für Live-TV-Sender verwenden / Umsetzung in SenderLiveListe
+			- TV-Livestreams: alle verfügbaren Bandbreiten anzeigen, nur die erste anzeigen
+			EGP-Daten: get_epg_ZDF - leere Listenelemente bereinigt
+			EPG-Daten (epg_text): Log-Ausgabe erfolgt jetzt utf8-kodiert (sonst UnicodeDecodeError
+			möglich)
+			SinglePage: störendes | bei leerer dachzeile entfernt
+			Log: Client.Platform eingefügt, um Clientspezifische Fehler zu erkennen 	
 
-21.06.2016 2.3.1 Update		Home-Button (Rücksprung zum Hauptmenü) in den allen Programm-Ebenen, außer 
-					Videoclip-, Videostream- und Audiostreamobjekt.
-					EPG-Daten für Kika hinzugefügt (Funktion: get_epg_KiKA)
-					EPG-Daten für Phoenix hinzugefügt (Funktion: get_epg_Phoenix)
-					EPG-Daten für Deutsche Welle hinzugefügt (Funktion: get_epg_DW)
-					EPG-Daten für ZDF umgestellt auf Zeitvergleich - bisheriges Suchmuster 'Jetzt'
-					fehlt manchmal bei laufenden Sendungen.  
+21.06.2016 2.3.1 	Home-Button (Rücksprung zum Hauptmenü) in den allen Programm-Ebenen, außer 
+			Videoclip-, Videostream- und Audiostreamobjekt.
+			EPG-Daten für Kika hinzugefügt (Funktion: get_epg_KiKA)
+			EPG-Daten für Phoenix hinzugefügt (Funktion: get_epg_Phoenix)
+			EPG-Daten für Deutsche Welle hinzugefügt (Funktion: get_epg_DW)
+			EPG-Daten für ZDF umgestellt auf Zeitvergleich - bisheriges Suchmuster 'Jetzt'
+			fehlt manchmal bei laufenden Sendungen.  
 
-17.06.2016 2.3.0 Update		nicht auf Github
-					livesenderRadio.xml: Einführung <sender> + <thumblist>
-					RadioLiveListe, RadioAnstalten: Umstellung auf lokale Icons (Fallback: Webquelle),
-					Ausgabe "Stream 1 (2) OK" entfernt (fortgesetzt im Log)
+17.06.2016 2.3.0 	nicht auf Github
+			livesenderRadio.xml: Einführung <sender> + <thumblist>
+			RadioLiveListe, RadioAnstalten: Umstellung auf lokale Icons (Fallback: Webquelle),
+			Ausgabe "Stream 1 (2) OK" entfernt (fortgesetzt im Log)
 	
-16.06.2016 2.2.9 Update		nicht auf Github
-					Icons: Renovierung des kompletten IconBestands durch wertige Icons von @Arauco
-					Struktur der Sender geändert (Vorschlag @Arauco) - dadurch erforderliche
-					Anpassungen / Änderungen:
-					livesender.xml: Einführung <epg_schema>  
-					SenderLiveListe + get_epg_ZDF: kompletter Umbau, listenweise Auswertung für
-					ZDF-Sender umgestellt auf Einzelauswertung (die neue Struktur enthält in
-					der Liste Überregional sowohl ARD- als auch ZDF-Sender)
+16.06.2016 2.2.9 	nicht auf Github
+			Icons: Renovierung des kompletten IconBestands durch wertige Icons von @Arauco
+			Struktur der Sender geändert (Vorschlag @Arauco) - dadurch erforderliche
+			Anpassungen / Änderungen:
+			livesender.xml: Einführung <epg_schema>  
+			SenderLiveListe + get_epg_ZDF: kompletter Umbau, listenweise Auswertung für
+			ZDF-Sender umgestellt auf Einzelauswertung (die neue Struktur enthält in
+			der Liste Überregional sowohl ARD- als auch ZDF-Sender)
 				
-15.06.2016 2.2.8 Update		nicht auf Github
-					Hauptmenü: Such-Icon eingefügt, Callback geändert (Main -> Main_ARD)
-					SenderLiveListePre: utf-8-encoding für Titel
+15.06.2016 2.2.8 	nicht auf Github
+			Hauptmenü: Such-Icon eingefügt, Callback geändert (Main -> Main_ARD)
+			SenderLiveListePre: utf-8-encoding für Titel
 								
-15.06.2016 2.2.7 Update		TV-Live-Streams ZDF: EPG-Daten hinzugefügt.
-					SenderLiveListe: utf-8-encoding für  summary + tagline (Umlaute, Sonderzeichen)
+15.06.2016 2.2.7 	TV-Live-Streams ZDF: EPG-Daten hinzugefügt.
+			SenderLiveListe: utf-8-encoding für  summary + tagline (Umlaute, Sonderzeichen)
 
-12.06.2016 2.2.6 Update		TV-Live-Streams ARD: EPG-Daten hinzugefügt - soweit auf den Webseiten der 
-					Livesender der ARD verfügbar - Ausgabe in den Container-Parametern 
-					summary + tagline.
-					Neue Funktion: get_epg. Neue Hilfsfunktionen: unescape, mystrip
-					Links zu den Quellen in Playlist livesenderTV.xml (Feld egp) ergänzt.
+12.06.2016 2.2.6 	TV-Live-Streams ARD: EPG-Daten hinzugefügt - soweit auf den Webseiten der 
+			Livesender der ARD verfügbar - Ausgabe in den Container-Parametern 
+			summary + tagline.
+			Neue Funktion: get_epg. Neue Hilfsfunktionen: unescape, mystrip
+			Links zu den Quellen in Playlist livesenderTV.xml (Feld egp) ergänzt.
 
-10.06.2016 2.2.5 Update		Radio-Live-Streams: Subtitel zu den einzelnen Sendern ergänzt
+10.06.2016 2.2.5 	Radio-Live-Streams: Subtitel zu den einzelnen Sendern ergänzt
 
-09.06.2016 2.2.4 Update		Radio-Live-Streams: Abfangroutine vom 8.6. mit Timeout versehen (toleranter bei
-					langsameren Antworten, wie z.B. RBB, SR und SWR)
-					CreateVideoStreamObject: resolution (bisher leer) belegt - ohne funktioniert
-					Livestream von DAF nicht mehr. 
+09.06.2016 2.2.4 	Radio-Live-Streams: Abfangroutine vom 8.6. mit Timeout versehen (toleranter bei
+			langsameren Antworten, wie z.B. RBB, SR und SWR)
+			CreateVideoStreamObject: resolution (bisher leer) belegt - ohne funktioniert
+			Livestream von DAF nicht mehr. 
 
-08.06.2016 2.2.3 Update		Radio-Live-Streams: Auswertung ev. weiterer verfügbarer Streams eines Senders. 
-					Abfangen nicht funktionierender Radio-Streams.
+08.06.2016 2.2.3 	Radio-Live-Streams: Auswertung ev. weiterer verfügbarer Streams eines Senders. 
+			Abfangen nicht funktionierender Radio-Streams.
 
-08.06.2016 2.2.2 Update		10 Logos für die Radio-Stationsübersicht neu erstellt (Skalierung 512x512).
-					SingleSendung: Abfangen bereits abgehandelter .m3u8-Dateien.
-					Live-TV-Sender: RTL 2 YOU - Livestream hinzugefügt. Da direkter Zugriff
-					auf die Streaming-URL nicht möglich, Verwendung einer lokalen m3u8-Datei
-					- Anpassungen (Code + Doku) in SenderLiveListe, SenderLiveResolution und
-					Parseplaylist.
+08.06.2016 2.2.2 	10 Logos für die Radio-Stationsübersicht neu erstellt (Skalierung 512x512).
+			SingleSendung: Abfangen bereits abgehandelter .m3u8-Dateien.
+			Live-TV-Sender: RTL 2 YOU - Livestream hinzugefügt. Da direkter Zugriff
+			auf die Streaming-URL nicht möglich, Verwendung einer lokalen m3u8-Datei
+			- Anpassungen (Code + Doku) in SenderLiveListe, SenderLiveResolution und
+			Parseplaylist.
 
-07.06.2016 2.2.1 Korrektur	RadioAnstalten: Berücksichtigung von .m3u-Links. Im Gegensatz zu den übrigen
-					Stream-Links führen diese zu weiterer Textdatei, die den eigentlichen 
-					Stream-Link enthält
+07.06.2016 2.2.1 	RadioAnstalten: Berücksichtigung von .m3u-Links. Im Gegensatz zu den übrigen
+			Stream-Links führen diese zu weiterer Textdatei, die den eigentlichen 
+			Stream-Link enthält
 
-06.06.2016 2.2.0 Update		Radio-Live-Stream-Funktionen hinzugefügt. Die lokale Datei livesenderRadio.xml
-					enthält die Stationsübersicht; die einzelnen Sender werden in Funktion 
-					RadioAnstalten ermittelt. Nach Auswahl einer Station wird in RadioLiveSender der
-					Audiostream-Link ermittelt und in CreateAudioStreamObject endverarbeitet.
+06.06.2016 2.2.0 	Radio-Live-Stream-Funktionen hinzugefügt. Die lokale Datei livesenderRadio.xml
+			enthält die Stationsübersicht; die einzelnen Sender werden in Funktion 
+			RadioAnstalten ermittelt. Nach Auswahl einer Station wird in RadioLiveSender der
+			Audiostream-Link ermittelt und in CreateAudioStreamObject endverarbeitet.
 
-05.06.2016 2.1.7 Korrektur	ARD Mediathek (SingleSendung): gemeinsame Auswertung für m3u8-, rtmp- und
-					mp4-Videoquellen in neuer Funktion parseLinks_Mp4_Rtmp
+05.06.2016 2.1.7 	ARD Mediathek (SingleSendung): gemeinsame Auswertung für m3u8-, rtmp- und
+			mp4-Videoquellen in neuer Funktion parseLinks_Mp4_Rtmp
 
-04.06.2016 2.1.6 Korrektur	ZDF Mediathek: Austausch xpath-Detail onlineairtime gegen airtime (onlineairtime
-					vermutlich Archivierungszeitpunkt, airtime = Sendezeitpunkt)
+04.06.2016 2.1.6 	ZDF Mediathek: Austausch xpath-Detail onlineairtime gegen airtime (onlineairtime
+			vermutlich Archivierungszeitpunkt, airtime = Sendezeitpunkt)
 
-03.06.2016 2.1.6 Korrektur	SingleSendung: Auslagerung m3u8- und rtmp-Auswertung (rtmp-Videos z.B. in 
-					"Alle Filme"). Code übersichtlicher geordnet  + neu kommentiert.
-					Provisorische Plakate ergänzt + überarbeitet.
-					Funktionstests (OK) in meiner Test- und Gebrauchsumgebung (siehe README).
-					Live-Sender Arte + 3Sat zur richtigen Anstalt ARD verlagert (Hinweis @Arauco)
+03.06.2016 2.1.6 	SingleSendung: Auslagerung m3u8- und rtmp-Auswertung (rtmp-Videos z.B. in 
+			"Alle Filme"). Code übersichtlicher geordnet  + neu kommentiert.
+			Provisorische Plakate ergänzt + überarbeitet.
+			Funktionstests (OK) in meiner Test- und Gebrauchsumgebung (siehe README).
+			Live-Sender Arte + 3Sat zur richtigen Anstalt ARD verlagert (Hinweis @Arauco)
 
-31.05.2016 2.1.5 Korrektur	SinglePage: Unterdrückung von Mehrfachverweisen auf Seiten mit Einzelsendungen.
+31.05.2016 2.1.5 	SinglePage: Unterdrückung von Mehrfachverweisen auf Seiten mit Einzelsendungen.
 
-31.05.2016 2.1.4 Update		ARD Mediathek: Filme + Dokus hinzugefügt (ausgewählte und alle)
+31.05.2016 2.1.4 	ARD Mediathek: Filme + Dokus hinzugefügt (ausgewählte und alle)
 
-30.05.2016 2.1.3 Update		ARD Mediathek: Serien hinzugefügt.  
-					Unterdrückung der Livesender in Themen + Rubriken (angebotene Links 
-					hier nicht geeignet)
+30.05.2016 2.1.3 	ARD Mediathek: Serien hinzugefügt.  
+			Unterdrückung der Livesender in Themen + Rubriken (angebotene Links 
+			hier nicht geeignet)
 
-29.05.2016 2.1.2 Update		ARD Mediathek: Rubriken + Themen hinzugefügt
+29.05.2016 2.1.2 	ARD Mediathek: Rubriken + Themen hinzugefügt
 
-27.05.2016 2.1.1 Update		ZDF Mediathek: provisorische Plakate für die Menüauswahl "Rubriken", "Themen"
-					und "MeistGesehen" erstellt.
-					Symbol icon-ok.png geändert (Kantenglättung, Größe, Farbe).
-					Menü Plugin-Update: Anzeige der Bezugsquelle. 
+27.05.2016 2.1.1 	ZDF Mediathek: provisorische Plakate für die Menüauswahl "Rubriken", "Themen"
+			und "MeistGesehen" erstellt.
+			Symbol icon-ok.png geändert (Kantenglättung, Größe, Farbe).
+			Menü Plugin-Update: Anzeige der Bezugsquelle. 
 
-26.05.2016 2.1.0 Update		ZDF Mediathek: Auswertung aller verfügbaren Videoangebote zu einer Sendung,
-					anwählbar am Ende der Liste der Auswahl Bandbreite / Auflösung. Je nach
-					Sendung ca. 5-8 verschiedene Videoformate, u.a. RTSP, Metafile-Video mit RTMP-Stream,
-					HbbTV (Hybrid broadcast broadband TV), H.264 Video - progressive,
-					H.264 Video - restriction_useragent, mov-Videos (Apples QuickTime),
-					webm-Videos (Container im HTML5-Standard).
-					Nicht umgesetzt: HDS + SMIL (Video-Url nicht ableitbar)
+26.05.2016 2.1.0 	ZDF Mediathek: Auswertung aller verfügbaren Videoangebote zu einer Sendung,
+			anwählbar am Ende der Liste der Auswahl Bandbreite / Auflösung. Je nach
+			Sendung ca. 5-8 verschiedene Videoformate, u.a. RTSP, Metafile-Video mit RTMP-Stream,
+			HbbTV (Hybrid broadcast broadband TV), H.264 Video - progressive,
+			H.264 Video - restriction_useragent, mov-Videos (Apples QuickTime),
+			webm-Videos (Container im HTML5-Standard).
+			Nicht umgesetzt: HDS + SMIL (Video-Url nicht ableitbar)
 
-25.05.2016 2.0.4 Update		gemeiname Nutzung Funktion CreateVideoClipObject + Hilfsroutinen
+25.05.2016 2.0.4 	gemeiname Nutzung Funktion CreateVideoClipObject + Hilfsroutinen
 
-24.05.2016 2.0.3 Update		gemeiname Nutzung Funktion CreateVideoStreamObject
+24.05.2016 2.0.3 	gemeiname Nutzung Funktion CreateVideoStreamObject
 
-24.05.2016 2.0.2 Update		Anpassung Menüs, Funktionspfade, gemeiname Nutzung Funktion VerpasstWoche
+24.05.2016 2.0.2 	Anpassung Menüs, Funktionspfade, gemeiname Nutzung Funktion VerpasstWoche
 
-23.05.2016 2.0.1 Update		Codeänderung ZDF Mediathek: Lauffähigkeit ohne URL-Service
+23.05.2016 2.0.1 	Codeänderung ZDF Mediathek: Lauffähigkeit ohne URL-Service
 
-22.05.2016 2.0.0 Update		Integration ZDF Mediathek
+22.05.2016 2.0.0 	Integration ZDF Mediathek
 
-16.05.2016 1.5.1 Update		Senderlogos überarbeitet von Arauco (Plex-Forum). Senderlogos wahlweise lokal
- 					oder als Url.
+16.05.2016 1.5.1 	Senderlogos überarbeitet von Arauco (Plex-Forum). Senderlogos wahlweise lokal
+ 			oder als Url.
 
-16.05.2016 1.5.0 Update		Update-Funktion hinzugefügt. Diverse Änderungen (siehe Github). Version auf
- 					1.5.0 angehoben.
+16.05.2016 1.5.0 	Update-Funktion hinzugefügt. Diverse Änderungen (siehe Github). Version auf
+ 			1.5.0 angehoben.
 
-10.05.2016 1.4.1 Korrektur	Codepflege in Funktion PageControl. Aktualisierung Doku im Kopfbereich 
-					(Live-Sender + Pfade).
+10.05.2016 1.4.1 	Codepflege in Funktion PageControl. Aktualisierung Doku im Kopfbereich 
+			(Live-Sender + Pfade).
 
-09.05.2016 1.4.0 Update		ARD-Mediathekbereich Einslike hinzugefügt.			
+09.05.2016 1.4.0 	ARD-Mediathekbereich Einslike hinzugefügt.			
 
-06.05.2016 1.3.2 Update		SendungenAZ: Behandlung inaktiver Buchstaben - Hinweis in Liste + Rücksprung 
-					zu SendungenAZ
+06.05.2016 1.3.2 	SendungenAZ: Behandlung inaktiver Buchstaben - Hinweis in Liste + Rücksprung 
+			zu SendungenAZ
 
-01.05.2016 1.3.1 Update		Live-Sender: Titelzeilen der Senderlisten ausführlicher, Sender Deutsche Welle
- 					hinzugefügt.  Posting im Plex-Forum/Channel
+01.05.2016 1.3.1 	Live-Sender: Titelzeilen der Senderlisten ausführlicher, Sender Deutsche Welle
+ 			hinzugefügt.  Posting im Plex-Forum/Channel
 
-30.04.2016 	 Update		Release hinzugefügt zur Downloadzählung. Verfahren bei Updates: Plugin zippen, 
-					als Release hochladen, anschl. aus git-Verzeichnis pushen wie bisher		
+30.04.2016 	 	Release hinzugefügt zur Downloadzählung. Verfahren bei Updates: Plugin zippen, 
+			als Release hochladen, anschl. aus git-Verzeichnis pushen wie bisher		
 
-30.04.2016	 Update		Live-Sender-Liste: Gliederung (ARD, ZDF, Sonstige), Update einiger Senderlogos
+30.04.2016	 	Live-Sender-Liste: Gliederung (ARD, ZDF, Sonstige), Update einiger Senderlogos
 
-27.04.2016 1.2.0 Update		Zusätzl. Streaming-Funktionen hinzugefügt, Live-Sender 
-					hinzugefügt			
+27.04.2016 1.2.0 	Zusätzl. Streaming-Funktionen hinzugefügt, Live-Sender 
+			hinzugefügt			
 
-05.04.2016	 ergänzt	Für Live-Sender 'autom. Auflösung und Bandbreite' ergänzt + 
-					verbesert.			
+05.04.2016	 	Für Live-Sender 'autom. Auflösung und Bandbreite' ergänzt + 
+			verbesert.			
 
-05.04.2016	 Korrektur   	Schleifenzähler in transl_wtag korrigiert.			
+05.04.2016	    	Schleifenzähler in transl_wtag korrigiert.			
 
-05.04.2016	 ergänzt   	Für Live-Sender: Senderlogos aktualisiert und integriert			
+05.04.2016	    	Für Live-Sender: Senderlogos aktualisiert und integriert			
 
-03.04.2016	 Korrektur	Funktion CreateVideoStreamObject: auf >ohne Redirekt< umgestellt (manche Player 
-					stiegen aus)
+03.04.2016	 	Funktion CreateVideoStreamObject: auf >ohne Redirekt< umgestellt (manche Player 
+			stiegen aus)
 
-02.04.2016 1.0.0 Init:		Neuanlage Plex-Plugin-ARDMediathek2016 / gelöscht: Plex-Plugin-ARDMediathek2015
-					Posting im Plex-Forum/Deutsch
+02.04.2016 1.0.0 	Neuanlage Plex-Plugin-ARDMediathek2016 / gelöscht: Plex-Plugin-ARDMediathek2015
+			Posting im Plex-Forum/Deutsch
 
-02.04.2016	 Korrektur	Zeile 11 in init.py mit der setlocale-Anweisung auskommentiert (crashte bei 
-					Otto Kerner)
+02.04.2016	 	Zeile 11 in init.py mit der setlocale-Anweisung auskommentiert (crashte bei 
+			Otto Kerner)
 
-08.03.2016	 ergänzt	Hinweis README: Das Plex-Plugin-ARDMediathek2015 ist leider nicht mehr nutzbar. 
-					Die ARD hat die Struktur der Webeiten verändert - das Plugin ist nicht mehr 
-					kompatibel. Eine neue Version ist - noch - nicht geplant, tut mir leid.
+####################### Wechsel von ARDMediathek2015 zu ARDMediathek2016 ##############################
 
-16.06.2015	 ergänzt	SinglePage: Uhrzeit der Sendung, falls vorhanden (Quelle: Rückwärtssuche in 
-					collapsible-sets) 
+08.03.2016	 	Hinweis README: Das Plex-Plugin-ARDMediathek2015 ist leider nicht mehr nutzbar. 
+			Die ARD hat die Struktur der Webeiten verändert - das Plugin ist nicht mehr 
+			kompatibel. Eine neue Version ist - noch - nicht geplant, tut mir leid.
 
-15.06.2015	 ergänzt	CreateVideoClipObject (duration): Fehlerbehandlung bei leerer Angabe der 
-					Videodauer
+16.06.2015	 	SinglePage: Uhrzeit der Sendung, falls vorhanden (Quelle: Rückwärtssuche in 
+			ollapsible-sets) 
 
-14.06.2015	 ergänzt	CreateVideoClipObject (duration): Videodauer in Millisekunden ergänzt - ohne 
-					klappte die zeitliche Positionierung im Video nicht korrekt. 			
+15.06.2015	 	CreateVideoClipObject (duration): Fehlerbehandlung bei leerer Angabe der 
+			Videodauer
 
-13.06.2015	 Korrektur	SingleSendung: Auswahl für Qualitätsstufen und Bandbreite/Auflösungen zusammen 
-					gelegt.	
+14.06.2015	 	CreateVideoClipObject (duration): Videodauer in Millisekunden ergänzt - ohne 
+			klappte die zeitliche Positionierung im Video nicht korrekt. 			
 
-13.06.2015	 Korrektur	Reihenfolge bei Qualitätsstufen umgedreht (jetzt Large, Medium, Small).
+13.06.2015	 	SingleSendung: Auswahl für Qualitätsstufen und Bandbreite/Auflösungen zusammen 
+			gelegt.	
 
-13.06.2015	 Korrektur	Playlist (falls vorhanden) an 1. Stelle der Auswahl, um die Voreinstellungen 
-					bei Plex-Apps optimal zu unterstützen	
+13.06.2015	 	Reihenfolge bei Qualitätsstufen umgedreht (jetzt Large, Medium, Small).
 
-02.06.2015	 Korrektur	SingleSendung: Test auf Qualitätsstufe 'S' geändert, da manchmal nur M, L 
-					angeboten wird.
+13.06.2015	 	Playlist (falls vorhanden) an 1. Stelle der Auswahl, um die Voreinstellungen 
+			bei Plex-Apps optimal zu unterstützen	
 
-01.06.2015	 ergänzt	Funktion Suche, Funktion Sendungen A-Z			
+02.06.2015	 	SingleSendung: Test auf Qualitätsstufe 'S' geändert, da manchmal nur M, L 
+			angeboten wird.
 
-26.05.2015	 ergänzt 	Parseplaylist: 2. Alternative für dies selbe Bandbreite/Auflösung verwendbar 
-					gemacht 	
+01.06.2015	 	Funktion Suche, Funktion Sendungen A-Z			
 
-25.05.2015	 Korrektur	LiveSender: Bandbreite <= 64000 verwerfen (kein Video, verm. nur Ton)
+26.05.2015	  	Parseplaylist: 2. Alternative für dies selbe Bandbreite/Auflösung verwendbar 
+			gemacht 	
 
-25.05.2015	 Korrektur	LiveSender: nicht verwendbare *.m3u8-Datei bei Arte - relative Pfade führen zur 
-					Rekursion. Kein Patch! abgefangen.			
+25.05.2015	 	LiveSender: Bandbreite <= 64000 verwerfen (kein Video, verm. nur Ton)
 
-25.05.2015	 Korrektur 	SendungVerpasst: Fehler bei nicht ladefähiger *.m3u8-Datei abgefangen.  Nicht 
-					vorhandene Qualitätsstufen abgefangen.			
+25.05.2015	 	LiveSender: nicht verwendbare *.m3u8-Datei bei Arte - relative Pfade führen zur 
+			Rekursion. Kein Patch! abgefangen.			
 
-24.05.2015	 ergänzt	SendungVerpasst: Auswertung *.m3u8-Datei falls vorhanden (umfangreicher + 
-					aussagekräftiger 
-					als die angebotenen Qualitätsstufen			
+25.05.2015	  	SendungVerpasst: Fehler bei nicht ladefähiger *.m3u8-Datei abgefangen.  Nicht 
+			vorhandene Qualitätsstufen abgefangen.			
 
-24.05.2015	 Korrektur	SendungVerpasst: Vertauschung S mit L in den Qualitätsstufen 
-					bereinigt			
+24.05.2015	 	SendungVerpasst: Auswertung *.m3u8-Datei falls vorhanden (umfangreicher + 
+			aussagekräftiger 
+			als die angebotenen Qualitätsstufen			
 
-23.05.2015	 ergänzt	SendungVerpasst: Uhrzeitangabe im Titel einzelner Sendungen			
+24.05.2015	 	SendungVerpasst: Vertauschung S mit L in den Qualitätsstufen 
+			bereinigt			
 
-22.05.2015	 Korrektur	Test auf Nichtverfügbarkeit eines Videos korrigiert - schlug fehl beim Fehlen eines 
-					2. Videos einer Qualitätsstufe			
+23.05.2015	 	SendungVerpasst: Uhrzeitangabe im Titel einzelner Sendungen			
 
-20.05.2015	 GitHub		Account angelegt, Installation Git + GUI SmartGit			
+22.05.2015	 	Test auf Nichtverfügbarkeit eines Videos korrigiert - schlug fehl beim Fehlen eines 
+			2. Videos einer Qualitätsstufe			
 
-20.05.2015	 GitHub		umbenannt: Plex-Plugin-ARDMediathek2015 (gleichnamiges  auf Github 5 Jahre alt, 
-					Author canbuffi, der angezeigte Titel heißt 'ARD Mediathek 2015' - aus Datei 
-					string/en.json.
+20.05.2015	 	Account angelegt, Installation Git + GUI SmartGit			
 
-19.05.2015	 Korrektur 	Folgeseiten: Pfad mit Verweis auf vorhergehende Seite ausgefiltert, Verwendung 
-					relativer Pfade mit BASE_URL für Mehrfachverwendung von Funktionen	
+20.05.2015	 	umbenannt: Plex-Plugin-ARDMediathek2015 (gleichnamiges  auf Github 5 Jahre alt, 
+			Author canbuffi, der angezeigte Titel heißt 'ARD Mediathek 2015' - aus Datei 
+			string/en.json.
 
-18.05.2015	 Korrektur	collapsible-sets mit Rubrik-Köpfen berücksichtigt			
+19.05.2015	  	Folgeseiten: Pfad mit Verweis auf vorhergehende Seite ausgefiltert, Verwendung 
+			relativer Pfade mit BASE_URL für Mehrfachverwendung von Funktionen	
 
-17.05.2015	 ergänzt 	Folgeseiten berücksichtigt (z.B. Live = 2 Seiten) - div class="pagingControl
+18.05.2015	 	collapsible-sets mit Rubrik-Köpfen berücksichtigt			
 
-15.05.2015	 ergänzt	Live-Sender. Posting im Plex-Forum/Deutsch			
+17.05.2015	  	Folgeseiten berücksichtigt (z.B. Live = 2 Seiten) - div class="pagingControl
+
+15.05.2015	 	Live-Sender. Posting im Plex-Forum/Deutsch			
 		
 
 
