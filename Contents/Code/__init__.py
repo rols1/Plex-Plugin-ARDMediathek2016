@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.1'		
-VDATE = '01.07.2017'
+VERSION =  '3.1.2'		
+VDATE = '04.07.2017'
 
 # 
 #	
@@ -1240,7 +1240,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 	if m3u8_master:	  		  								# nicht bei rtmp-Links (ohne master wie m3u8)
 		title = 'Bandbreite und Auflösung automatisch'			# master.m3u8
 		Codecs = ''
-		m3u8_master = m3u8_master.replace('https', 'http')	# 26.01.2017: nun auch ARD mit https
+		m3u8_master = m3u8_master.replace('https', 'http')	# 26.06.2017: nun auch ARD mit https
 		oc.add(CreateVideoStreamObject(url=m3u8_master, title=title, rtmp_live='nein',
 			summary='automatische Auflösung | Auswahl durch den Player', tagline=title, meta=Codecs, thumb=thumb, 
 			resolution=''))			
@@ -1311,7 +1311,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 				if ID == 'PODCAST':
 					oc.add(CreateTrackObject(url=url, title=title, summary=summary, fmt='mp3', thumb=thumb))	
 				else:
-					# 26.01.2017: nun auch ARD mit https - aber: bei den mp4-Videos liefern die Server auch
+					# 26.06.2017: nun auch ARD mit https - aber: bei den mp4-Videos liefern die Server auch
 					#	mit http, während bei m3u8-Url https durch http ersetzt werden MUSS. 
 					url = url.replace('https', 'http')	
 					oc.add(CreateVideoClipObject(url=url, title=title, 

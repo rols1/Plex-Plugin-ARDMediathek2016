@@ -517,6 +517,7 @@ def Scheme_wdr(page, rec_per_page, offset):		# Schema WDR, XML-Format
 		title = title_org.strip()
 		summ = stringextract('<description>', '</description>', s) 			
 		summ = summ.strip()
+		summ = unescape(summ)
 		url = stringextract('<enclosure url="', '"', s) 
 		img =  stringextract('<img src="', '\"', s) 
 		img_alt =  stringextract('alt="', '\"', s) 						# 
@@ -746,19 +747,20 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 		if img == '':										# Episodenbild 
 			img =img_src_header 
 		
-		author = ''	  										# fehlt
-		groesse = ''	  									# fehlt
+		author = '';  groesse = ''  						# fehlen hier
+		datum = '';  dauer = '';			
 		if subtitle.find('|') > 0:
 			datum = subtitle.split('|')[0]
 			dauer = subtitle.split('|')[1]
 		
 		if dachzeile:
 			title = ' %s | %s ' % (dachzeile, headline)
-			summ =  ' %s  | %s' % (datum, dauer)
+			summ =  ' %s | %s' % (datum, dauer)
 		else:
-			title = ' %s | %s  | %s' % (headline, datum, dauer)
+			title = ' %s | %s | %s' % (headline, datum, dauer)
 			if teasertext:
 				summ = teasertext
+		title = title.replace('|  |', '')						# Datum + Dauer können fehlen
 				
 		tagline = teasertext									# aus Episodendach, falls vorh.
 		tagline = unescape(tagline)
@@ -841,7 +843,8 @@ def unescape(line):	# HTML-Escapezeichen in Text entfernen, bei Bedarf erweitern
 	line_ret = (line.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
 		.replace("&#39;", "'").replace("&#039;", "'").replace("&quot;", '"').replace("&#x27;", "'")
 		.replace("&ouml;", "ö").replace("&auml;", "ä").replace("&uuml;", "ü").replace("&szlig;", "ß")
-		.replace("&Ouml;", "Ö").replace("&Auml;", "Ä").replace("&Uuml;", "Ü").replace("&apos;", "'"))
+		.replace("&Ouml;", "Ö").replace("&Auml;", "Ä").replace("&Uuml;", "Ü").replace("&apos;", "'")
+		.replace("&#xD;", " "))
 		
 	# Log(line_ret)		# bei Bedarf
 	return line_ret	

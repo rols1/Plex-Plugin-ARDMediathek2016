@@ -103,6 +103,11 @@ Radio Livesender:
 
 Podcast-Menü:
 ===================  
-![img](https://us.v-cdn.net/6025034/uploads/editor/me/v2d8banzraa9.png)
+![img](https://us.v-cdn.net/6025034/uploads/editor/mx/pgmo59s3layj.png)
+
+Podcast-Favoriten:
+===================  
+![img](https://us.v-cdn.net/6025034/uploads/editor/as/s2ogw2bx2s5h.png)
+
 
 
