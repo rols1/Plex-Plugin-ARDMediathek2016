@@ -2,6 +2,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
 	
+13.08.2017 3.1.3	Radio-Live: Anpassung livesenderRadio.xml an Austausch des 
+			NDR-Sender Radio Nordwest zu Bremen Zwei. Icon radio-nordwest-radio.png ausgetauscht 
+			gegen radio-bremen-zwei.png.
+	
 04.07.2017 3.1.2	PodFavoriten(Pod_Content): Korrekturen in Scheme_ARD (abgefangen, falls unbelegt: Dauer + Datum).
 			PodFavoriten(Pod_Content/unescape): Ersatz von &#xD; (<br>) durch Leerz. (WDR, Leonardo).
 	

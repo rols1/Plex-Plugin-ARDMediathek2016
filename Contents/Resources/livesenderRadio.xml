@@ -50,8 +50,8 @@
 		<title>Radio Bremen</title>
 		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=1116</link>
 		<thumbnail>radio-radio-bremen.png</thumbnail>
-		<sender>Bremen Eins|bremen NEXT|Bremen Vier|Nordwestradio</sender>		
-		<thumblist>radio-bremen-eins.png|radio-bremen-next.png|radio-bremen-vier.png|radio-nordwest-radio.png</thumblist>
+		<sender>Bremen Eins|bremen NEXT|Bremen Vier|Bremen Zwei</sender>		
+		<thumblist>radio-bremen-eins.png|radio-bremen-next.png|radio-bremen-vier.png|radio-bremen-zwei.png</thumblist>
 	</item>
 	<item>
 		<title>RBB</title>
