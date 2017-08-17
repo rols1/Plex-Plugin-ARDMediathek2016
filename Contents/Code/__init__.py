@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.3'		
-VDATE = '13.08.2017'
+VERSION =  '3.1.4'		
+VDATE = '17.08.2017'
 
 # 
 #	
@@ -1088,17 +1088,17 @@ def SinglePage(title, path, next_cbKey, mode, ID, offset=0):	# path komplett
 	sendungen = ''
 	
 	if mode == 'Suche':									# relevanten Inhalt ausschneiden, Blöcke bilden
-		page = stringextract('data-ctrl-scorefilterloadableLoader-source', 'class=\"socialMedia\"', page)	
+		page = stringextract('data-ctrl-scorefilterloadableLoader-source', '<!-- **** END **** -->', page)	
 		sendungen = blockextract('class=\"teaser\"', page) 
 	if mode == 'Verpasst':								
-		page = stringextract('"boxCon isCollapsible', 'class=\"socialMedia\"', page)	
+		page = stringextract('"boxCon isCollapsible', '<!-- **** END **** -->', page)	
 		sendungen = blockextract('<h3 class="headline"', page) 
 	if mode == 'Sendereihen':	
 		if ID == 'PODCAST':						       # auch A-Z 
 			# Filter nach next_cbKey (PageControl, 	SinglePage, SingleSendung) hier nicht erforderlich	
-			page = stringextract('class=\"section onlyWithJs sectionA\">', '<!--googleoff: snippet-->', page)
+			page = stringextract('class=\"section onlyWithJs sectionA\">', '<!-- content -->', page)
 		else:
-			page = stringextract('data-ctrl-layoutable', 'class=\"socialMedia\"', page)	
+			page = stringextract('data-ctrl-layoutable', '<!-- **** END **** -->', page)	
 	sendungen = blockextract('class=\"teaser\"', page)	# Sendungsblöcke in PODCAST: 1. teaser=Sendungskopf, 
 														#   Rest Beiträge - Auswertung in get_sendungen	
 	if len(sendungen) == 0:								# Fallback 	
