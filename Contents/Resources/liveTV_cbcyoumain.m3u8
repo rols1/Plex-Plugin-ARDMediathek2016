@@ -1,22 +1,23 @@
 #EXTM3U
 #EXT-X-VERSION:3
 #EXT-X-INDEPENDENT-SEGMENTS
-#EXT-X-STREAM-INF:BANDWIDTH=4375800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=1280x720,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream1_.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=2725800,AVERAGE-BANDWIDTH=2725800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=1280x720,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream2_.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1625800,AVERAGE-BANDWIDTH=1625800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=960x540,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream3_.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=1240800,AVERAGE-BANDWIDTH=1240800,CODECS="avc1.66.30,mp4a.40.2",RESOLUTION=640x360,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream4_.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=855800,AVERAGE-BANDWIDTH=855800,CODECS="avc1.66.30,mp4a.40.2",RESOLUTION=640x360,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream5_.m3u8
-#EXT-X-STREAM-INF:BANDWIDTH=415800,AVERAGE-BANDWIDTH=415800,CODECS="avc1.42c00c,mp4a.40.2",RESOLUTION=320x180,FRAME-RATE=15.000,CLOSED-CAPTIONS=NONE
-http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream6_.m3u8
 #EXT-X-STREAM-INF:BANDWIDTH=191400,AVERAGE-BANDWIDTH=191400,CODECS="avc1.42c00a,mp4a.40.2",RESOLUTION=160x90,FRAME-RATE=5.000,CLOSED-CAPTIONS=NONE
 http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream7_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=415800,AVERAGE-BANDWIDTH=415800,CODECS="avc1.42c00c,mp4a.40.2",RESOLUTION=320x180,FRAME-RATE=15.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream6_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=855800,AVERAGE-BANDWIDTH=855800,CODECS="avc1.66.30,mp4a.40.2",RESOLUTION=640x360,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream5_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1240800,AVERAGE-BANDWIDTH=1240800,CODECS="avc1.66.30,mp4a.40.2",RESOLUTION=640x360,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream4_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=1625800,AVERAGE-BANDWIDTH=1625800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=960x540,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream3_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=2725800,AVERAGE-BANDWIDTH=2725800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=1280x720,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream2_.m3u8
+#EXT-X-STREAM-INF:BANDWIDTH=4375800,CODECS="avc1.42c01f,mp4a.40.2",RESOLUTION=1280x720,FRAME-RATE=25.000,CLOSED-CAPTIONS=NONE
+http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumainstream1_.m3u8
 
 
 # rols 08.06.2016: Pfade hier komplettiert (Original nur cbcyoumainstream1_.m3u8 usw)
-# 	Zugriff auf http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumain.m3u8
+# 	Zugriff auf http://rtl2ingest1-i.akamaihd.net/hls/live/225448/cbcyoumain/cbcyoumain.m3u8 (in Chrome ermittelt)
 #	abgewehrt mit HTTP Error 403: Forbidden (Plex + VLC)
+# 10.08.2017: Sortierung auf "aufsteigend" geändert für Abgleich mit Video-Sofort-Format 

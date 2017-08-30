@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.4'		
-VDATE = '17.08.2017'
+VERSION =  '3.1.5'		
+VDATE = '30.08.2017'
 
 # 
 #	
@@ -210,9 +210,18 @@ def Start():
 def Main():
 	Log('Funktion Main'); Log(PREFIX); 
 	Log('Plugin-Version: ' + VERSION); Log('Plugin-Datum: ' + VDATE)
-	Log('Client: '); Log(Client.Platform);									# Client.Platform: None möglich
+	client_platform = str(Client.Platform)								# Client.Platform: None möglich
+	client_product = str(Client.Product)								# Client.Product: None möglich
+	Log('Client-Platform: ' + client_platform)							
+	Log('Client-Product: ' + client_product)							
+    
 	Log('Plattform: ' + sys.platform)
-	Dict.Reset()					# Speicherobjekte des Plugins löschen
+	Log('Platform.OSVersion: ' + Platform.OSVersion)
+	Log('Platform.CPU: '+ Platform.CPU)
+	Log('Platform.ServerVersion: ' + Platform.ServerVersion)
+	
+	Dict.Reset()							# Speicherobjekte des Plugins löschen
+			
 	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art)	# Plex akzeptiert nur InfoList + List, keine
 																			# Auswirkung auf Wiedergabe im Webplayer																																						
 	# folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
@@ -246,6 +255,9 @@ def Main():
 		int_lv = ret[0]			# Version Github
 		int_lc = ret[1]			# Version aktuell
 		latest_version = ret[2]	# Version Github, Format 1.4.1
+		if ret[0] == False:
+			msgH = 'Error'; msg = 'Github ist nicht errreichbar. Bitte in den Einstellungen die Update-Anzeige abschalten.'		
+			return ObjectContainer(header=msgH, message=msg)		
 		
 		if int_lv > int_lc:								# Update-Button "installieren" zeigen
 			call_update = True
@@ -427,7 +439,7 @@ def home(cont, ID):												# Home-Button, Aufruf: oc = home(cont=oc)
 
 def Main_Options(title):
 	Log('Funktion Main_Options')	
-	# Log(Prefs['pref_use_epg']); Log(Prefs['pref_tvlive_allbandwith']);
+	# Log(Prefs['pref_use_epg']); 
 	
 	# hier zeigt Plex die Einstellungen (Entwicklervorgabe in DefaultPrefs.json):
 	# 	http://127.0.0.1:32400/:/plugins/com.plexapp.plugins.ardmediathek2016/prefs
@@ -516,6 +528,7 @@ def ListEnum(id, label, values):
 	Log(values);
 	for i in range(len(values)):
 		pref = values[i]
+		pref = unescape(pref)
 		oc_wert = pref
 		Log('value: ' + str(i) + ' Wert: ' + oc_wert)
 		oc.add(DirectoryObject(key=Callback(Set, key=id, value=i, oc_wert=oc_wert), title = u'%s' % (pref)))				
@@ -1221,7 +1234,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 	if path.endswith('.mp3') == False:
 		Log('vor parseLinks_Mp4_Rtmp')
 		page = HTTP.Request(path).content  # als Text, nicht als HTML-Element. 
-		link_path,link_img, m3u8_master = parseLinks_Mp4_Rtmp(page)	# link_img kommt bereits mit thumb, außer bei Podcasts						
+		link_path,link_img, m3u8_master, geoblock = parseLinks_Mp4_Rtmp(page) # link_img kommt bereits mit thumb, außer Podcasts						
 		Log('m3u8_master: ' + m3u8_master); Log(link_img); Log(link_path); 
 		if thumb == None or thumb == '': 
 			thumb = link_img
@@ -1230,6 +1243,11 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 			Log('link_path == []') 		 
 			msgH = 'keine Videoquelle gefunden - Abbruch'; msg = 'keine Videoquelle gefunden - Abbruch. Seite: ' + path;
 			return ObjectContainer(header=msgH, message=msg)
+		Log('geoblock: ' + geoblock)
+		if geoblock == 'true':			# Info für  summary 
+			geoblock = ' | Geoblock!'
+		else:
+			geoblock = ''
 	else:
 		m3u8_master = False
 		# Nachbildung link_path, falls path == mp3-Link:
@@ -1242,17 +1260,16 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 		Codecs = ''
 		m3u8_master = m3u8_master.replace('https', 'http')	# 26.06.2017: nun auch ARD mit https
 		oc.add(CreateVideoStreamObject(url=m3u8_master, title=title, rtmp_live='nein',
-			summary='automatische Auflösung | Auswahl durch den Player', tagline=title, meta=Codecs, thumb=thumb, 
-			resolution=''))			
-		cont = Parseplaylist(oc, m3u8_master, thumb)	# Liste der zusätzlichen einzelnen Auflösungen 
+			summary='automatische Auflösung | Auswahl durch den Player' + geoblock, tagline=title, meta=Codecs, 
+			thumb=thumb, resolution=''))			
+		cont = Parseplaylist(oc, m3u8_master, thumb, geoblock)	# Liste der zusätzlichen einzelnen Auflösungen 
 		#del link_path[0]								# master.m3u8 entfernen, Rest bei m3u8_master: mp4-Links
 		Log(cont)  										
 	 
 	# ab hier Auswertung der restlichen mp4-Links bzw. rtmp-Links (aus parseLinks_Mp4_Rtmp)
 	# Format: 0|http://mvideos.daserste.de/videoportal/Film/c_610000/611560/format706220.mp4
 	# 	oder: rtmp://vod.daserste.de/ardfs/mp4:videoportal/mediathek/...
-	# Achtung: ARD-Videos kommen manchmal mit der selben Url für verschiedene Qualitäten. Daher
-	#	muss CreateVideoClipObject als rating_key den Titel als eindeutige Kennz. in der Trackliste verwenden
+	#	
 	href_quality_S 	= ''; href_quality_M 	= ''; href_quality_L 	= ''; href_quality_XL 	= ''
 	download_list = []		# 2-teilige Liste für Download: 'title # url'
 	for i in range(len(link_path)):
@@ -1304,8 +1321,8 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 			if url.find('rtmp://') >= 0:	# 2. rtmp-Links:	
 				summary = Format + 'RTMP-Stream'	
 				oc.add(CreateVideoStreamObject(url=url, title=title, 
-					summary=summary, tagline=title, meta=path, thumb=thumb, duration=duration, rtmp_live='nein', 
-					resolution=''))					
+					summary=summary+geoblock, tagline=title, meta=path, thumb=thumb, duration=duration, 
+					rtmp_live='nein', resolution=''))					
 			else:
 				summary = Format			# 3. Podcasts mp3-Links, mp4-Links
 				if ID == 'PODCAST':
@@ -1315,7 +1332,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 					#	mit http, während bei m3u8-Url https durch http ersetzt werden MUSS. 
 					url = url.replace('https', 'http')	
 					oc.add(CreateVideoClipObject(url=url, title=title, 
-						summary=summary, meta=path, thumb=thumb, tagline='', duration=duration, resolution=''))
+						summary=summary+geoblock, meta=path, thumb=thumb, tagline='', duration=duration, resolution=''))
 	Log(download_list)
 	if 	download_list:			
 		# high=-1: letztes Video bisher höchste Qualität
@@ -1850,7 +1867,8 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Textseite .mp4- und rtmp-Links 
 		link_img = ""
 
 	link_path = []							# Liste nimmt Pfade und Quali.-Markierung auf
-	m3u8_master = ''						# nimmt master.m3u8 zusätzlich auf
+	m3u8_master = ''						# nimmt master.m3u8 zusätzlich auf	
+	geoblock =  stringextract('_geoblocked":', '}', page)	# Geoblock-Info
 	
 	if page.find('\"_quality\":') >= 0:
 		s = page.split('\"_quality\":')	
@@ -1901,7 +1919,7 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Textseite .mp4- und rtmp-Links 
 	link_path.sort()							# Sortierung - Original Bsp.: 0,1,2,0,1,2,3
 	Log(link_path); Log(len(link_path))					
 		
-	return link_path, link_img, m3u8_master				 		
+	return link_path, link_img, m3u8_master, geoblock				 		
 		
 ####################################################################################################
 def get_sendungen(container, sendungen, ID, mode): # Sendungen ausgeschnitten mit class='teaser', aus Verpasst + A-Z,
@@ -2247,6 +2265,11 @@ def SenderLiveListe(title, listname, offset=0):	#
 	# SenderLiveListe -> SenderLiveResolution (reicht nur durch) -> Parseplaylist (Ausw. m3u8)
 	#	-> CreateVideoStreamObject 
 	Log.Debug('SenderLiveListe')
+	
+	Log('Dict_Lock: ' + str(Dict['Lock']))
+	if Dict['Lock'] == True:				# schütz bei Back-Schritten vor erneuter Thread-Auslösung -
+		Dict['Lock']=False					# 	siehe Thread remoteVideo
+		Log('Lock_geloest')	
 
 	title2 = 'Live-Sender ' + title
 	title2 = title2.decode(encoding="utf-8", errors="ignore")	
@@ -2277,7 +2300,7 @@ def SenderLiveListe(title, listname, offset=0):	#
 		Log(link);
 		
 		# Bei link zu lokaler m3u8-Datei (Resources) reagieren SenderLiveResolution und ParsePlayList entsprechend:
-		#	der erste Eintrag (automatisch) entfällt, da für die lokale Reource kein HTTP-Request durchge-
+		#	der erste Eintrag (automatisch) entfällt, da für die lokale Ressource kein HTTP-Request durchge-
 		#	führt werden kann. In ParsePlayList werden die enthaltenen Einträge wie üblich aufbereitet
 		#	
 		# Spezialbehandlung für N24 in SenderLiveResolution - Test auf Verfügbarkeit der Lastserver (1-4)
@@ -2322,14 +2345,144 @@ def SenderLiveListe(title, listname, offset=0):	#
 		# Link zu master.m3u8 erst auf Folgeseite? - SenderLiveResolution reicht an  Parseplaylist durch  
 		oc.add(DirectoryObject(key=Callback(SenderLiveResolution, path=link, title=title, thumb=img),
 			title=title, summary=summary,  tagline=tagline, thumb=img))
-
 	Log(len(oc))
 	return oc
+		
+#-----------------------------------------------------------------------------------------------------
+# remote: s. https://github.com/plexinc/plex-media-player/wiki/Remote-control-API
+#	TV-Livestreams:
+#		Filterung der Videoobjekte gemäß Video-Sofort-Format in Parseplaylist (auto, Bandbreite)
+#		Aufruf Thread.Create in SenderLiveResolution - für TV-Livestreams 
+#	Thread.Sleep() führt zu unmittelbar wiederholten Aufrufen der Funktion - div. negative
+#		Versuche mit Thread.Block() + Thread.Lock. Bisher beste Lösung: globale Variable
+#		Dict['Lock'] - Freigabe erst bei Rückkehr in SenderLiveListe
+#	Ermittlung des Zieldevice via https://plex.tv/devices.xml (Header: X-Plex-Token)
+#	3 Steuerkommandos:  jeweils verzögert (delay sec, Voreinstellung 2 sec)
+#		1. navigation/moveRight - vom Homebutton zur Auswahl
+#		2. navigation/select	- von Auswahl zum Player
+#		3. navigation/select	- startet Player
+#	bisher nicht erforderlich: X-Plex-Target-Client-Identifier   
+#	
+#	Problem Plex Media Player (PMP): subscribe -> command - unsubscribe
+#		Die vom PMP zur Steuerung gesendete timeline führt zum Error im PMP-Log, da wir im Plugin keinen 
+#		eigenen HTTP-Server aufspannen. Mit dem subscribe-Port  kann auch der PMS nichts anfangen.
+#		Innerhalb der 10sec-Timeout-Frist akzeptiert der PMP trotzdem die
+#		Steuerkommandos. Für diese ist jeweils der notwendige Headersatz erforderlich (s. Code).
+#		S.a. https://forums.plex.tv/discussion/190372/pmp-control-api-my-feedback
+#		
 
+def remoteVideo():	# Thread, Problem PHT: esc funktioniert nur 1 x (Video-Abbruch)
+	Log('Thread_remoteVideo')
+	plextoken = os.environ.get('PLEXTOKEN')	# 	id für diesen channel
+	Log(plextoken)						
+	myproduct = Client.Product					# für pref_setVideoFormatLive, none bei thread-python-Alternative
+	Log(myproduct)
+
+	Log(Prefs['pref_setVideoFormat_Delay'])
+	delay = int(Prefs['pref_setVideoFormat_Delay'])	# Verzögerung in sec zwischen den remote-Requests
+
+	if Dict['Lock'] == True:
+		Log('Lock_return')	
+		return
+		
+	return		# todo. entfernen nach Konsolentests. DefaultPrefs.json aktualisieren
+	
+#	if 'Plex Web' in myproduct:					# klappt garantiert nicht im Webplayer 
+#		Log('remote nicht im Webplayer...')
+#		return
+		
+	Dict['Lock']=True							# Global - Freigabe in SenderLiveListe
+	Log('Lock_gestartet')
+		
+	Log('Thread remoteVideo: Start_Remote')
+	r=HTTP.Request('https://plex.tv/devices.xml', headers={'X-Plex-Token': plextoken}, cacheTime=0, immediate=True)
+	cont = r.content		# Liste devices
+	Log(cont[:80])
+	Log(r.headers)		
+
+#	Android: Fernsteuerung PHT OK
+# Plex Media Player:  HTTP Error 406: Not Acceptable (moveRight-Request)
+#	token: DysMBz5fPdPJGx9uo6f4
+#	clientIdentifier="43vj7bht8uj2szqvr73fyzm2"
+#	uri="http://192.168.0.105:32433"
+
+# 	https://forums.plex.tv/discussion/129922/how-to-request-a-x-plex-token-token-for-your-app/p1
+#	https://www.reddit.com/r/PleX/comments/3vr3ti/plex_api_help/
+#	-> http://{M:plex.Server}:{M:plex.Port_serv}/system/players/{M:plexClients.Client_ip{2}}/playback/{1}?X-Plex-Token={M:plex.Auth_token}
+#	http://192.168.0.100:32400/system/players/192.168.0.100/playback/1/?X-Plex-Token=DysMBz5fPdPJGx9uo6f4
+#		-> 'NoneType' object is not callable">
+
+#	-> http://{M:plex.Server}:{M:plex.Port_serv}/system/players/{M:plex.Client01}/navigation/moveRight
+
+#	http://192.168.0.105:32433/player/navigation/select 	keine Reaktion
+#	http://192.168.0.105:32433/player/navigation/home?commandID=1
+#	
+
+	uri = ''; clientid = ''
+	devices = blockextract('<Device', cont)
+	for device in devices:
+		product = stringextract('product="', '"', device)	# Bsp. "Plex Home Theater"
+		Log(myproduct); Log(product)
+		if myproduct == product:
+			client_token = stringextract('token="', '"', device)	# wird Client- und Target-Client-Identifier
+			client_id =  stringextract('clientIdentifier="', '"', device)		
+			plex_device =  stringextract('Device name="', '"', device)		
+			uri =  stringextract('Connection uri="', '"', device)	# Bsp. "http://192.168.0.102:32500"
+			if uri:				
+				Log('client_token: ' + client_token); Log('client_id: ' + client_id); 
+				Log('uri: ' + uri); Log('plex_device: ' + plex_device); 
+								
+				# 1. Subscribe
+				Thread.Sleep(delay)
+				# time.sleep(delay) 						# keine Änderungen im Thread-Verhalten
+				commandID = 1								
+				headers={'X-Plex-Token': plextoken, 'X-Plex-Client-Identifier': client_token, 'X-Plex-Device-Name': plex_device,
+					'X-Plex-Target-Client-Identifier': client_token, 'commandID' : commandID}
+				Log('headers: ' + str(headers)); 
+				r = HTTP.Request('%s/player/timeline/subscribe?protocol=http&port=32400&commandID=%s' % (uri, commandID), 
+					headers=headers, cacheTime=0, immediate=True) 
+#				Log(r.headers); Log(r.content)
+				
+				# 2. moveRight	(PMP: no handler for MoveDown, select OK)
+				Thread.Sleep(delay)
+				commandID = 2							
+				headers={'X-Plex-Token': plextoken, 'X-Plex-Client-Identifier': client_token, 'X-Plex-Device-Name': plex_device,
+					'X-Plex-Target-Client-Identifier': client_token, 'commandID' : commandID}
+				r = HTTP.Request('%s/player/navigation/moveRight&X-Plex-Client-Identifier=DysMBz5fPdPJGx9uo6f4' % uri, headers=headers, cacheTime=0, immediate=True) 
+#				Log(r.headers); Log(r.content)
+		
+				# 3. select									# PHT: http://192.168.0.100:3005/player/navigation/select
+				Thread.Sleep(delay)
+				commandID = 3							
+				r = HTTP.Request('%s/player/navigation/select' % uri, headers=headers, cacheTime=0, immediate=True) 
+#				Log(r.headers); Log(r.content)
+				
+				# 4. select								
+				Thread.Sleep(delay)
+				commandID = 4							
+				r = HTTP.Request('%s/player/navigation/select' % uri, headers=headers, cacheTime=0, immediate=True) 
+#				Log(r.headers); Log(r.content)
+				
+				# 5. Unsubscribe								
+				# Thread.Sleep(delay)
+				commandID = 5							
+				r = HTTP.Request('%s/player/timeline/unsubscribe?protocol=http&port=32400&commandID=%s' % (uri, commandID), 
+					headers=headers, cacheTime=0, immediate=True) 
+#				Log(r.headers); Log(r.content)
+				
+				Log('Thread remoteVideo: select-request erfolgt')				
+				return True		
+			
+	Log('Thread remoteVideo: kein select-request')
+	return			
 ###################################################################################################
 @route(PREFIX + '/SenderLiveResolution')	# Auswahl der Auflösungstufen des Livesenders
 	#	Die URL der gewählten Auflösung führt zu weiterer m3u8-Datei (*.m3u8), die Links zu den 
 	#	Videosegmenten (.ts-Files enthält). Diese  verarbeitet der Plexserver im Videoobject. 
+	#	10.08.2017: Video-Sofort-Format beschränkt die Auswahl auf 1 Element (der autom. Start funktioniert
+	#		aber nicht im Webplayer)
+	#		Bei lokalen m3u8-Dateien müssen die Bandbreiten aufsteiend sortiert sein für Abgleich mit
+	#			Video-Sofort-Format (Bsp. liveTV_cbcyoumain.m3u8, liveTV_ntvlive-ipadakamai.m3u8)
 def SenderLiveResolution(path, title, thumb, include_container=False):
 	#page = HTML.ElementFromURL(path)
 	url_m3u8 = path
@@ -2341,27 +2494,53 @@ def SenderLiveResolution(path, title, thumb, include_container=False):
 	
 	Codecs = 'H.264'	# dummy-Vorgabe für PHT (darf nicht leer sein)	
 										
-	# Spezialbehandlung für N24 - Test auf Verfügbarkeit der Lastserver (1-4):
+	# Spezialbehandlung für N24 - Test auf Verfügbarkeit der Lastserver (1-4),
+	#	  m3u8-Datei für Parseplaylist inkompatibel, nur 1 Videoobjekt
 	if title.find('N24') >= 0:
 		url_m3u8 = N24LastServer(url_m3u8)
-		
-	if url_m3u8.find('rtmp') == 0:		# rtmp, summary darf für PHT nicht leer sein
-		oc.add(CreateVideoStreamObject(url=url_m3u8, title=title, 
-			summary='rtmp-Stream', tagline=title, meta=Codecs, thumb=thumb, rtmp_live='ja', resolution=''))
+		oc.add(CreateVideoStreamObject(url=url_m3u8, title=title, 		
+			summary='Bandbreite unbekannt', tagline=title, meta=Codecs, thumb=thumb, 	
+			rtmp_live='nein', resolution='unbekannt'))								
+		if Prefs['pref_setVideoFormatLive']:		
+			t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (auto)
+			Log(t)
 		return oc
 		
-	# alle übrigen (i.d.R. http-Links)
-	if url_m3u8.find('.m3u8') >= 0:					# häufigstes Format
+	if url_m3u8.find('rtmp') == 0:		# rtmp, nur 1 Videoobjekt
+		oc.add(CreateVideoStreamObject(url=url_m3u8, title=title, 
+			summary='rtmp-Stream', tagline=title, meta=Codecs, thumb=thumb, 
+			rtmp_live='ja', resolution='unbekannt'))
+		if Prefs['pref_setVideoFormatLive']:		
+			t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (auto)
+			Log(t)
+		return oc
+		
+	# alle übrigen (i.d.R. http-Links), Videoobjekte für einzelne Auflösungen erzeugen
+	if url_m3u8.find('.m3u8') >= 0:				# häufigstes Format
 		Log(url_m3u8)
-		if url_m3u8.find('http') == 0:		# URL (auch https) oder lokale Datei? (lokal entfällt Eintrag "autom.")			
+		if url_m3u8.find('http') == 0:			# URL (auch https) oder lokale Datei? (lokal entfällt Eintrag "autom.")			
 			oc.add(CreateVideoStreamObject(url=url_m3u8, title=title + ' | Bandbreite und Auflösung automatisch', 
 				summary='automatische Auflösung | Auswahl durch den Player', tagline=title,
 				meta=Codecs, thumb=thumb, rtmp_live='nein', resolution=''))
-			if Prefs['pref_tvlive_allbandwith'] == False:	# nur 1. Eintrag zeigen
-				Log(Prefs['pref_tvlive_allbandwith'])		# Plex-Forum plex-plugin-ardmediathek2016/p5
-				return oc
-		# hier weiter mit Auswertung der m3u8-Datei (lokal oder extern, Berücksichtigung pref_tvlive_allbandwith)
-		oc = Parseplaylist(oc, url_m3u8, thumb)	# Auswertung *.m3u8-Datei, Auffüllung Container mit Auflösungen
+		if Prefs['pref_setVideoFormatLive']:	# Video-Sofort-Format = Qualität: auto (m3u8)
+			if 'auto' in Prefs['pref_setVideoFormatLive']:
+				if len(oc) == 1:				# lokale Datei i.d.R. ohne 'auto'-Eintrag
+					return ObjectContainer(header='Fehler', message='lokale Datei ohne Video-Sofort-Format >auto<: ' + url_m3u8)
+				else:					
+					if Prefs['pref_setVideoFormatLive']:		
+						t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (auto)
+						Log(t)
+					return oc					# Rückgabe Objekt 'auto' - Fernsteuerung in remoteVideo 
+			else:
+				# 'auto' entfernen, Ersatz durch gewähltes Format in Parseplaylist:
+				oc = ObjectContainer(view_group="InfoList", title1=title + ' Live', art=ICON)
+				
+		# hier weiter mit Auswertung der m3u8-Datei (lokal oder extern), Berücksichtigung pref_setVideoFormatLive
+		if Prefs['pref_setVideoFormatLive']:		
+			t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (ausgewählte Bandbreite)
+			Log(t)
+		 # Auswertung *.m3u8-Datei, Auffüllung Container mit Auflösungen. geoblock hier nicht verwendet:	
+		oc = Parseplaylist(oc, url_m3u8, thumb, geoblock='')
 		return oc							# (-> CreateVideoStreamObject pro Auflösungstufe)
 	else:	# keine oder unbekannte Extension - Format unbekannt
 		return ObjectContainer(header='SenderLiveResolution: ', message='unbekanntes Format in ' + url_m3u8)
@@ -2434,16 +2613,20 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
 	Log('Plattform: ' + sys.platform)
 	Log(Client.Product)
 
+	random.seed()								# 23.08.2017 Zufallswert für eindeutigen rating_key 				
+	rating_id = random.randint(1,10000)			# 	(wie CreateTrackObject) - title verursacht Error
+	rating_key = 'rating_key-' + str(rating_id) #	im Server-Log
+	Log(rating_key)
+
 	if url.find('rtmp:') >= 0:	# rtmp = Protokoll für flash, Quellen: rtmpdump, shark, Chrome/Entw.-Tools
 		if rtmp_live == 'ja':
 			Log('rtmp_live: '); Log(rtmp_live) 
 			mo = MediaObject(parts=[PartObject(key=RTMPVideoURL(url=url,live=True))]) # live=True nur Streaming
 			
-			rating_key = title
 			videoclip_obj = VideoClipObject(
 				key = Callback(CreateVideoStreamObject, url=url, title=title, summary=summary, tagline=tagline,
 				meta=meta, thumb=thumb, rtmp_live='ja', resolution=[720, 540, 480], include_container=True), 
-				rating_key=title,
+				rating_key=rating_key,
 				title=title,
 				summary=summary,
 				tagline=tagline,
@@ -2451,11 +2634,10 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
 		else:
 			mo = MediaObject(parts=[PartObject(key=RTMPVideoURL(url=url))])
 			
-			rating_key = title
 			videoclip_obj = VideoClipObject(
 				key = Callback(CreateVideoStreamObject, url=url, title=title, summary=summary,  tagline=tagline,
 				meta=meta, thumb=thumb, rtmp_live='nein', resolution='', include_container=True), 
-				rating_key=title,
+				rating_key=rating_key,
 				title=title,
 				summary=summary,
 				tagline=tagline,
@@ -2470,11 +2652,10 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
 		meta=url									# leer (None) im Webplayer OK, mit PHT:  Server: Had trouble breaking meta
 		mo = MediaObject(parts=[PartObject(key=HTTPLiveStreamURL(url=url))]) 
 				
-		rating_key = title
 		videoclip_obj = VideoClipObject(					# Parameter wie MovieObject
 			key = Callback(CreateVideoStreamObject, url=url, title=title, summary=summary,  tagline=tagline,
 			meta=meta, thumb=thumb, rtmp_live='nein', resolution=resolution, include_container=True), 
-			rating_key=title,
+			rating_key=rating_key,
 			title=title,
 			summary=summary,
 			tagline=tagline,
@@ -2557,7 +2738,7 @@ def RadioLiveListe(path, title):
 	
 	doc = HTML.ElementFromString(playlist)		# unterschlägt </link>	
 	liste = doc.xpath('//item')					# z.Z. nur 1 Channel (ARD). Bei Bedarf Schleife erweitern
-	Log(liste)
+	Log(len(liste))
 	
 	# Unterschied zur TV-Playlist livesenderTV.xml: Liste  der Radioanstalten mit Links zu den Webseiten.
 	#	Die Liste der Sender im Feld <sender> muss exakt den Benennungen in den jew. Webseiten entsprechen.
@@ -2635,7 +2816,8 @@ def RadioAnstalten(path, title,sender,thumbs):
 		Log(path_content[0:80])			# enthält nochmal Bildquelle + Auflistung Streams (_quality)
 										# Streamlinks mit .m3u-Ext. führen zu weiterer Textdatei - Auswert. folgt 
 		#slink = stringextract('_stream\":\"', '\"}', path_content) 		# nur 1 Streamlink? nicht mehr aktuell
-		link_path,link_img, m3u8_master = parseLinks_Mp4_Rtmp(path_content)	# mehrere Streamlinks auswerten	
+		link_path,link_img, m3u8_master, geoblock = parseLinks_Mp4_Rtmp(path_content)	# mehrere Streamlinks auswerten,
+																						# geoblock hier nicht verwendet
 		
 		if sender and thumbs:				# Zuordnung zu lokalen Icons, Quelle livesenderRadio.xml
 			senderlist = sender.split('|')
@@ -2683,7 +2865,7 @@ def RadioAnstalten(path, title,sender,thumbs):
 				# msg = ', Stream ' + str(i + 1) + ': OK'		# Log in parseLinks_Mp4_Rtmp ausreichend
 				msg = ''
 				if img_src.find('http') >= 0:	# Bildquelle Web
-					oc.add(CreateTrackObject(url=slink, title=headline + msg, summary=subtitel,
+					oc.add(CreateTrackObject(url=slink, title=headline + msg, summary=subtitel, 
 						 thumb=img_src, fmt='mp3'))				# funktioniert hier auch mit aac
 				else:							# Bildquelle lokal
 					# OpenPHT scheitert, falls hier CreateTrackObject direkt angesteuert wird und sich in der
@@ -3556,6 +3738,9 @@ def get_formitaeten(sid, ID=''):
 		duration = str(duration) + " min"	
 	Log('duration: ' + duration)		
 	formitaeten = blockextract('formitaeten', page)		# Video-URL's ermitteln
+	geoblock =  stringextract('geoLocation',  'profile', page) 
+	geoblock =  stringextract('"value":',  '}', geoblock).strip()
+	Log(geoblock)										# i.d.R. "none" - wie bei ARD verwenden, falls Block-Tag bekannt
 
 	return formitaeten, duration
 
@@ -3693,7 +3878,7 @@ def ZDF_Bildgalerie(oc, page, mode, title):	# keine Bildgalerie, aber ähnlicher
 ####################################################################################################
 #									Hilfsfunktionen
 ####################################################################################################
-def Parseplaylist(container, url_m3u8, thumb):		# master.m3u8 auswerten, Url muss komplett sein
+def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8 auswerten, Url muss komplett sein
 #													# container muss nicht leer ein (siehe SingleSendung)
 #  1. Besonderheit: in manchen *.m3u8-Dateien sind die Pfade nicht vollständig,
 #	sondern nur als Ergänzung zum Pfadrumpf (ohne Namen + Extension) angegeben, Bsp. (Arte):
@@ -3712,6 +3897,7 @@ def Parseplaylist(container, url_m3u8, thumb):		# master.m3u8 auswerten, Url mus
 #  3. Besonderheit: für manche Sendungen nur 1 Qual.-Stufe verfügbar (Bsp. Abendschau RBB)
 #  4. Besonderheit: manche Playlists enthalten zusätzlich abgeschaltete Links, gekennzeichnet mit #. Fehler Webplayer:
 #		 crossdomain access denied. Keine Probleme mit OpenPHT und VLC
+#  10.08.2017 Filter für Video-Sofort-Format, für m3u8-auto bereits in SenderLiveResolution erfolgt
 
   Log ('Parseplaylist: ' + url_m3u8)
   playlist = ''
@@ -3730,7 +3916,7 @@ def Parseplaylist(container, url_m3u8, thumb):		# master.m3u8 auswerten, Url mus
 			msg = 'Playlist kann nicht geladen werden. URL: \r'
 			msg = msg + url_m3u8
 			Log(msg.replace('\r', ''))
-			return ObjectContainer(message=msg)	  # header=... ohne Wirkung	(?)			
+			return ObjectContainer(message=msg)	  	# header=... ohne Wirkung	(?)			
   else:													
 	playlist = Resource.Load(url_m3u8) 
   # Log(playlist)   # bei Bedarf
@@ -3743,7 +3929,7 @@ def Parseplaylist(container, url_m3u8, thumb):		# master.m3u8 auswerten, Url mus
   #for line in lines[1::2]:	# Start 1. Element, step 2
   for line in lines:	
  	line = lines[i].strip()
- 	# Log(line)				bei Bedarf
+ 	# Log(line)		# bei Bedarf
 	if line.startswith('#EXT-X-STREAM-INF'):# tatsächlich m3u8-Datei?
 		url = lines[i + 1].strip()	# URL in nächster Zeile
 		Log(url)
@@ -3766,22 +3952,30 @@ def Parseplaylist(container, url_m3u8, thumb):		# master.m3u8 auswerten, Url mus
 				pos = url_m3u8.rfind('/')				# m3u8-Dateinamen abschneiden
 				url = url_m3u8[0:pos+1] + url 			# Basispfad + relativer Pfad
 				
-			Log(url); Log(title); Log(thumb); Log('Resolution')
-			container.add(CreateVideoStreamObject(url=url, title=title, 		# Einbettung in DirectoryObject zeigt bei
-				summary= Resolution, tagline=title, meta=Codecs, thumb=thumb, # AllConnect trotzdem nur letzten Eintrag
-				rtmp_live='nein', resolution=''))								# resolution s. CreateVideoStreamObject
+			Log(url); Log(title); Log(thumb); Log('Resolution')	
+			# Video-Sofort-Format = Qualität: auto (m3u8) - nur 1 Objekt, auto bereits abgehandelt?	
+			BandwithWish = Prefs['pref_setVideoFormatLive']			# leer, auto oder Bandbreitenwert
+			Log(BandwithWish); 
+			if BandwithWish and BandwithWish.endswith('auto') == False: 
+				BandwithWish = BandwithWish.split('>')[1].strip()	# Bsp. "m3u8-Streaming: Bandbreite > 100000"
+				Log(Bandwith); Log(BandwithWish);
+				if int(Bandwith) > int(BandwithWish):				# Bandbreite größer als Wunschbandbreite?
+					container.add(CreateVideoStreamObject(url=url, title=title, 		
+						summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
+						rtmp_live='nein', resolution=''))
+					return container					# nur dieser gewünscht
+			else:										# Objekte für alle gefundenen Bandbreiten
+				container.add(CreateVideoStreamObject(url=url, title=title, 		
+					summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
+					rtmp_live='nein', resolution=''))								
 			BandwithOld = Bandwith
-			
-		if url_m3u8.startswith('http') == False:			# lokale Datei
-			if Prefs['pref_tvlive_allbandwith'] == False:	# nur 1. Eintrag zeigen, bei lokalen Dateien immer alle zeigen
-				return container
-
 				
+
   	i = i + 1	# Index für URL
   #Log (len(container))	# Anzahl Elemente
   if len(container) == 0:	# Fehler, zurück zum Hauptmenü
-  		container.add(DirectoryObject(key=Callback(Main),  title='inkompatible m3u8-Datei', 
-			tagline='Kennung #EXT-X-STREAM-INF fehlt oder den Pfaden fehlt http:// ', thumb=thumb)) 
+  		container.add(DirectoryObject(key=Callback(Main),  title='Problem mit Video-Sofort-Format oder m3u8-Datei', 
+			tagline='Video-Sofort-Format nicht gefunden oder fehlerhafte m3u8-Datei', thumb=thumb)) 
 	
   return container
 
@@ -3857,7 +4051,7 @@ def teilstring(zeile, startmarker, endmarker):  		# rfind: endmarker=letzte Fund
   return teils 
 #----------------------------------------------------------------  
 def blockextract(blockmark, mString):  	# extrahiert Blöcke begrenzt durch blockmark aus mString
-	#	blockmark bleibt Bestandteil der Rückgabe
+	#	blockmark bleibt Bestandteil der Rückgabe - im Unterschied zu split()
 	#	Rückgabe in Liste. Letzter Block reicht bis Ende mString (undefinierte Länge),
 	#		Variante mit definierter Länge siehe Plex-Plugin-TagesschauXL (extra Parameter blockendmark)
 	#	Verwendung, wenn xpath nicht funktioniert (Bsp. Tabelle EPG-Daten www.dw.com/de/media-center/live-tv/s-100817)
