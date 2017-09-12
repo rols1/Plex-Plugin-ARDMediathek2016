@@ -3,6 +3,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 12.09.2017 3.1.7	Fehlende Videos beim WDR: in Funktion parseLinks_Mp4_Rtmp fehlendes 'http:' ergänzt.
+			ZDF-Bereich: Reihenfolge der Videoquellen geändert - ngplayer_2_3-Link zuerst, dann
+			/tmd/2/portal-Link.
+			Funktion ZDF_Bildgalerie: HTML-tags im Titel entfernt.
+			Funktion BarriereArmSingle: Auswertung an geändertes Layout angepasst.
 
 04.09.2017 3.1.6	Video-Sofort-Format (experimentell, zunächst nur TV-Livestreams)- Details s. Forum.
 			Funktion SingleSendung (Laden der Mediendatei): Absicherung gegen Connect-Probleme.	

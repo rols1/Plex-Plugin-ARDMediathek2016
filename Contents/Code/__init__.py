@@ -3261,7 +3261,7 @@ def BarriereArm(name):				# Vorauswahl: 1. Infos, 2. Hörfassungen, 3. Videos mi
 #-------------------------
 @route(PREFIX + '/BarriereArmSingle')
 def BarriereArmSingle(title, ID):			# Aufruf: 1. Infos, 2. Hörfassungen, 3. Videos mit Untertitel
-	Log('BarriereArmSingle')
+	Log('BarriereArmSingle: ' + ID)
 	
 	title = title.decode(encoding="utf-8", errors="ignore")
 	oc = ObjectContainer(title2='ZDF: ' + title, view_group="List")
@@ -3271,9 +3271,9 @@ def BarriereArmSingle(title, ID):			# Aufruf: 1. Infos, 2. Hörfassungen, 3. Vid
 	page = HTTP.Request(path).content 
 	
 	# Dreiteilung: 1. Infos, 2. Hörfassungen, 3. Videos mit Untertitel
-	cont1 =  stringextract('title\" >Barrierefreie Angebote', 'itemprop=\"name\">Verfügbare Hörfassungen', page)
-	cont2 =  stringextract('\"name\">Verfügbare Hörfassungen', '\"name\">Verfügbare Videos mit Untertitel', page)
-	pos = page.find('Verfügbare Videos mit Untertitel</h2>')   # nur 1 x vorh, bis Rest
+	cont1 =  stringextract('title\" >Barrierefreie Angebote', 'Hörfassungen</h2>', page)
+	cont2 =  stringextract('Hörfassungen</h2>', 'Die neuesten Videos mit Untertitel</h2>', page)
+	pos = page.find('Die neuesten Videos mit Untertitel</h2>')   # nur 1 x vorh, bis Rest
 	cont3 = page[pos:]
 	Log(len(cont3))
 	
@@ -3696,7 +3696,7 @@ def get_formitaeten(sid, ID=''):
 	Log(request[:20])	# "canonical" ...
 	request = str(request)				# json=dict erlaubt keine Stringsuche, json.dumps klappt hier nicht
 	request = request.decode('utf-8', 'ignore')	
-	# Log(request)		# bei Bedarf
+	# Log(request)		# bei Bedarf, ev. reicht nachfolg. mainVideoContent
 	
 	pos = request.rfind('mainVideoContent')				# 'mainVideoContent' am Ende suchen
 	request_part = request[pos:]
@@ -3711,10 +3711,13 @@ def get_formitaeten(sid, ID=''):
 		Log('videodat: nicht in request_part enthalten')
 		return '',''
 	
-	# videodat_url = 'https://api.zdf.de/tmd/2/%s/vod/ptmd/mediathek/' % (ptmd_player) 	# ptmd_player injiziert - (noch) nicht benötigt, s.o.
-	videodat_url = 'https://api.zdf.de/tmd/2/portal/vod/ptmd/mediathek/'  
-	videodat_url = videodat_url + videodat
-	Log('ptmd: ' + old_videodat_url); Log('uurl: ' + videodat); Log('videodat_url: ' + videodat_url)	
+	ptmd_player = 'ngplayer_2_3'
+	videodat_url = stringextract('ptmd-template": "', '",', request_part)
+	videodat_url = videodat_url.replace('{playerId}', ptmd_player) 				# ptmd_player injiziert 
+	videodat_url = 'https://api.zdf.de' + videodat_url
+	# videodat_url = 'https://api.zdf.de/tmd/2/portal/vod/ptmd/mediathek/'  	# unzuverlässig
+	# videodat_url = videodat_url + videodat
+	Log('old_videodat_url: ' + old_videodat_url); Log('videodat_url: ' + videodat_url); Log('uurl: ' + videodat); 	
 
 	# ab 28.05.2017: Verwendung JSON.ObjectFromURL - Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich
 	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei
@@ -3886,7 +3889,7 @@ def ZDF_Bildgalerie(oc, page, mode, title):	# keine Bildgalerie, aber ähnlicher
 			msg =  msg.decode(encoding="utf-8", errors="ignore")
 			return ObjectContainer(header=msgH, message=msg)
 					
-		title = unescape(title)
+		title = unescape(title); title = cleanhtml(title)
 		title = title.decode(encoding="utf-8", errors="ignore")
 		summ = unescape(summ)
 		summ = summ .decode(encoding="utf-8", errors="ignore")
