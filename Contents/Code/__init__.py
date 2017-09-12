@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.6'		
-VDATE = '04.09.2017'
+VERSION =  '3.1.7'		
+VDATE = '12.09.2017'
 
 # 
 #	
@@ -408,7 +408,7 @@ def Main_POD(name):
 ################################################################	
 	
 #----------------------------------------------------------------
-def home(cont, ID):												# Home-Button, Aufruf: oc = home(cont=oc)
+def home(cont, ID):												# Home-Button, Aufruf: oc = home(cont=oc, ID=NAME)
 	Log('home')	
 	title = 'Zurück zum Hauptmenü ' + str(ID)
 	title = title.decode(encoding="utf-8", errors="ignore")
@@ -1889,23 +1889,15 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Mediendatei (Text) .mp4- und rt
 				t2 = stringextract( '\"_stream\":\"', '\"}', s1) 
 				s2 = t1 + t2	# beide rtmp-Teile verbinden
 				#Log(s2)				# nur bei Bedarf
-			
-			if 'http' in s1: 			# http / https: master.m3u8 + mp4
-				if s1.find('master.m3u8') >= 0 :
-					#s2 = teilstring(s1, 'http://','master.m3u8' )	# als Endung nicht sicher, auch vorkommend:
-					s2 = stringextract('stream\":\"','\"', s1)		# 	../master.m3u8?__b__=200
+			else:						# http-Links, auch Links, die mit // beginnen
+				s2 = stringextract('stream\":\"','\"', s1)
+				if s2.startswith('//'):				# 12.09.2017: WDR-Links ohne http:
+					s2 = 'http:' + s2
+				if 'master.m3u8' in s1:
 					m3u8_master = s2
-					Log(s2); Log(s1)				# nur bei Bedarf
-				elif s1.find('.mp4')  >= 0:
-					s2 = teilstring(s1, 'http', '.mp4' )
-					#Log(s2)
-				elif s1.find('master.m3u8') == -1 and s1.find('.mp4') == -1: # Video-Urls ohne Extension
-					#s2 = stringextract('_stream\":\"', '\"}]}]', s1) 
-					s2 = stringextract('_stream\":\"', '\"}]', s1) 
-					#Log(s2)					# nur bei Bedarf
+			Log(s2); Log(len(s2))				# nur bei Bedarf
 				
-			#Log(s2); Log(len(s2))				# nur bei Bedarf
-			
+							
 			if len(s2) > 9:						# schon url gefunden? Dann Markierung ermitteln
 				if s1.find('auto') >= 0:
 					mark = 'auto' + '|'					
