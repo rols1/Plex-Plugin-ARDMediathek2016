@@ -2,9 +2,9 @@
  <channels_info>
   <title>Deutsche Sender</title>
   <genre>TV</genre>
-  <description>Livestreams</description>
+  <description>Livestreams http://www.ardmediathek.de/tv/live</description>
   <thumbnail></thumbnail>
-   <date>10.03.2017 rols1</date>
+   <date>13.09.2017 rols1</date>
   <credits>Grafiken @Arauco (Plex-Forum)</credits>
  </channels_info>
  
@@ -215,7 +215,7 @@
 	</item>
 	<item>
 		<title>rbb Berlin</title>
-		<link>http://rbb_live-lh.akamaihd.net/i/rbb_berlin@108248/master.m3u8</link>
+		<link>https://rbblive-lh.akamaihd.net/i/rbb_berlin@144674/master.m3u8</link>
 		<thumbnail>tv-rbb-berlin.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>RBB</EPG_ID>
@@ -224,7 +224,7 @@
 	</item>
 	<item>
 		<title>rbb Brandenburg</title>
-		<link>http://rbb_live-lh.akamaihd.net/i/rbb_brandenburg@107638/master.m3u8</link>
+		<link>https://rbblive-lh.akamaihd.net/i/rbb_brandenburg@349369/master.m3u8</link>
 		<thumbnail>tv-rbb-brandenburg.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>RBB</EPG_ID>

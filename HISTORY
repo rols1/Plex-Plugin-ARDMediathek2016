@@ -2,6 +2,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
 
+14.09.2017 3.1.9	TV-Live: Austausch der Videoquellen von rbb Berlin und rbb Brandenburg in
+			livesenderTV.xml.
+
 13.09.2017 3.1.8	Radio-Live: Auswertung der Qualitätsstufen + Kennzeichnung im Titel (64 / 128 KB).	
 
 12.09.2017 3.1.7	Fehlende Videos beim WDR: in Funktion parseLinks_Mp4_Rtmp fehlendes 'http:' ergänzt.
