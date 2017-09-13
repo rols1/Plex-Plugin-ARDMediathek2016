@@ -2,6 +2,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
 
+13.09.2017 3.1.8	Radio-Live: Auswertung der Qualitätsstufen + Kennzeichnung im Titel (64 / 128 KB).	
+
 12.09.2017 3.1.7	Fehlende Videos beim WDR: in Funktion parseLinks_Mp4_Rtmp fehlendes 'http:' ergänzt.
 			ZDF-Bereich: Reihenfolge der Videoquellen geändert - ngplayer_2_3-Link zuerst, dann
 			/tmd/2/portal-Link.

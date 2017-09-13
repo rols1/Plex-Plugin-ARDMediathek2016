@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.7'		
-VDATE = '12.09.2017'
+VERSION =  '3.1.8'		
+VDATE = '13.09.2017'
 
 # 
 #	
@@ -2862,7 +2862,8 @@ def RadioAnstalten(path, title,sender,thumbs):
 					Log(img_src); 			# bei Bedarf
 					break
 
-		Log(link_path); Log(link_img); Log(img_src);Log(m3u8_master);  		
+		Log(link_path); Log(link_img); Log(img_src);Log(m3u8_master); 
+		headline_org =  headline	# sichern		
 		for i in range(len(link_path)):
 			s = link_path[i]
 			Log(s)
@@ -2882,6 +2883,10 @@ def RadioAnstalten(path, title,sender,thumbs):
 			Log(img_src); Log(headline); Log(subtitel); Log(sid); Log(slink);	# Bildquelle: z.Z. verwenden wir nur img_src
 			if subtitel == '':		# OpenPHT parsing Error, wenn leer
 				subtitel = headline
+			if mark == '0':						#  Titel kennz. (0=64kb, 1=128kb, 2=128kb), bisher nur diese gesehen
+				headline = headline_org + ' (64 KByte)'
+			if mark == '1' or mark == '2':					
+				headline = headline_org + ' (128 KByte)'
 			headline = headline.decode(encoding="utf-8", errors="ignore")
 			subtitel = unescape(subtitel)	
 			subtitel = subtitel.decode(encoding="utf-8", errors="ignore")
