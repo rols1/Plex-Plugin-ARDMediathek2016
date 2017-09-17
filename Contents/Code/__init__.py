@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.1.9'		
-VDATE = '14.09.2017'
+VERSION =  '3.2.0'		
+VDATE = '17.09.2017'
 
 # 
 #	
@@ -294,8 +294,8 @@ def Main_ARD(name):
 	oc.add(InputDirectoryObject(key=Callback(Search,  channel='ARD', s_type='video', title=u'%s' % L('Search Video')),
 		title=u'%s' % L('Search'), prompt=u'%s' % L('Search Video'), thumb=R(ICON_SEARCH)))
 		
-	title = 'Sendung Verpasst (1 Woche)'
-	oc.add(DirectoryObject(key=Callback(VerpasstWoche, name='ARD', title='Sendung Verpasst', sender='DAS ERSTE', 
+	title = 'Sendung verpasst (1 Woche)'
+	oc.add(DirectoryObject(key=Callback(VerpasstWoche, name='ARD', title='Sendung verpasst', sender='DAS ERSTE', 
 		kanal='208'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_VERP)))
 	title = 'Sendungen A-Z'
 	oc.add(DirectoryObject(key=Callback(SendungenAZ, name='Sendungen 0-9 | A-Z', ID='ARD'), 
@@ -347,8 +347,8 @@ def Main_ZDF(name):
 	oc.add(InputDirectoryObject(key=Callback(ZDF_Search, s_type='video', title=u'%s' % L('Search Video')),
 		title=u'%s' % L('Search'), prompt=u'%s' % L('Search Video'), thumb=R(ICON_ZDF_SEARCH)))
 		
-	oc.add(DirectoryObject(key=Callback(VerpasstWoche, name=name, title='Sendung Verpasst', sender='ZDF', 
-		kanal=''), title="Sendung Verpasst (1 Woche)", thumb=R(ICON_ZDF_VERP)))
+	oc.add(DirectoryObject(key=Callback(VerpasstWoche, name=name, title='Sendung verpasst', sender='ZDF', 
+		kanal='leer'), title="Sendung verpasst (1 Woche)", thumb=R(ICON_ZDF_VERP)))
 	oc.add(DirectoryObject(key=Callback(ZDFSendungenAZ, name="Sendungen A-Z"), title="Sendungen A-Z",
 		thumb=R(ICON_ZDF_AZ)))
 	oc.add(DirectoryObject(key=Callback(Rubriken, name="Rubriken"), title="Rubriken", 
@@ -3609,7 +3609,7 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 	# key = 'page_GZVS'											# entf., in get_formitaeten nicht mehr benötigt
 	# Dict[key] = page	
 	docId = stringextract("docId: \'", "\'", page)				# Bereich window.zdfsite
-	formitaeten, duration = get_formitaeten(sid=docId)			# Video-URL's ermitteln
+	formitaeten,duration,geoblock = get_formitaeten(sid=docId)	# Video-URL's ermitteln
 	# Log(formitaeten)
 	if formitaeten == '':										# Nachprüfung auf Videos
 		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
@@ -3624,7 +3624,7 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 
 	only_list = ["h264_aac_ts_http_m3u8_http"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,
-		thumb=thumb, only_list=only_list)		  
+		thumb=thumb, only_list=only_list,geoblock=geoblock)		  
 		
 	title_oc='weitere Video-Formate'
 	if Prefs['pref_use_downloads']:	
@@ -3644,11 +3644,11 @@ def ZDFotherSources(title, tagline, thumb, docId):
 
 	title = title.decode(encoding="utf-8", errors="ignore")					
 	oc = ObjectContainer(title2=title, view_group="InfoList")
-	oc = home(cont=oc, ID='ZDF')							# Home-Button
+	oc = home(cont=oc, ID='ZDF')								# Home-Button
 		
-	formitaeten, duration = get_formitaeten(sid=docId)		# Video-URL's ermitteln
+	formitaeten,duration,geoblock = get_formitaeten(sid=docId)	# Video-URL's ermitteln
 	# Log(formitaeten)
-	if formitaeten == '':									# Nachprüfung auf Videos
+	if formitaeten == '':										# Nachprüfung auf Videos
 		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
 		msg = msg.decode(encoding="utf-8", errors="ignore")		
 		return ObjectContainer(header='Error', message=msg)
@@ -3661,7 +3661,7 @@ def ZDFotherSources(title, tagline, thumb, docId):
 
 	only_list = ["h264_aac_mp4_http_na_na", "vp8_vorbis_webm_http_na_na", "vp8_vorbis_webm_http_na_na"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title_org, formitaeten=formitaeten, tagline=tagline,
-		thumb=thumb, only_list=only_list)		  
+		thumb=thumb, only_list=only_list, geoblock=geoblock)		  
 					
 	# high=0: 	1. Video bisher höchste Qualität:  [progressive] veryhigh
 	oc = test_downloads(oc,download_list,title_org,summary_org,tagline,thumb,high=0)  # Downloadbutton(s)
@@ -3775,14 +3775,18 @@ def get_formitaeten(sid, ID=''):
 	formitaeten = blockextract('formitaeten', page)		# Video-URL's ermitteln
 	geoblock =  stringextract('geoLocation',  '}', page) 
 	geoblock =  stringextract('"value": "',  '"', geoblock).strip()
-	Log(geoblock)										# i.d.R. "none", sonst "de" - wie bei ARD verwenden
+	Log('geoblock: ' + geoblock)									# i.d.R. "none", sonst "de" - wie bei ARD verwenden
+	if geoblock == 'de':			# Info-Anhang für summary 
+		geoblock = ' | Geoblock!'
+	else:
+		geoblock = ''
 
-	return formitaeten, duration
+	return formitaeten, duration, geoblock 
 
 #-------------------------
 # 	Ausgabe der Videoformate
 #	
-def show_formitaeten(oc, title_call, formitaeten, tagline, thumb, only_list):	
+def show_formitaeten(oc, title_call, formitaeten, tagline, thumb, only_list, geoblock):	
 	Log('show_formitaeten')
 	Log(only_list)
 	# Log(formitaeten)		# bei Bedarf
@@ -3812,14 +3816,14 @@ def show_formitaeten(oc, title_call, formitaeten, tagline, thumb, only_list):
 						title=str(i) + '. ' + title_call + ' | ' + quality + ' [m3u8]'
 						summary = 'Qualität: ' + quality + ' | Typ: ' + typ + ' [m3u8-Streaming]'
 						summary = summary.decode(encoding="utf-8", errors="ignore")
-						oc.add(CreateVideoStreamObject(url=url, title=title, rtmp_live='nein', summary=summary, 
+						oc.add(CreateVideoStreamObject(url=url, title=title, rtmp_live='nein', summary=summary+geoblock, 
 							tagline=tagline, meta=Plugin.Identifier + str(i), thumb=thumb, resolution='unbekannt'))	
 					else:
 						title=str(i) + '. ' + title_call + ' | ' + quality	
 						summary = 'Qualität: ' + quality + ' | Typ: ' + typ + ' ' + facets 
 						summary = summary.decode(encoding="utf-8", errors="ignore")
 						download_list.append(summary + '#' + url)					# Download-Liste füllen				
-						oc.add(CreateVideoClipObject(url=url, title=title, summary=summary,
+						oc.add(CreateVideoClipObject(url=url, title=title, summary=summary+geoblock,
 							meta= Plugin.Identifier + str(i), tagline=tagline, thumb=thumb, 
 							duration='duration', resolution='unbekannt'))
 					

@@ -589,7 +589,7 @@ def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
 			single_rec.append(tagline);
 			POD_rec.append(single_rec)
 		return POD_rec							# Rückkehr aus Seitenkontrolle
-
+		
 												# 2. Durchlauf - Inhalte der einzelnen Seiten:
 	sendungen = blockextract('class="module list w100">', page) 
 	if sendungen[2].find('urlScheme') >= 0:								# 2 = Episodendach
@@ -597,6 +597,7 @@ def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
 		img_src_header, img_alt_header = img_urlScheme(text, 320, ID='PODCAST') 
 		teasertext = stringextract('class="teasertext">', '</p>', sendungen[2])
 		Log(img_src_header);Log(img_alt_header);Log(teasertext);
+	
 	
 	max_len = len(sendungen)					# Gesamtzahl gefundener Sätze dieser Seite
 	Log(max_len)
