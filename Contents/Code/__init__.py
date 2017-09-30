@@ -19,7 +19,7 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.0'		
+VERSION =  '3.2.2'		
 VDATE = '30.09.2017'
 
 # 

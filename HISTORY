@@ -3,7 +3,7 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
-30.09.2017 3.2.0	'Mehr..'-Option für ZDF-Videos in Barrierearm, Verpasst, Sendung A-Z,  Rubriken,
+30.09.2017 3.2.2	'Mehr..'-Option für ZDF-Videos in Barrierearm, Verpasst, Sendung A-Z,  Rubriken,
 			Meist Gesehen, Neu in der Mediathek (Option in Suche + Bilderserien bereits vorhanden). 
 			Neo-Funktionen: geoblock-Info ergänzt in GetNeoVideoSources + NEOotherSources (Plugin 
 			blockte beim Laden der Videoquellen).
