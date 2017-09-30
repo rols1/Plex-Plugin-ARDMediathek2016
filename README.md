@@ -74,7 +74,10 @@ Anleitung zum manuellen Installieren von Plex Software-Bundles (Channels, Agente
 
 ein Neustart von Plex oder ein vorheriges Beenden von Plex ist i.d.R. nicht erforderlich
 Beim Aktualisieren einfach den .bundle Ordner löschen und die neue Version an seine Stelle kopieren.
+Ergänzung:
  
+### Ergänzung
+beim Download der zip-Datei aus Plex-Plugin-ARDMediathek2016/release entfällt das Umbenennen.
 
 Credits:
 ===================  

@@ -27,14 +27,15 @@ def EPG(ID, mode=None, day_offset=None):
 	url="http://www.tvtoday.de/programm/standard/sender/%s.html" % ID
 	Log(url)
 
-	page, err = get_page(path=url)				# Absicherung gegen Connect-Probleme
+	page, err = get_page(path=url, cTimeout=0)				# Absicherung gegen Connect-Probleme
+	# Log(page[:500])	# bei Bedarf
 	if err:
-		return err	
-	#Log(len(page))
+		return ''	# Verarbeitung in SenderLiveListe (rec = EPG.EPG..)
+	Log(len(page))
 
 	pos = page.find('tv-show-container js-tv-show-container')	# ab hier relevanter Inhalt
 	page = page[pos:]
-	#Log(len(page))
+	Log(len(page))
 
 	liste = blockextract('href=\"', page)  
 	Log(len(liste));	
@@ -169,21 +170,27 @@ def transl_wtag(tag):	# Wochentage engl./deutsch wg. Problemen mit locale-Settin
 			break
 	return wt_ret
 #----------------------------------------------------------------  
-def get_page(path):		# holt kontrolliert raw-Content
+def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content
+	Log('get_page');
+	msg = ''; page = ''				
 	try:
-		page = HTTP.Request(path).content
-		err = ''
-	except:
-		page = ''
+		if cTimeout:					# mit Cachevorgabe
+			page = HTTP.Request(path, cacheTime=int(cTimeout) ).content
+		else:
+			page = HTTP.Request(path).content
+	except Exception as exception:
+		summary = str(exception)
+		summary = summary.decode(encoding="utf-8", errors="ignore")
+		Log(summary)		
 		
 	if page == '':	
 		error_txt = 'Seite nicht erreichbar'			 			 	 
 		msgH = 'Fehler'; msg = error_txt + ' | Seite: ' + path
 		Log(msg)
 		msg =  msg.decode(encoding="utf-8", errors="ignore")
-		err = ObjectContainer(header=msgH, message=msg)
+		# err = ObjectContainer(header=msgH, message=msg)
 
-	return page, err	
+	return page, msg	
 #----------------------------------------------------------------  
 def stringextract(mFirstChar, mSecondChar, mString):  	# extrahiert Zeichenkette zwischen 1. + 2. Zeichenkette
 	pos1 = mString.find(mFirstChar)						# return '' bei Fehlschlag

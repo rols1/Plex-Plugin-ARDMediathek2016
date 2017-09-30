@@ -20,7 +20,7 @@ import EPG
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
 VERSION =  '3.2.0'		
-VDATE = '17.09.2017'
+VDATE = '30.09.2017'
 
 # 
 #	
@@ -167,7 +167,7 @@ ZDF_SENDUNG_VERPASST 	= 'https://www.zdf.de/sendung-verpasst?airtimeDate=%s'  # 
 ZDF_SENDUNGEN_AZ		= 'https://www.zdf.de/sendungen-a-z?group=%s'			# group-Format: a,b, ... 0-9: group=0+-+9
 ZDF_WISSEN				='https://www.zdf.de/doku-wissen'						# Basis für Ermittlung der Rubriken
 ZDF_SENDUNGEN_MEIST		= 'https://www.zdf.de/meist-gesehen'
-ZDF_BARRIEREARM		= 'https://www.zdf.de/barrierefreiheit-im-zdf'
+ZDF_BARRIEREARM			= 'https://www.zdf.de/barrierefreiheit-im-zdf'
 # 26.02.2017 alternative Seiten (vollständig im Vergleich mit Web-Version?): 
 #	https://config-cdn.cellular.de/zdf/mediathek/config/android/4_0/zdf_mediathek_android_live_4_0.json
 #	Siehe https://github.com/raptor2101/Mediathek/issues/85 Kodi-Plugin Mediathek
@@ -715,10 +715,13 @@ def test_fault(page, path):	# testet geladene ARD-Seite auf ARD-spezif. Error-Te
 	else:
 		return ''
 #-----------------------
-def get_page(path):		# holt kontrolliert raw-Content
+def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content, cTimeout für cacheTime
 	msg = ''; page = ''				
 	try:
-		page = HTTP.Request(path).content
+		if cTimeout:					# mit Cachevorgabe
+			page = HTTP.Request(path, cacheTime=int(cTimeout) ).content
+		else:
+			page = HTTP.Request(path).content
 	except Exception as exception:
 		summary = str(exception)
 		summary = summary.decode(encoding="utf-8", errors="ignore")
@@ -2310,7 +2313,10 @@ def SenderLiveListe(title, listname, offset=0):	#
 			EPG_ID = stringextract('<EPG_ID>', '</EPG_ID>', element)
 			try:
 				rec = EPG.EPG(ID=EPG_ID, mode='OnlyNow')	# Daten holen - nur aktuelle Sendung
-				sname=rec[3]; stime=rec[4]; summ=rec[5]; vonbis=rec[6]	
+				if rec == '':								# Fehler, ev. Sender EPG_ID nicht bekannt
+					sname=''; stime=''; summ=''; vonbis=''
+				else:
+					sname=rec[3]; stime=rec[4]; summ=rec[5]; vonbis=rec[6]	
 			except:
 				sname=''; stime=''; summ=''; vonbis=''						
 			if sname:
@@ -2704,7 +2710,6 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
 	#	beobachtet bei Firefox (Suse Leap) + Chrome (Windows7)
 	#	s.a. https://github.com/sander1/channelpear.bundle/tree/8605fc778a2d46243bb0378b0ab40a205c408da4
 def CreateVideoClipObject(url, title, summary, tagline, meta, thumb, duration, resolution, include_container=False, **kwargs):
-	#title = title.encode("utf-8")		# ev. für alle ausgelesenen Details erforderlich
 	Log('CreateVideoClipObject')
 	Log(url); Log(duration); Log(tagline)
 	Log(Client.Platform)
@@ -3059,22 +3064,36 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 	Log(path)	
 	# page = HTTP.Request(path, cacheTime=1).content 		# Debug: cacheTime=1 
 	page = HTTP.Request(path).content 
-	
-	# Log(page)	# bei Bedarf		
-	searchResult = stringextract('data-loadmore-result-count=\"', '\"', page)
+	searchResult = stringextract('data-loadmore-result-count=\"', '\"', page)	# Anzahl Ergebnisse
 	Log(searchResult);
 	
-	if pagenr == '':		# erster Aufruf muss '' sein
-		pagenr = 1
+	# Log(page)	# bei Bedarf		
 	NAME = 'ZDF Mediathek'
 	name = 'Suchergebnisse zu: %s (Gesamt: %s), Seite %s'  % (urllib.unquote(query), searchResult, pagenr)
 	name = name.decode(encoding="utf-8", errors="ignore")
 	oc = ObjectContainer(view_group="InfoList", title1=NAME, title2=name, art = ObjectContainer.art)
+
+	if searchResult == '0':
+		msg_notfound = 'Kein Ergebnis für >%s<' % query
+		title = msg_notfound.decode(encoding="utf-8", errors="ignore")
+		summary = 'zurück zu ' + NAME
+		summary = summary.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(Main_ZDF, name=NAME), title=title, 
+			summary=summary, tagline='TV', thumb=R(ICON_MAIN_ZDF)))
+		return oc
+	
 	oc = home(cont=oc, ID='ZDF')							# Home-Button	
+	
+	if pagenr == '':		# erster Aufruf muss '' sein
+		pagenr = 1
 			
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=path, ID=ID)
+	# offset=0: anders als bei den übrigen ZDF-'Mehr'-Optionen gibt der Sender Suchergebnisse bereits
+	#	seitenweise aus, hier umgesetzt mit pagenr - offset entfällt	
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID=ID, offset=0)
 	
 	# auf mehr prüfen (Folgeseite auf content-link = Ausschlusskriterum prüfen):
+	#	im Gegensatz zu anderen ZDF-Seiten gibt  der Sender hier die Resultate seitenweise aus.
+	# 	Daher entfällt die offset-Variante wiez.B. in BarriereArmSingle.
 	pagenr = int(pagenr) + 1
 	path = ZDF_Search_PATH % (query, pagenr)
 	Log(pagenr); Log(path)
@@ -3089,7 +3108,7 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 	
 #-------------------------
 @route(PREFIX + '/ZDF_Verpasst')
-def ZDF_Verpasst(title, zdfDate):
+def ZDF_Verpasst(title, zdfDate, offset=0):
 	Log('ZDF_Verpasst'); Log(title); Log(zdfDate)
 	oc = ObjectContainer(title2=title, view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
@@ -3098,8 +3117,15 @@ def ZDF_Verpasst(title, zdfDate):
 	page = HTTP.Request(path).content 
 	Log(path);	# Log(page)	# bei Bedarf
 
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='VERPASST')
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='VERPASST', offset=offset)
+	summ_mehr = 'Mehr zu >Verpasst<, Gesamt: %s' % page_cnt
 	
+	Log(offset)
+	if offset:
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(ZDF_Verpasst, title=title, zdfDate=zdfDate, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
+			
 	return oc
 	
 ####################################################################################################
@@ -3122,7 +3148,7 @@ def ZDFSendungenAZ(name):
 
 ####################################################################################################
 @route(PREFIX + '/SendungenAZList')
-def SendungenAZList(title, element):	# Sendungen zm gewählten Buchstaben
+def SendungenAZList(title, element, offset=0):	# Sendungen zm gewählten Buchstaben
 	Log('SendungenAZList')
 	title2='Sendungen mit ' + element
 	oc = ObjectContainer(title2=title2, view_group="List")
@@ -3135,10 +3161,17 @@ def SendungenAZList(title, element):	# Sendungen zm gewählten Buchstaben
 	page = HTTP.Request(azPath).content 
 	Log(azPath);	
 
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=azPath, ID='DEFAULT')
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=azPath, ID='DEFAULT', offset=offset)
 	  
 	if len(oc) == 1:	# home berücksichtigen
-		return NotFound('Leer - keine Sendung(en), die mit  >' + element + '< starten')
+		return NotFound('Leer - keine Sendung(en), die mit  >' + element + '< beginnen')
+		
+	summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (title2, page_cnt)
+	Log(offset)
+	if offset:
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(SendungenAZList, title=title, element=element, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 
 	return oc
 	
@@ -3146,7 +3179,7 @@ def SendungenAZList(title, element):	# Sendungen zm gewählten Buchstaben
 # 	wrapper für Mehrfachseiten aus ZDF_get_content (multi=True). Dort ist kein rekursiver Aufruf
 #	möglich (Übergabe Objectcontainer in Callback nicht möglich - kommt als String an)
 @route(PREFIX + '/ZDF_Sendungen')	
-def ZDF_Sendungen(url, title, ID):
+def ZDF_Sendungen(url, title, ID, offset=0):
 	Log('ZDFSendungen')
 	
 	title = title.decode(encoding="utf-8", errors="ignore")
@@ -3162,7 +3195,14 @@ def ZDF_Sendungen(url, title, ID):
 			msg = msg + url
 			return ObjectContainer(message=msg)	  # header=... ohne Wirkung	(?)	
 					
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=url, ID=ID)
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=url, ID='VERPASST', offset=offset)
+
+	Log(offset)
+	summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (title, page_cnt)
+	if offset:
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(ZDF_Sendungen, url=url, title=title, ID=ID, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 
 	return oc
   
@@ -3193,32 +3233,45 @@ def Rubriken(name):
 	return oc
 #-------------------------
 @route(PREFIX + '/RubrikSingle')
-def RubrikSingle(title, path):
+def RubrikSingle(title, path, offset=0):
 	Log('RubrikSingle'); 
 	oc = ObjectContainer(title2=title, view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 	
 	page = HTTP.Request(path).content 			
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT')	
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
 	
+	Log(offset)
+	if offset:
+		summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (title, page_cnt)
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(RubrikSingle, title=title, path=path, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 	return oc
 	
 ####################################################################################################
 @route(PREFIX + '/MeistGesehen')
-def MeistGesehen(name):
+def MeistGesehen(name, offset=0):
 	Log('MeistGesehen'); 
 	oc = ObjectContainer(title2=name, view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 	
 	path = ZDF_SENDUNGEN_MEIST
 	page = HTTP.Request(path).content 			
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT')	
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	
+	Log(offset)
+	if offset:
+		summ_mehr = 'Mehr zu >name<, Gesamt: %s' % (name, page_cnt)
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(RubrikSingle, path=path, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 	
 	return oc
 		
 ####################################################################################################
 @route(PREFIX + '/NeuInMediathek')
-def NeuInMediathek(name):
+def NeuInMediathek(name, offset=0):
 	Log('NeuInMediathek'); 
 	oc = ObjectContainer(title2=name, view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
@@ -3230,7 +3283,14 @@ def NeuInMediathek(name):
 	page = stringextract('<article class="b-cluster m-filter js-rb-live','<article class="b-cluster m-filter js-rb-live', page)
 	Log(len(page))
 	 			
-	oc = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='NeuInMediathek')	
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	
+	Log(offset)
+	if offset:
+		summ_mehr = 'Mehr zu >name<, Gesamt: %s' % (name, page_cnt)
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(NeuInMediathek, name=name, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 	
 	return oc
 		
@@ -3265,8 +3325,9 @@ def BarriereArm(name):				# Vorauswahl: 1. Infos, 2. Hörfassungen, 3. Videos mi
 	
 #-------------------------
 @route(PREFIX + '/BarriereArmSingle')
-def BarriereArmSingle(title, ID):			# Aufruf: 1. Infos, 2. Hörfassungen, 3. Videos mit Untertitel
+def BarriereArmSingle(title, ID, offset=0):	# Aufruf: 1. Infos, 2. Hörfassungen, 3. Videos mit Untertitel
 	Log('BarriereArmSingle: ' + ID)
+	Log(offset)
 	
 	title = title.decode(encoding="utf-8", errors="ignore")
 	oc = ObjectContainer(title2='ZDF: ' + title, view_group="List")
@@ -3283,12 +3344,21 @@ def BarriereArmSingle(title, ID):			# Aufruf: 1. Infos, 2. Hörfassungen, 3. Vid
 	Log(len(cont3))
 	
 	if ID == 'Infos':
-		oc = ZDF_get_content(oc=oc, page=cont1, ref_path=path, ID='DEFAULT')	
+		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont1, ref_path=path, ID='DEFAULT', offset=offset)	
+		summ_mehr = 'Infos zu >Barrierefreie Angebote<, Gesamt: %s' % page_cnt
 	if ID == 'Voice':
-		oc = ZDF_get_content(oc=oc, page=cont2, ref_path=path, ID='DEFAULT')	
+		oc, offset, page_cnt = ZDF_get_content(oc=oc, page=cont2, ref_path=path, ID='DEFAULT', offset=offset)	
+		summ_mehr = 'Mehr zu >Hörfassungen<, Gesamt: %s' % page_cnt
 	if ID == 'UT':
-		oc = ZDF_get_content(oc=oc, page=cont3, ref_path=path, ID='DEFAULT')	
+		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont3, ref_path=path, ID='DEFAULT', offset=offset)	
+		summ_mehr = 'Mehr zu >Videos mit Untertitel<, Gesamt: %s' % page_cnt
 	
+	Log(offset)
+	if offset:
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(BarriereArmSingle, title=title, ID=ID, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
+		
 	return oc
 	
 ####################################################################################################
@@ -3296,13 +3366,17 @@ def BarriereArmSingle(title, ID):			# Aufruf: 1. Infos, 2. Hörfassungen, 3. Vid
 #	Die Erkennung von Mehrfachseiten (multi=true) ist leider nicht allen Fällen möglich. Bsp.:
 #	Liveticker, Bilderserien usw. werden ohne bes. Kennung hier angezeigt. Bis auf Weiteres werden
 #	die Folgeseiten mit Fehlermeldung abgefangen (nach Test auf Videos) 
+#	offset: für übergroße Seiten, die nicht wie die Suchergebn. als Folgeseiten mit pagenr organisiert sind.
+#		Bsp. für übergroße Seite: Hörfassungen (145 am 28.9.2017)
 
-def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' - Abweichungen zu Rubriken + A-Z
-	Log('ZDF_get_content'); Log(ID); Log(ref_path)
+def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'VERPASST' - Abweichungen zu Rubriken + A-Z
+	Log('ZDF_get_content'); Log(ID); Log(ref_path); Log(offset)					
+	max_count = int(Prefs['pref_maxZDFContent'])				# max. Anzahl Einträge ab offset
+	offset = int(offset)																		
 	
 	img_alt = teilstring(page, 'class=\"m-desktop', '</picture>') # Bildsätze für b-playerbox
 	
-	if page.find('class=\"content-box gallery-slider-box') >= 0:  # Bildgalerie (hier aus Folgeseiten)
+	if page.find('class=\"content-box gallery-slider-box') >= 0: 	# Bildgalerie (hier aus Folgeseiten)
 		title = stringextract('\"big-headline\"  itemprop=\"name\" >', '</h1>', page)
 		title = unescape(title)
 		Log(title)
@@ -3324,9 +3398,11 @@ def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' -
 	content =  blockextract('class=\"artdirect\"', page)
 	if ID == 'NeuInMediathek':									# letztes Element entfernen (Verweis Sendung verpasst)
 		content.pop()	
-	Log(len(page)); Log('content-Blocks: ' + str(len(content)));
+	Log(len(page)); 
+	page_cnt = len(content)
+	Log('content_Blocks: ' + str(page_cnt));
 	
-	if len(content) == 0:										# kein Ergebnis oder allg. Fehler
+	if page_cnt == 0:											# kein Ergebnis oder allg. Fehler
 		s = 'Es ist leider ein Fehler aufgetreten.'				# ZDF-Meldung Server-Problem
 		if page.find('\"title\">' + s) >= 0:
 			msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
@@ -3335,7 +3411,8 @@ def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' -
 			
 		if ref_path.startswith('https://www.zdf.de/comedy/neo-magazin-mit-jan-boehmermann'): # neue ZDF-Seite
 			import zdfneo
-			return zdfneo.neo_content(path=ref_path, ID=ID)		# Abschluss dort
+			oc = zdfneo.neo_content(path=ref_path, ID=ID)		# Abschluss dort
+			return oc, offset, page_cnt 
 			
 		title = msg_notfound.decode(encoding="utf-8", errors="ignore")					
 		summary = 'zurück zur ' + NAME.decode(encoding="utf-8", errors="ignore")		
@@ -3348,7 +3425,11 @@ def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' -
 		first_rec = img_alt +  stringextract('class=\"item-caption', 'data-tracking=', page) # mit img_alt
 		content.insert(0, first_rec)		# an den Anfang der Liste
 		# Log(content[0]) # bei Bedarf
-		
+	
+	if 	max_count:								# 0 = 'Mehr..'-Option ausgeschaltet
+		delnr = min(page_cnt, offset)
+		del content[:delnr]						# Sätze bis offset löschen (bzw. bis Ende records)
+	Log(len(content))
 	for rec in content:	
 		pos = rec.find('</article>')		# Satz begrenzen - bis nächsten Satz nicht verwertbare Inhalte möglich
 		if pos > 0:
@@ -3529,11 +3610,22 @@ def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' -
 		tagline = tagline.decode(encoding="utf-8", errors="ignore")
 		
 		if multi == True:
-			oc.add(DirectoryObject(key=Callback(ZDF_Sendungen, url=path, title=title, ID=ID), 
+			oc.add(DirectoryObject(key=Callback(ZDF_Sendungen, url=path, title=title, ID=ID, offset=0), 
 				title=title, thumb=thumb, summary=summary, tagline=tagline))
 		else:							
 			oc.add(DirectoryObject(key=Callback(GetZDFVideoSources, title=title, url=path, tagline=tagline, thumb=thumb), 
-					title=title, thumb=thumb, summary=summary, tagline=tagline))					
+					title=title, thumb=thumb, summary=summary, tagline=tagline))
+
+		if max_count:
+			# Mehr Seiten anzeigen:		# 'Mehr...'-Callback durch Aufrufer	
+			cnt = len(oc) + offset		# 
+			Log('Mehr-Test'); Log(len(oc)); Log(cnt); Log(page_cnt)
+			if cnt >= page_cnt:			# Gesamtzahl erreicht - Abbruch
+				offset=0
+				break					# Schleife beenden
+			elif len(oc) >= max_count:	# Mehr, wenn max_count erreicht
+				offset = offset + max_count-1
+				break					# Schleife beenden
 
 	# Bildstrecken am Fuß des Dokuments anhängen (ZDF-Korrespondenten, -Mitarbeiter,...):
 	segment_start='<article class=\"b-group-persons\">'; segment_end = 'class="b-footer">'
@@ -3554,8 +3646,8 @@ def ZDF_get_content(oc, page, ref_path, ID=None):	# ID='Search' od. 'VERPASST' -
 		oc.add(DirectoryObject(key=Callback(GetZDFVideoSources, title=title, url=path, tagline=tagline, thumb=thumb,
 			segment_start=segment_start, segment_end=segment_end),  title=title, thumb=thumb, summary=summary,
 			tagline=tagline))	
-
-	return oc
+				
+	return oc, offset, page_cnt 
 #-------------
 def get_airing(airing_string):		# Datum + Uhrzeit, Bsp. airing_string 2016-11-12T21:45:00.000+01:00
 	# Log(airing_string)
@@ -3685,7 +3777,7 @@ def get_formitaeten(sid, ID=''):
 	profile_url = 'https://api.zdf.de/content/documents/%s.json?profile=player'	% sid
 	Log(profile_url)
 	if sid == '':														# Nachprüfung auf Videos
-		return '',''
+		return '','',''
 	
 	# apiToken (Api-Auth) : bei Änderungen des  in configuration.json neu ermitteln (für NEO: HAR-Analyse mittels chrome)
 	# Api-Auth + Host reichen manchmal, aber nicht immer! 
@@ -3714,7 +3806,7 @@ def get_formitaeten(sid, ID=''):
 	videodat = stringextract('"uurl": "', '"', request_part)	# Bsp.: 161118_clip_5_hsh
 	if videodat == '':												# fehlt manchmal, dann auch kein Video verfügbar
 		Log('videodat: nicht in request_part enthalten')
-		return '',''
+		return '','',''
 	
 	ptmd_player = 'ngplayer_2_3'
 	videodat_url = stringextract('ptmd-template": "', '",', request_part)
@@ -3744,7 +3836,7 @@ def get_formitaeten(sid, ID=''):
 			page = ""
 		
 		Log('videodat_url: Laden fehlgeschlagen')
-		return '', ''
+		return '', '', ''
 		
 	Log(page[:20])	# "{..attributes" ...
 		

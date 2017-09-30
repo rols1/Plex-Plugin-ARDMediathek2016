@@ -33,6 +33,7 @@ def neo_content(path, ID, offset=0):
 	oc = home(cont=oc, ID='ZDF')								# Home-Button
 	
 	content = blockextract('class="modules', page)
+	Log(len(content))
 	if len(oc) == 0:
 		msg_notfound = title + ': Auswertung fehlgeschlagen'	
 		title = msg_notfound.decode(encoding="utf-8", errors="ignore")
@@ -89,7 +90,7 @@ def GetNeoVideoSources(url, sid, title, summary, tagline, thumb):
 	oc = ObjectContainer(title2='Videoformate', view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 
-	formitaeten, duration = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
+	formitaeten, duration, geoblock = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
 	if formitaeten == '':									# Nachprüfung auf Videos
 		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
 		msg = msg.decode(encoding="utf-8", errors="ignore")		
@@ -103,7 +104,7 @@ def GetNeoVideoSources(url, sid, title, summary, tagline, thumb):
 
 	only_list = ["h264_aac_ts_http_m3u8_http"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,
-		thumb=thumb, only_list=only_list)		  
+		thumb=thumb, only_list=only_list, geoblock=geoblock)		  
 
 	title_oc='weitere Video-Formate'
 	if Prefs['pref_use_downloads']:	
@@ -125,7 +126,7 @@ def NEOotherSources(title, tagline, thumb, sid):
 	oc = ObjectContainer(title2='Videoformate', view_group="List")
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 	
-	formitaeten, duration = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
+	formitaeten, duration, geoblock = get_formitaeten(sid=sid, ID='NEO')	# Video-URL's ermitteln
 	if formitaeten == '':										# Nachprüfung auf Videos
 		msg = 'Video nicht vorhanden / verfügbar'  + ' Seite:\r' + url
 		msg = msg.decode(encoding="utf-8", errors="ignore")		
@@ -139,7 +140,7 @@ def NEOotherSources(title, tagline, thumb, sid):
 	
 	only_list = ["h264_aac_mp4_http_na_na", "vp8_vorbis_webm_http_na_na", "vp8_vorbis_webm_http_na_na"]
 	oc, download_list = show_formitaeten(oc=oc, title_call=title, formitaeten=formitaeten, tagline=tagline,
-		thumb=thumb, only_list=only_list)	
+		thumb=thumb, only_list=only_list, geoblock=geoblock)	
 		
 	# high=0: 	1. Video bisher höchste Qualität:  [progressive] veryhigh
 	oc = test_downloads(oc,download_list,title_org,summary_org,tagline,thumb,high=0)  # Downloadbutton(s)
