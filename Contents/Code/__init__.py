@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.2'		
-VDATE = '30.09.2017'
+VERSION =  '3.2.3'		
+VDATE = '03.10.2017'
 
 # 
 #	
@@ -2332,6 +2332,7 @@ def SenderLiveListe(title, listname, offset=0):	#
 		title = unescape(title)	
 		title = title.replace('JETZT:', '')					# 'JETZT:' hier überflüssig
 		title = title.decode(encoding="utf-8", errors="ignore")	
+		summary = unescape(summary)	
 		summary = summary.decode(encoding="utf-8", errors="ignore")			
 		tagline = tagline.decode(encoding="utf-8", errors="ignore")	
 						

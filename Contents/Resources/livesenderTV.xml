@@ -178,7 +178,7 @@
 	</item>	
 	<item>
 		<title>NDR Fernsehen Hamburg</title>
-		<link>http://ndr_fs-lh.akamaihd.net/i/ndrfs_hh@119223/master.m3u8</link>
+		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_hh@430231/master.m3u8</link>
 		<thumbnail>tv-ndr-hamburg.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
@@ -187,7 +187,7 @@
 	</item>
 	<item>
 		<title>NDR Fernsehen Mecklenburg-Vorpommern</title>
-		<link>http://ndr_fs-lh.akamaihd.net/i/ndrfs_mv@119226/master.m3u8</link>
+		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_mv@430232/master.m3u8</link>
 		<thumbnail>tv-ndr-mecklenburg-vorpommern.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
@@ -196,7 +196,7 @@
 	</item>
 	<item>
 		<title>NDR Fernsehen Niedersachsen</title>
-		<link>http://ndr_fs-lh.akamaihd.net/i/ndrfs_nds@119224/master.m3u8</link>
+		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_nds@430233/master.m3u8</link>
 		<thumbnail>tv-ndr-niedersachsen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
@@ -205,7 +205,7 @@
 	</item>
 	<item>
 		<title>NDR Fernsehen Schleswig-Holstein</title>
-		<link>http://ndr_fs-lh.akamaihd.net/i/ndrfs_sh@119225/master.m3u8</link>
+		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_sh@430234/master.m3u8</link>
 		<thumbnail>tv-ndr-schleswig-holstein.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>

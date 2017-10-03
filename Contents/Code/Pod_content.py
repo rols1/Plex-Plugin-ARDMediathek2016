@@ -765,6 +765,7 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 				
 		tagline = teasertext									# aus Episodendach, falls vorh.
 		tagline = unescape(tagline)
+		summ = unescape(summ)
 		
 		Log(title); Log(summ); Log(url); 
 		title=title.decode(encoding="utf-8", errors="ignore")
