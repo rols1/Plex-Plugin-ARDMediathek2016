@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.3'		
-VDATE = '03.10.2017'
+VERSION =  '3.2.4'		
+VDATE = '08.10.2017'
 
 # 
 #	
@@ -3695,7 +3695,11 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 			return oc		
 		if page.find('class=\"content-box gallery-slider-box') >= 0:		# Bildgalerie
 			oc = ZDF_Bildgalerie(oc=oc, page=page, mode='is_gallery', title=title)
-			return oc			
+			return oc
+	else:													# vorhanden: data-module="zdfplayer"
+		apiToken = stringextract('"apiToken": "', '"', page)# ab 08.10.2017 dyn. ermitteln (wieder mal vom ZDF geändert)
+		Dict['apiToken'] = apiToken
+					
 	# -- Ende Vorauswertungen
 			
 	oc = home(cont=oc, ID='ZDF')	# Home-Button - nach Bildgalerie (PhotoObject darf keine weiteren Medienobjekte enth.)
@@ -3781,11 +3785,14 @@ def get_formitaeten(sid, ID=''):
 		return '','',''
 	
 	# apiToken (Api-Auth) : bei Änderungen des  in configuration.json neu ermitteln (für NEO: HAR-Analyse mittels chrome)
+	#		ab 08.10.2017 für ZDF in GetZDFVideoSources ermittelt + als Dict gespeichert + hier injiziert (s.u.)
 	# Api-Auth + Host reichen manchmal, aber nicht immer! 
 	if ID == 'NEO':
 		headers = {'Api-Auth': "Bearer d90ed9b6540ef5282ba3ca540ada57a1a81d670a",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
 	else:
-		headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+		apiToken = 'Bearer ' + str(Dict['apiToken'])		# s. GetZDFVideoSources. str falls None
+		# headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+		headers = {'Api-Auth': apiToken,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
 	# Log(headers)		# bei Bedarf
 	
 	# Bei Anforderung von profile_url mittels urllib2.urlopen ssl.SSLContext erforderlich - entf. bei JSON.ObjectFromURL

@@ -2,6 +2,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases
 --------------				gelöschte Releases: älter als  2.7.0	
 
+08.10.2017 3.2.4	ZDF-Videos: apiToken vom ZDF geändert - Ersatz des bisherigen statischen Tokens durch
+			den dyn. ermittelten. Funktionen: GetZDFVideoSources + 	get_formitaeten.
+
 03.10.2017 3.2.3	TV-Livestream: Ermittlung der neuen Streamlinks für die 4 Sender des NDR, Aktualisierung
 			von livesenderTV.xml.
 			PodFavoriten(Pod_Content/Scheme_ARD: unescape für summary.
