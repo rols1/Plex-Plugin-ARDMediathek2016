@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.4'		
-VDATE = '08.10.2017'
+VERSION =  '3.2.5'		
+VDATE = '09.10.2017'
 
 # 
 #	
@@ -3263,9 +3263,10 @@ def MeistGesehen(name, offset=0):
 	
 	Log(offset)
 	if offset:
-		summ_mehr = 'Mehr zu >name<, Gesamt: %s' % (name, page_cnt)
+		# Log(name); Log(page_cnt)
+		summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (name, page_cnt)
 		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
-		oc.add(DirectoryObject(key=Callback(RubrikSingle, path=path, offset=offset), 
+		oc.add(DirectoryObject(key=Callback(RubrikSingle, title=name, path=path, offset=offset), 
 			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
 	
 	return oc

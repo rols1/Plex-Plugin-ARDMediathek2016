@@ -316,12 +316,12 @@
 		<date>13.03.2015</date>
 	</item>
 	<item>
-		<title>RTL 2 YOU: nicht mehr frei verfügbar</title>
-		<link>liveTV_cbcyoumain.m3u8</link>
-		<thumbnail>tv-rtl2you.png</thumbnail>
+		<title>QVC Live Stream</title>
+		<link>http://live.qvcde.simplestreamcdn.com/live/qvcde_main_clean/bitrate1.isml/live.m3u8?dvr_window_length=18</link>
+		<thumbnail>tv-qvc.png</thumbnail>
 		<genre>TV</genre>
-		<EPG_ID></EPG_ID>
-		<date>08.06.2016</date>
+		<EPG_ID>qvc</EPG_ID>
+		<date>08.10.2017</date>
 	</item>
 </items>
 </channel>
