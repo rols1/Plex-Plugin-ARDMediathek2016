@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.5'		
-VDATE = '09.10.2017'
+VERSION =  '3.2.6'		
+VDATE = '11.10.2017'
 
 # 
 #	
@@ -221,6 +221,8 @@ def Main():
 	Log('Platform.ServerVersion: ' + Platform.ServerVersion)			# dto.
 	
 	Dict.Reset()							# Speicherobjekte des Plugins löschen
+	Dict['R'] = Core.storage.join_path(Core.bundle_path, 'Contents', 'Resources')
+	# Log(Dict['R'])
 			
 	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art)	# Plex akzeptiert nur InfoList + List, keine
 																			# Auswirkung auf Wiedergabe im Webplayer																																						
@@ -1865,10 +1867,10 @@ def parseLinks_Mp4_Rtmp(page):		# extrahiert aus Mediendatei (Text) .mp4- und rt
 	Log('parseLinks_Mp4_Rtmp')		
 	#Log('parseLinks_Mp4_Rtmp: ' + page)	# bei Bedarf
 	
-	if page.find('http://www.ardmediathek.de/image') >= 0:
+	if page.find('_previewImage') >= 0:
 		#link_img = teilstring(page, 'http://www.ardmediathek.de/image', '\",\"_subtitleUrl')
 		#link_img = stringextract('_previewImage\":\"', '\",\"_subtitle', page)
-		link_img = stringextract('_previewImage\":\"', '\",', page)
+		link_img = stringextract('_previewImage\":\"', '\",', page) # ev. nur Mediatheksymbol
 	else:
 		link_img = ""
 
@@ -2773,10 +2775,11 @@ def RadioLiveListe(path, title):
 	Log(len(liste))
 	
 	# Unterschied zur TV-Playlist livesenderTV.xml: Liste  der Radioanstalten mit Links zu den Webseiten.
-	#	Die Liste der Sender im Feld <sender> muss exakt den Benennungen in den jew. Webseiten entsprechen.
-	#	Nach Auswahl durch den Nutzer werden in RadioAnstalten die einzelnen Sender der Station
-	#	ermittelt. Die Icons werden durch Zuordnung Name in Webseite -> Feld <sender> -> Feld <thumblist>
-	#		 ermittelt (Index identisch).
+	#	Ab 11.10.2917: die Liste + Reihenfolge der Sender wird in der jew. Webseite ermittelt. Die Sender-Liste
+	#		wird aus LivesenderRadio.xml geladen und gegen die Sendernamen abgeglichen. Die Einträge sind paarweise
+	#		angelegt (Sendername:Icon).
+	#		Ohne Treffer beim  Abgleich wird ein Ersatz-Icon verwendet (im Watchdog-PRG führt dies zur Fehleranzeige). 
+	#		Die frühere Icon-Liste in <thumblist> entfällt.
 	#	Nach Auswahl einer Station wird in RadioLiveSender der Audiostream-Link ermittelt und
 	#	in CreateTrackObject endverarbeitet.
 	#
@@ -2796,15 +2799,14 @@ def RadioLiveListe(path, title):
 			img = img
 			
 		sender = stringextract('<sender>', '</sender>', s)			# Auswertung sender + thumbs in RadioAnstalten
-		thumbs = stringextract('<thumblist>', '</thumblist>', s)	
 			
 		Log(title); Log(link); Log(img); 												
-		oc.add(DirectoryObject(key=Callback(RadioAnstalten, path=link, title=title, sender=sender, thumbs=thumbs), 
+		oc.add(DirectoryObject(key=Callback(RadioAnstalten, path=link, title=title, sender=sender), 
 			title=title, summary='einzelne Sender', tagline='Radio', thumb=img))
 	return oc
 #-----------------------------
 @route(PREFIX + '/RadioAnstalten')  
-def RadioAnstalten(path, title,sender,thumbs):
+def RadioAnstalten(path, title,sender):
 	Log('RadioAnstalten: ' + path);
 	entry_path = path	# sichern
 	oc = ObjectContainer(view_group="InfoList",  title1='Radiosender von ' + title, art=ICON)
@@ -2851,21 +2853,27 @@ def RadioAnstalten(path, title,sender,thumbs):
 		link_path,link_img, m3u8_master, geoblock = parseLinks_Mp4_Rtmp(path_content)	# mehrere Streamlinks auswerten,
 																						# geoblock hier nicht verwendet
 		
-		if sender and thumbs:				# Zuordnung zu lokalen Icons, Quelle livesenderRadio.xml
+		if headline:						# Zuordnung zu lokalen Icons, Quelle livesenderRadio.xml
 			senderlist = sender.split('|')
-			thumblist = thumbs.split('|')
-			Log(senderlist); Log(thumblist); 	# bei Bedarf
+			# Log(senderlist); 		# bei Bedarf
 			for i in range (len(senderlist)):
 				sname = ''; img = ''
 				try:								# try gegen Schreibfehler in  livesenderRadio.xml
-					sname =  mystrip(senderlist[i]) # mystrip wg. Zeilenumbrüchen in livesenderRadio.xml
-					img = mystrip(thumblist[i])
+					pair =  mystrip(senderlist[i]) 	# mystrip wg. Zeilenumbrüchen in livesenderRadio.xml
+					pair = pair.split(':')			# Bsp.: B5 aktuell:radio-b5-aktuell.png
+					sname 	= pair[0].strip()
+					img 	= pair[1].strip()
 				except:
 					break					# dann bleibt es bei img_src (Fallback)
 				if sname == headline:		# lokaler Sendername in  <sender> muss Sendernahme aus headline entspr.
-					if img:
+					# if img:
+					img_path = os.path.join(Dict['R'], img)
+					Log(img_path)
+					if os.path.exists(img_path):
 						img_src = img
-					Log(img_src); 			# bei Bedarf
+					else:
+						img_src = link_img	# Fallback aus parseLinks_Mp4_Rtmp, ev. nur Mediathek-Symbol
+					# Log(img_src); 			# bei Bedarf
 					break
 
 		Log(link_path); Log(link_img); Log(img_src);Log(m3u8_master); 
@@ -2910,8 +2918,6 @@ def RadioAnstalten(path, title,sender,thumbs):
 					oc.add(CreateTrackObject(url=slink, title=headline, summary=subtitel, thumb=R(img_src), fmt='mp3',))							 	
 			else:
 				msg = ' Stream ' + str(i + 1) + ': nicht verfügbar'	# einzelnen nicht zeigen - verwirrt nur
-				#oc.add(DirectoryObject(key=Callback(RadioAnstalten, path=entry_path, title=msg), 
-				#	title=headline + msg, summary='', tagline='', thumb=img_src))				
 	
 	if len(oc) < 1:	      		# keine Radiostreams gefunden		
 		Log('oc = 0, keine Radiostreams gefunden') 		 
