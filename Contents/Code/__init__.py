@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.6'		
-VDATE = '11.10.2017'
+VERSION =  '3.2.7'		
+VDATE = '21.10.2017'
 
 # 
 #	
@@ -2860,12 +2860,12 @@ def RadioAnstalten(path, title,sender):
 				sname = ''; img = ''
 				try:								# try gegen Schreibfehler in  livesenderRadio.xml
 					pair =  mystrip(senderlist[i]) 	# mystrip wg. Zeilenumbrüchen in livesenderRadio.xml
-					pair = pair.split(':')			# Bsp.: B5 aktuell:radio-b5-aktuell.png
+					pair = pair.split(':')			# Paarweise, Bsp.: B5 aktuell:radio-b5-aktuell.png
 					sname 	= pair[0].strip()
 					img 	= pair[1].strip()
 				except:
-					break					# dann bleibt es bei img_src (Fallback)
-				if sname == headline:		# lokaler Sendername in  <sender> muss Sendernahme aus headline entspr.
+					break								# dann bleibt es bei img_src (Fallback)
+				if sname.upper() == headline.upper():	# lokaler Sendername in  <sender> muss Sendernahme aus headline entspr.
 					# if img:
 					img_path = os.path.join(Dict['R'], img)
 					Log(img_path)

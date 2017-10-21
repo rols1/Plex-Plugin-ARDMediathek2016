@@ -2,6 +2,11 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+21.10.2017 3.2.7	RadioAnstalten: Vergleich Sendername/headline im uppercase (Bayern 3 plötzlich in
+			Großbuchstaben).
+			TV-Live-Sender: neue QVC-Quellen (Hinweis @EpicKau) umgesetzt (alle englisch, alte
+			deutsche Quelle belassen).
+				
 11.10.2017 3.2.6	Radio-Live-Sender: Bildung von Paaren 'Sender-Name:Sender-Icon' - Grund: häufiges
 			Verschieben der Senderplätze kappt die bisherige Zuordnung zur Icon-Position in thumblist. 
 			livesenderRadio.xml entsprechend geändert.
