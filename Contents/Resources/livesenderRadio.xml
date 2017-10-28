@@ -33,7 +33,7 @@
 		<title>mdr</title>
 		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=620</link>
 		<thumbnail>radio-mdr.png</thumbnail>
-		<sender>MDR AKTUELL:radio-mdr-aktuell.png|JUMP:radio-mdr-jump.png|MDR KLASSIK:radio-mdr-klassik.png|
+		<sender>MDR AKTUELL:radio-mdr-aktuell.png|MDR JUMP:radio-mdr-jump.png|MDR KLASSIK:radio-mdr-klassik.png|
 			MDR KULTUR:radio-mdr-kultur.png|MDR SACHSEN:radio-mdr1-sachsen.png|MDR Sachsen-Anhalt:radio-mdr1-sachsen-anhalt.png|
 			MDR SCHLAGERWELT:radio-mdr-schlagerwelt.png|SPUTNIK:radio-mdr-sputnik.png|MDR THÜRINGEN:radio-mdr1-thueringen.png</sender>			
 		<thumblist></thumblist>

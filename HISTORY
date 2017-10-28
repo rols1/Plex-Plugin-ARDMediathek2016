@@ -2,7 +2,11 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
-21.10.2017 3.2.8	TV-Live-Sender: die engl. Quellen wieder entfernt.	
+
+28.10.2017 3.2.9	Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung JUMP -> MDR JUMP.
+
+21.10.2017 3.2.8	TV-Live-Sender: die engl. Quellen wieder entfernt.
+	
 21.10.2017 3.2.7	RadioAnstalten: Vergleich Sendername/headline im uppercase (Bayern 3 plötzlich in
 			Großbuchstaben).
 			TV-Live-Sender: neue QVC-Quellen (Hinweis @EpicKau) umgesetzt (alle englisch, alte

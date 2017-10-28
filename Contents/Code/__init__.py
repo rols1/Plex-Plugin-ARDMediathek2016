@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.8'		
-VDATE = '21.10.2017'
+VERSION =  '3.2.9'		
+VDATE = '28.10.2017'
 
 # 
 #	
@@ -3627,8 +3627,8 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 		if max_count:
 			# Mehr Seiten anzeigen:		# 'Mehr...'-Callback durch Aufrufer	
 			cnt = len(oc) + offset		# 
-			Log('Mehr-Test'); Log(len(oc)); Log(cnt); Log(page_cnt)
-			if cnt >= page_cnt:			# Gesamtzahl erreicht - Abbruch
+			# Log('Mehr-Test'); Log(len(oc)); Log(cnt); Log(page_cnt)
+			if cnt > page_cnt:			# Gesamtzahl erreicht - Abbruch
 				offset=0
 				break					# Schleife beenden
 			elif len(oc) >= max_count:	# Mehr, wenn max_count erreicht
