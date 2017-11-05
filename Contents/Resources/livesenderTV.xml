@@ -316,12 +316,28 @@
 		<date>13.03.2015</date>
 	</item>
 	<item>
-		<title>QVC deutsch</title>
-		<link>http://live.qvcde.simplestreamcdn.com/live/qvcde_main_clean/bitrate1.isml/live.m3u8?dvr_window_length=18</link>
+		<title>QVC</title>
+		<link>http://live.qvcde.simplestreamcdn.com/live/qvcde_main_clean/bitrate1.isml/live.m3u8</link>
 		<thumbnail>tv-qvc.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>QVC</EPG_ID>
-		<date>21.10.2017</date>
+		<date>05.11.2017</date>
+	</item>
+	<item>
+		<title>QVC BEAUTY & STYLE</title>
+		<link>http://live.qvcde.simplestreamcdn.com/live/qvcde_beauty_clean/bitrate1.isml/live.m3u8</link>
+		<thumbnail>tv-qvc.png</thumbnail>
+		<genre>TV</genre>
+		<EPG_ID>qvcbs</EPG_ID>
+		<date>05.11.2017</date>
+	</item>
+	<item>
+		<title>QVC PLUS</title>
+		<link>http://live.qvcde.simplestreamcdn.com/live/qvcde_plus_clean/bitrate1.isml/live.m3u8</link>
+		<thumbnail>tv-qvc.png</thumbnail>
+		<genre>TV</genre>
+		<EPG_ID>qvcp</EPG_ID>
+		<date>05.11.2017</date>
 	</item>
 </items>
 </channel>

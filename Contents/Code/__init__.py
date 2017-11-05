@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.2.9'		
-VDATE = '28.10.2017'
+VERSION =  '3.3.0'		
+VDATE = '05.11.2017'
 
 # 
 #	
@@ -2358,7 +2358,7 @@ def SenderLiveListe(title, listname, offset=0):	#
 #		Filterung der Videoobjekte gemäß Video-Sofort-Format in Parseplaylist (auto, Bandbreite)
 #		Aufruf Thread.Create in SenderLiveResolution - für TV-Livestreams 
 #	Thread.Sleep() führt zu unmittelbar wiederholten Aufrufen der Funktion - dto. vom Nutzer 
-#		betägdigte Back-Funktion. Div. negative Versuche mit Thread.Block() + Thread.Lock. Bisher beste 
+#		ausgeführte Back-Funktion. Div. negative Versuche mit Thread.Block() + Thread.Lock. Bisher beste 
 #		Lösung: globale Variable Dict['Lock'] - Freigabe erst bei Rückkehr in SenderLiveListe
  
 def remoteVideo():	# Thread, Problem PHT: esc funktioniert nur 1 x (Video-Abbruch)

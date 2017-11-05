@@ -3,6 +3,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
+05.11.2017 3.3.0	TV-Live-Sender: neue (deutsche) QVC-Quellen (Hinweis @EpicKau) umgesetzt -QVC,
+			QVC BEAUTY & STYLE, QVC PLUS. Anpassung livesenderTV.xml einschl. EPG_ID für TV-Today.
+
 28.10.2017 3.2.9	Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung JUMP -> MDR JUMP.
 
 21.10.2017 3.2.8	TV-Live-Sender: die engl. Quellen wieder entfernt.
