@@ -2,6 +2,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+07.11.2017 3.3.1	Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung WDR Kiraka -> KiRaKa.
+			Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung Sputnik -> MDR Sputnik.
 
 05.11.2017 3.3.0	TV-Live-Sender: neue (deutsche) QVC-Quellen (Hinweis @EpicKau) umgesetzt -QVC,
 			QVC BEAUTY & STYLE, QVC PLUS. Anpassung livesenderTV.xml einschl. EPG_ID für TV-Today.
@@ -30,15 +32,15 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 
 03.10.2017 3.2.3	TV-Livestream: Ermittlung der neuen Streamlinks für die 4 Sender des NDR, Aktualisierung
 			von livesenderTV.xml.
-			PodFavoriten(Pod_Content/Scheme_ARD: unescape für summary.
-			
+			PodFavoriten(Pod_Content/Scheme_ARD: unescape für summary.			
 			SenderLiveListe: unescape für summary, um HTML-Quotes zu entfernen.
+			
 30.09.2017 3.2.2	'Mehr..'-Option für ZDF-Videos in Barrierearm, Verpasst, Sendung A-Z,  Rubriken,
 			Meist Gesehen, Neu in der Mediathek (Option in Suche + Bilderserien bereits vorhanden). 
 			Neo-Funktionen: geoblock-Info ergänzt in GetNeoVideoSources + NEOotherSources (Plugin 
 			blockte beim Laden der Videoquellen).
-			
 			Funktion get_formitaeten: fehlende return-Leerparameter ergänzt.
+			
 not Github 3.2.1	EPG, Funktion get_page: Timeout für Cache auf 0 gesetzt.
 			Funktion SenderLiveListe: leere EPG-Rückgabe behandelt (sinnl. Angaben bei ONE).
 			livesenderTV.xml: veraltete Einträge für <epg_url> entfernt.	

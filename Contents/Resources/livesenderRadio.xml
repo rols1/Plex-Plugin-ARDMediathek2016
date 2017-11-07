@@ -35,7 +35,7 @@
 		<thumbnail>radio-mdr.png</thumbnail>
 		<sender>MDR AKTUELL:radio-mdr-aktuell.png|MDR JUMP:radio-mdr-jump.png|MDR KLASSIK:radio-mdr-klassik.png|
 			MDR KULTUR:radio-mdr-kultur.png|MDR SACHSEN:radio-mdr1-sachsen.png|MDR Sachsen-Anhalt:radio-mdr1-sachsen-anhalt.png|
-			MDR SCHLAGERWELT:radio-mdr-schlagerwelt.png|SPUTNIK:radio-mdr-sputnik.png|MDR THÜRINGEN:radio-mdr1-thueringen.png</sender>			
+			MDR SCHLAGERWELT:radio-mdr-schlagerwelt.png|MDR SPUTNIK:radio-mdr-sputnik.png|MDR THÜRINGEN:radio-mdr1-thueringen.png</sender>			
 		<thumblist></thumblist>
 	</item>
 	<item>
@@ -86,7 +86,7 @@
 		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=638</link>
 		<thumbnail>radio-wdr.png</thumbnail>
 		<sender>Cosmo:radio-wdr-cosmo.png|WDR Event:radio-wdr-event.png|WDR 2:radio-wdr2.png|
-			WDR 3:radio-wdr3.png|WDR 4:radio-wdr4.png|WDR 5:radio-wdr5.png|WDR 5 kiraka:radio-kiraka.png|
+			WDR 3:radio-wdr3.png|WDR 4:radio-wdr4.png|WDR 5:radio-wdr5.png|KiRaKa:radio-kiraka.png|
 			1LIVE:radio-wdr-1live.png|1LIVE diggi:radio-wdr-1live-diggi.png</sender>	
 		<thumblist></thumblist>
 	</item>
