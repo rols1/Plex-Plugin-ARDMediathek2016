@@ -3389,12 +3389,14 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 		title = unescape(title)
 		Log(title)
 		oc = ZDF_Bildgalerie(oc=oc, page=page, mode='is_gallery', title=title)
-		return oc
+		page_cnt = len(oc)
+		return oc, offset, page_cnt 
 	if page.find('name headline mainEntityOfPage') >= 0:  # spez. Bildgalerie, hier Bares für Rares
 		headline = stringextract('name headline mainEntityOfPage\" >', '</h1>', page)
 		if headline[0:7] == 'Objekte':		# Bsp.: Objekte vom 6. Dezember 2016
 			oc = ZDF_Bildgalerie(oc=oc, page=page, mode='pics_in_accordion-panels', title=headline)
-			return oc 		 	
+			page_cnt = len(oc)
+			return oc, offset, page_cnt  		 	
 		
 	pos = page.find('class=\"content-box\"')					# ab hier verwertbare Inhalte 
 	if pos >= 0:

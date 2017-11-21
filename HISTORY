@@ -2,6 +2,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+21.11.2017 3.3.2	ZDF-Bilderserien (Absturz): fehlende return-Parameter ergänzt. 
+			EPG: timeout in get_page auf 1 gesetzt (Aktualisierung erzwingen).	
 07.11.2017 3.3.1	Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung WDR Kiraka -> KiRaKa.
 			Radio-Live-Sender: Anpassung livesenderRadio.xml an Umbenennung Sputnik -> MDR Sputnik.
 

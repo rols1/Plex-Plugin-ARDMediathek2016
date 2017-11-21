@@ -27,7 +27,7 @@ def EPG(ID, mode=None, day_offset=None):
 	url="http://www.tvtoday.de/programm/standard/sender/%s.html" % ID
 	Log(url)
 
-	page, err = get_page(path=url, cTimeout=0)				# Absicherung gegen Connect-Probleme
+	page, err = get_page(path=url, cTimeout=1)				# Absicherung gegen Connect-Probleme
 	# Log(page[:500])	# bei Bedarf
 	if err:
 		return ''	# Verarbeitung in SenderLiveListe (rec = EPG.EPG..)
