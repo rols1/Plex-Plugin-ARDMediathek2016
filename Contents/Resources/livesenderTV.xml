@@ -277,7 +277,7 @@
 	</item>
 	<item>
 		<title>ServusTV</title>
-		<link>http://hdiosstv-f.akamaihd.net/i/servustvhdde_1@75540/master.m3u8</link>
+		<link>https://liveservustv-i.akamaihd.net/hls/live/271000/ServusTV_DE/master.m3u8</link>
 		<thumbnail>tv-servus.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>SERVU</EPG_ID>

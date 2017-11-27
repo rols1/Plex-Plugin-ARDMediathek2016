@@ -2,6 +2,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+27.11.2017 3.3.4	Version + Versionsdatum im Quelltext korrigiert
+			TV-Live-Sender: Streaming-URL ServusTV erneuert.	
+
 27.11.2017 3.3.3	EPG_ShowSingle: Blättern-Funktion integriert (Timeout häufig bei mehr als 20 Sätzen). 
 			EPG_ShowSingle: Behandlung leerer Rückgaben korrigiert (Zugriff auf Index EPG_rec führte
 			zum Absturz).
