@@ -2159,6 +2159,7 @@ def get_sort_playlist():								# sortierte Playliste der TV-Livesender
 	for item in playlist:   
 		rec = []
 		title = stringextract('<title>', '</title>', item)
+		title = title.upper()										# lower-/upper-case für sort() relevant
 		EPG_ID = stringextract('<EPG_ID>', '</EPG_ID>', item)
 		img = 	stringextract('<thumbnail>', '</thumbnail>', item)
 		link =  stringextract('<link>', '</link>', item)			# url für Livestreaming
@@ -2178,13 +2179,14 @@ def EPG_ShowSingle(ID, name, stream_url, pagenr=0):
 	# Indices EPG_rec: 0=starttime, 1=href, 2=img, 3=sname, 4=stime, 5=summ, 6=vonbis, 7=today_human: 
 	# Link zur Einzelanzeige href=rec[1] hier nicht verwendet - wenig zusätzl. Infos
 	EPG_rec = EPG.EPG(ID=ID, day_offset=pagenr)		# Daten holen
-	today_human = 'ab ' + EPG_rec[0][7]
 	
 	if len(EPG_rec) == 0:			# kann vorkommen, Bsp. SR
 		msg='Sender ' + name + ': keine EPG-Daten gefunden'
 		msg = msg.decode(encoding="utf-8", errors="ignore")
 		return ObjectContainer(header='Error', message=msg)
 		
+	today_human = 'ab ' + EPG_rec[0][7]
+			
 	# Log(EPG_rec[0]) # bei Bedarf
 	name = name.decode(encoding="utf-8", errors="ignore") 
 	oc = ObjectContainer(view_group="InfoList", title1=name, title2=today_human, art = ICON)	
@@ -2214,16 +2216,37 @@ def EPG_ShowSingle(ID, name, stream_url, pagenr=0):
 		
 	return oc
 #-----------------------------------------------------------------------------------------------------
-@route(PREFIX + '/EPG_ShowAll')		# EPG: aktuelle Sendungen aller Sender mode='allnow'
-def EPG_ShowAll(title):
+# EPG: aktuelle Sendungen aller Sender mode='allnow'
+# Todo: Sammelabruf in EPG-Modul integrieren - der ständige Wechsel in der Schleife hier ist 
+#		sehr zeitaufwendig
+
+@route(PREFIX + '/EPG_ShowAll')		
+def EPG_ShowAll(title, offset=0):
 	Log('EPG_ShowAll')
+	title_org = title
+	title2='Aktuelle Sendungen'
 		
-	oc = ObjectContainer(view_group="InfoList", title1='EPG', title2='Aktuelle Sendungen', art = ICON)	
+	oc = ObjectContainer(view_group="InfoList", title1='EPG', title2=title2, art = ICON)	
 	oc = home(cont=oc, ID=NAME)				# Home-Button	
 
 	# Zeilen-Index: title=rec[0]; EPG_ID=rec[1]; img=rec[2]; link=rec[3];	
 	sort_playlist = get_sort_playlist()	
-	for rec in sort_playlist:
+	Log(len(sort_playlist))
+	
+	rec_per_page = 10								# Anzahl pro Seite (Timeout ab 15 beobachtet)
+	max_len = len(sort_playlist)					# Anzahl Sätze gesamt
+	start_cnt = int(offset) 						# Startzahl diese Seite
+	end_cnt = int(start_cnt) + int(rec_per_page)	# Endzahl diese Seite
+	
+	for i in range(len(sort_playlist)):
+		cnt = int(i) + int(offset)
+		# Log(cnt); Log(i)
+		if int(cnt) >= max_len:				# Gesamtzahl überschritten?
+			break
+		if i >= rec_per_page:				# Anzahl pro Seite überschritten?
+			break
+		rec = sort_playlist[cnt]
+
 		title_playlist = rec[0].decode(encoding="utf-8", errors="ignore")
 		m3u8link = rec[3]
 		img_playlist = R(rec[2])
@@ -2256,6 +2279,16 @@ def EPG_ShowAll(title):
 		tagline = tagline.decode(encoding="utf-8", errors="ignore")
 		oc.add(DirectoryObject(key=Callback(SenderLiveResolution, path=m3u8link, title=title, thumb=img),
 			title=title, summary=summ,  tagline=tagline, thumb=img))	
+
+	# Mehr Seiten anzeigen:
+	# Log(offset); Log(cnt); Log(max_len);
+	if (int(cnt) +1) < int(max_len): 						# Gesamtzahl noch nicht ereicht?
+		new_offset = cnt 
+		Log(new_offset)
+		summ = 'Mehr (insgesamt ' + str(max_len) + ') ' + title2
+		summ = summ.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(EPG_ShowAll, title=title_org, offset=new_offset), 
+			title=title_org, tagline=title2, summary=summ,  thumb=R(ICON_MEHR)))	
 		
 	return oc
 #-----------------------------------------------------------------------------------------------------
