@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.3.4'		
-VDATE = '27.11.2017'
+VERSION =  '3.3.5'		
+VDATE = '30.11.2017'
 
 # 
 #	
@@ -1485,8 +1485,8 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 			sp = subprocess.Popen([AppPath, url, "-o", curl_fullpath])	# OK, wartet nicht (ohne p.communicate())
 			# sp = subprocess.Popen([AppPath, url, "-N", "-o", curl_fullpath])	# Buffering für curl abgeschaltet
 		else:															# wget-Call
-			Log('%s %s %s %s %s' % (AppPath, "--no-use-server-timestamps", "-qO", curl_fullpath, url))	
-			sp = subprocess.Popen([AppPath, "--no-use-server-timestamps", "-qO", curl_fullpath, url])
+			Log('%s %s %s %s %s %s' % (AppPath, "--no-use-server-timestamps", "-q", "-O", curl_fullpath, url))	
+			sp = subprocess.Popen([AppPath, "--no-check-certificate", "--no-use-server-timestamps", "-q", "-O", curl_fullpath, url])
 			
 		msgH = 'curl/wget: Download erfolgreich gestartet'
 		Log('sp = ' + str(sp))
@@ -3451,11 +3451,13 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
 		else:
 			msg_notfound = 'Leider keine Inhalte' 				# z.B. bei A-Z für best. Buchstaben 
-			
-		if ref_path.startswith('https://www.zdf.de/comedy/neo-magazin-mit-jan-boehmermann'): # neue ZDF-Seite
-			import zdfneo
-			oc = zdfneo.neo_content(path=ref_path, ID=ID)		# Abschluss dort
-			return oc, offset, page_cnt 
+		
+		# kann entfallen - Blockbildung mit class="content-box" inzw. möglich. Modul zdfneo.py entfernt.
+		#	Zeilen hier ab 1.1.2018 löschen:
+		#if ref_path.startswith('https://www.zdf.de/comedy/neo-magazin-mit-jan-boehmermann'): # neue ZDF-Seite
+		#	import zdfneo
+		#	oc = zdfneo.neo_content(path=ref_path, ID=ID)		# Abschluss dort
+		#	return oc, offset, page_cnt 
 			
 		title = msg_notfound.decode(encoding="utf-8", errors="ignore")					
 		summary = 'zurück zur ' + NAME.decode(encoding="utf-8", errors="ignore")		
