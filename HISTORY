@@ -2,6 +2,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+07.12.2017 3.3.6	TV-Live-Sender - Aktualisierung Stream-Url in livesenderTV.xml: WDR, MDR, BR, HR,
+			NDR, RBB, Saarländischer Rundfunk, Südwestrundfunk RP, KiKa, ARD ONE.
+
 30.11.2017 3.3.5	DownloadExtern: Zertifikate-Problem mit wg bei https-Servern - wget mit Parameter
 			--no-check-certificate versorgt.
 			Modul zdfneo.py entfernt (inzw. entbehrlich). Hinw. im Code verbleibt bis

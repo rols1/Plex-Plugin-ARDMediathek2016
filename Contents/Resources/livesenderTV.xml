@@ -33,7 +33,7 @@
 	</item>
 	<item>
 		<title>KiKA</title>
-		<link>http://kika_geo-lh.akamaihd.net/i/livetvkika_de@75114/master.m3u8</link>
+		<link>https://kikade-lh.akamaihd.net/i/livetvkika_de@450035/master.m3u8</link>
 		<thumbnail>tv-kika.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>KIKA</EPG_ID>
@@ -41,7 +41,7 @@
 		<epg_url></epg_url>
 	</item>
 	<item>
-		<title>Arte</title>
+		<title>Arte deutsch</title>
 		<link>https://artelive-lh.akamaihd.net/i/artelive_de@393591/master.m3u8</link>
 		<link1>LiveTV_Arte.m3u8</link1>link1>
 		<info>Web: http://www.ardmediathek.de/tv/live?kanal=5880</info>
@@ -53,7 +53,7 @@
 	</item>
 	<item>
 		<title>ARD ONE</title>
-		<link>http://wdr_einsfestival-lh.akamaihd.net/i/wdr_einsfestival@328300/master.m3u8</link>
+		<link>http://onelivestream-lh.akamaihd.net/i/one_livestream@568814/master.m3u8</link>
 		<thumbnail>tv-one.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>ONE</EPG_ID>
@@ -132,8 +132,8 @@
 <epg>http://www.zdf.de/epg/programm-4100.html</epg>
 <items>
 	<item>
-		<title>Bayerischer Rundfunk</title>
-		<link>http://livestreams.br.de/i/bfsnord_germany@119898/master.m3u8</link>
+		<title>Bayerischer Rundfunk Nord</title>
+		<link>https://brlive-lh.akamaihd.net/i/bfsnord_germany@119898/master.m3u8</link>
 		<thumbnail>tv-br.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>BR</EPG_ID>
@@ -142,7 +142,7 @@
 	</item>
 	<item>
 		<title>HR</title>
-		<link>http://live1_hr-lh.akamaihd.net/i/hr_fernsehen@75910/master.m3u8</link>
+		<link>http://hrlive1-lh.akamaihd.net/i/hr_fernsehen@75910/master.m3u8</link>		  
 		<thumbnail>tv-hr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>HR</EPG_ID>
@@ -151,7 +151,7 @@
 	</item>
 	<item>
 		<title>MDR Sachsen</title>
-		<link>http://mdr_sachsen_hls-lh.akamaihd.net/i/livetvmdrsachsen_de@106902/master.m3u8</link>
+		<link>http://mdrsnhls-lh.akamaihd.net/i/livetvmdrsachsen_de@513998/master.m3u8</link>
 		<thumbnail>tv-mdr-sachsen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
@@ -160,7 +160,7 @@
 	</item>
 	<item>
 		<title>MDR Sachsen-Anhalt</title>
-		<link>http://mdr_sa_hls-lh.akamaihd.net/i/livetvmdrsachsenanhalt_de@106901/master.m3u8</link>
+		<link>http://mdrsahls-lh.akamaihd.net/i/livetvmdrsachsenanhalt_de@513999/master.m3u8</link>
 		<thumbnail>tv-mdr-sachsen-anhalt.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
@@ -169,7 +169,7 @@
 	</item>
 	<item>
 		<title>MDR Thüringen</title>
-		<link>http://mdr_th_hls-lh.akamaihd.net/i/livetvmdrthueringen_de@106903/master.m3u8</link>
+		<link>http://mdrthuhls-lh.akamaihd.net/i/livetvmdrthueringen_de@514027/master.m3u8</link>
 		<thumbnail>tv-mdr-thueringen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
@@ -177,7 +177,7 @@
 		<epg_url></epg_url>
 	</item>	
 	<item>
-		<title>NDR Fernsehen Hamburg</title>
+		<title>NDR Hamburg</title>
 		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_hh@430231/master.m3u8</link>
 		<thumbnail>tv-ndr-hamburg.png</thumbnail>
 		<genre>TV</genre>
@@ -186,7 +186,7 @@
 		<epg_url></epg_url>
 	</item>
 	<item>
-		<title>NDR Fernsehen Mecklenburg-Vorpommern</title>
+		<title>NDR Mecklenburg-Vorpommern</title>
 		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_mv@430232/master.m3u8</link>
 		<thumbnail>tv-ndr-mecklenburg-vorpommern.png</thumbnail>
 		<genre>TV</genre>
@@ -195,7 +195,7 @@
 		<epg_url></epg_url>
 	</item>
 	<item>
-		<title>NDR Fernsehen Niedersachsen</title>
+		<title>NDR Niedersachsen</title>
 		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_nds@430233/master.m3u8</link>
 		<thumbnail>tv-ndr-niedersachsen.png</thumbnail>
 		<genre>TV</genre>
@@ -204,7 +204,7 @@
 		<epg_url></epg_url>
 	</item>
 	<item>
-		<title>NDR Fernsehen Schleswig-Holstein</title>
+		<title>NDR Schleswig-Holstein</title>
 		<link>https://ndrfs-lh.akamaihd.net/i/ndrfs_sh@430234/master.m3u8</link>
 		<thumbnail>tv-ndr-schleswig-holstein.png</thumbnail>
 		<genre>TV</genre>
@@ -232,7 +232,7 @@
 	</item>
 	<item>
 		<title>Saarländischer Rundfunk</title>
-		<link>http://livestream.sr-online.de/live.m3u8</link>
+		<link>https://srlive24-lh.akamaihd.net/i/sr_universal02@107595/master.m3u8</link>
 		<thumbnail>tv-sr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>SWR</EPG_ID>
@@ -241,8 +241,8 @@
 		<epg_url></epg_url>
 	</item>
 	<item>
-		<title>Südwestrundfunk</title>
-		<link>http://swrrp-lh.akamaihd.net/i/swrrp_live@196739/master.m3u8</link>
+		<title>Südwestrundfunk RP</title>
+		<link>https://swrrp-lh.akamaihd.net/i/swrrp_live@196739/master.m3u8</link>
 		<thumbnail>tv-swr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>SWR</EPG_ID>
@@ -251,7 +251,7 @@
 	</item>
 	<item>
 		<title>WDR</title>
-		<link>http://www.metafilegenerator.de/WDR/WDR_FS/m3u8/wdrfernsehen.m3u8</link>
+		<link>http://wdrfsgeo-lh.akamaihd.net/i/wdrfs_geogeblockt@530016/master.m3u8</link>
 		<thumbnail>tv-wdr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>WDR</EPG_ID>
