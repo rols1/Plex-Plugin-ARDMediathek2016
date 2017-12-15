@@ -37,7 +37,7 @@
 		<thumbnail>tv-kika.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>KIKA</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -57,7 +57,7 @@
 		<thumbnail>tv-one.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>ONE</EPG_ID>
-		<date>03.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -137,7 +137,7 @@
 		<thumbnail>tv-br.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>BR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -146,7 +146,7 @@
 		<thumbnail>tv-hr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>HR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -155,7 +155,7 @@
 		<thumbnail>tv-mdr-sachsen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -164,7 +164,7 @@
 		<thumbnail>tv-mdr-sachsen-anhalt.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -173,7 +173,7 @@
 		<thumbnail>tv-mdr-thueringen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>MDR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>	
 	<item>
@@ -182,7 +182,7 @@
 		<thumbnail>tv-ndr-hamburg.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -191,7 +191,7 @@
 		<thumbnail>tv-ndr-mecklenburg-vorpommern.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -200,7 +200,7 @@
 		<thumbnail>tv-ndr-niedersachsen.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -209,7 +209,7 @@
 		<thumbnail>tv-ndr-schleswig-holstein.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>N3</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -218,7 +218,7 @@
 		<thumbnail>tv-rbb-berlin.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>RBB</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -227,7 +227,7 @@
 		<thumbnail>tv-rbb-brandenburg.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>RBB</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -236,7 +236,7 @@
 		<thumbnail>tv-sr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>SWR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_schema>ARD</epg_schema>
 		<epg_url></epg_url>
 	</item>
@@ -246,7 +246,7 @@
 		<thumbnail>tv-swr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>SWR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -255,7 +255,7 @@
 		<thumbnail>tv-wdr.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>WDR</EPG_ID>
-		<date>01.10.2016</date>
+		<date>07.12.2017</date>
 		<epg_url></epg_url>
 	</item>
 </items>
@@ -309,11 +309,11 @@
 	</item>
 	<item>
 		<title>n-tv</title>
-		<link>liveTV_ntvlive-ipadakamai.m3u8</link>
+		<link>LiveTV_ntv.m3u8</link>
 		<thumbnail>tv-ntv.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>NTV</EPG_ID>
-		<date>13.03.2015</date>
+		<date>11.03.2017</date>
 	</item>
 	<item>
 		<title>QVC</title>

@@ -19,8 +19,8 @@ import EPG
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.3.6'		
-VDATE = '07.12.2017'
+VERSION =  '3.3.7'		
+VDATE = '15.12.2017'
 
 # 
 #	
@@ -2668,7 +2668,7 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
   #				Die CRITICAL Meldung CreateVideoStreamObject() takes at least 7 arguments (7 given) führt
   #				nicht zum Abbruch des Streams.
   # 
-  # 01.03.2017: kein DirectPlay mehr neuen Web-Player-Versionen. Lokaler Workaround: Austausch WebClient.bundle gegen
+  # 01.03.2017: kein DirectPlay mehr mit neuen Web-Player-Versionen. Lokaler Workaround: Austausch WebClient.bundle gegen
   #			WebClient.bundle aus PMS-Version 1.0.0. Siehe auch Post sander1:
   #			https://forums.plex.tv/discussion/260454/no-directplay-with-httplivestreamurl-in-the-latest-web-players
   # 		Bei Web-Player-Meldung ohne Plugin-Änderung 'dieses medium unterstützt kein streaming' Browser neu starten
@@ -2895,9 +2895,11 @@ def RadioAnstalten(path, title,sender):
 					pair =  mystrip(senderlist[i]) 	# mystrip wg. Zeilenumbrüchen in livesenderRadio.xml
 					pair = pair.split(':')			# Paarweise, Bsp.: B5 aktuell:radio-b5-aktuell.png
 					sname 	= pair[0].strip()
+					sname	= sname.decode('utf-8') # wie headline
 					img 	= pair[1].strip()
 				except:
 					break								# dann bleibt es bei img_src (Fallback)
+				# Log('headline:' + headline.upper()); Log(sname.upper());
 				if sname.upper() == headline.upper():	# lokaler Sendername in  <sender> muss Sendernahme aus headline entspr.
 					# if img:
 					img_path = os.path.join(Dict['R'], img)
@@ -2937,7 +2939,7 @@ def RadioAnstalten(path, title,sender):
 			headline = headline.decode(encoding="utf-8", errors="ignore")
 			subtitel = unescape(subtitel)	
 			subtitel = subtitel.decode(encoding="utf-8", errors="ignore")
-			Log(subtitel)	
+			Log(subtitel)
 				
 			if slink:						# normaler Link oder Link über .m3u ermittelt
 				# msg = ', Stream ' + str(i + 1) + ': OK'		# Log in parseLinks_Mp4_Rtmp ausreichend
@@ -2948,6 +2950,7 @@ def RadioAnstalten(path, title,sender):
 				else:							# Bildquelle lokal
 					# OpenPHT scheitert, falls hier CreateTrackObject direkt angesteuert wird und sich in der
 					#	Liste andere als Trackobjekte befinden (z.B. Homebutton) Webplayer dagegen OK
+					Log(img_src) # Log hilft hier gegen (seltenes) "Verschlucken" des Caches (Bild fehlt)
 					oc.add(CreateTrackObject(url=slink, title=headline, summary=subtitel, thumb=R(img_src), fmt='mp3',))							 	
 			else:
 				msg = ' Stream ' + str(i + 1) + ': nicht verfügbar'	# einzelnen nicht zeigen - verwirrt nur

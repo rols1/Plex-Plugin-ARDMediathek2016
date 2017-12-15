@@ -1,0 +1,16 @@
+#EXTM3U
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=1650000
+http://p.live.fra.n-tv.de/hls-live/ntvlive/ntvlive_1500.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=950000
+http://p.live.fra.n-tv.de/hls-live/ntvlive/ntvlive_800.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=610000
+http://p.live.fra.n-tv.de/hls-live/ntvlive/ntvlive_500.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=320000
+http://p.live.fra.n-tv.de/hls-live/ntvlive/ntvlive_250.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=130000
+http://p.live.fra.n-tv.de/hls-live/ntvlive/ntvlive_80.m3u8
+#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=48000
+http://p.live.fra.n-tv.de/hls-live/audio-only-aac/ntvlive/ntvlive_80.m3u8
+
+# rols 11.12.2017 Austausch gegen Live_ntv-ipadakamai.m3u8 - funktionieren
+#	nicht mehr

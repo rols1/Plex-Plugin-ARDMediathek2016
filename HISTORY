@@ -2,6 +2,11 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+
+15.12.2017 3.3.7	TV-Live-Sender - Aktualisierung Stream-Url nt-v.
+			Radio-Live-Sender: Log(img_src) nötig gegen "Verschlucken" des Caches  (Icon vorhanden,
+			wird aber nicht gezeigt).   
+	
 07.12.2017 3.3.6	TV-Live-Sender - Aktualisierung Stream-Url in livesenderTV.xml: WDR, MDR, BR, HR,
 			NDR, RBB, Saarländischer Rundfunk, Südwestrundfunk RP, KiKa, ARD ONE.
 
