@@ -15,12 +15,13 @@ import json				# json -> Textstrings
 import locale
 import updater
 import EPG
+import update_single
 
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.3.7'		
-VDATE = '15.12.2017'
+VERSION =  '3.3.8'		
+VDATE = '19.12.2017'
 
 # 
 #	
@@ -113,6 +114,7 @@ ICON_DOWNL_DIR			= "icon-downl-dir.png"
 ICON_DELETE 			= "icon-delete.png"
 ICON_STAR 				= "icon-star.png"
 ICON_NOTE 				= "icon-note.png"
+ICON_SPEAKER 			= "icon-speaker.png"								# Breit-Format
 
 ICON_DIR_CURLWGET 		= "Dir-curl-wget.png"
 ICON_DIR_FOLDER			= "Dir-folder.png"
@@ -268,9 +270,22 @@ def Main():
 			url = 'https://github.com/{0}/releases/download/{1}/{2}.bundle.zip'.format(GITHUB_REPOSITORY, latest_version, REPO_NAME)
 			oc.add(DirectoryObject(key=Callback(updater.update, url=url , ver=latest_version), 
 				title=title, summary=summary, tagline=cleanhtml(summary), thumb=R(ICON_UPDATER_NEW)))
+		else:	
+			# Update von Einzeldateien, wenn kein aktuelles Plugin-Update vorliegt: 
+			ret, info = update_single.check_repo()		# ret=1: Einzeldateien aktualisieren
+			Log('update_single: ' + str(ret)); 
+			if ret:
+				call_update = True
+				oc.add(DirectoryObject(
+					key = Callback(update_single.replace), 
+					title = 'neue Einzeldateien vorhanden - jetzt installieren',
+					summary = info,
+					tagline = 'Version bleibt %s' % VERSION,
+				thumb = R(ICON_UPDATER_NEW)))			
+				
 	if call_update == False:							# Update-Button "Suche" zeigen	
 		title = 'Plugin-Update | akt. Version: ' + VERSION + ' vom ' + VDATE	
-		summary='Suche nach neuen Updates starten'
+		summary='Suche starten nach Updates für Plugin und Einzeldateien'.decode(encoding="utf-8")
 		tagline='Bezugsquelle: ' + repo_url			
 		oc.add(DirectoryObject(key=Callback(SearchUpdate, title='Plugin-Update'), 
 			title=title, summary=summary, tagline=tagline, thumb=R(ICON_MAIN_UPDATER)))
@@ -597,13 +612,31 @@ def SearchUpdate(title):		#
 			summary = 'weiter im aktuellen Plugin',
 			thumb = R(ICON_UPDATER_NEW)))
 	else:	
-		oc.add(DirectoryObject(
-			#key = Callback(updater.menu, title='Update Plugin'), 
-			key = Callback(Main), 
-			title = 'Plugin ist aktuell | weiter zum aktuellen Plugin',
-			summary = 'Plugin Version ' + VERSION + ' ist aktuell (kein Update vorhanden)',
-			tagline = cleanhtml(summ),
-			thumb = R(ICON_OK)))
+		# Update von Einzeldateien, wenn kein aktuelles Plugin-Update vorliegt: 
+		ret, info = update_single.check_repo()		# ret=1: Einzeldateien aktualisieren
+		Log('update_single: ' + str(ret)); 
+		if ret:
+			oc.add(DirectoryObject(
+				key = Callback(update_single.replace), 
+				title = 'neue Einzeldateien vorhanden - jetzt installieren',
+				tagline = 'Version bleibt %s' % VERSION,
+				summary = info,
+				thumb = R(ICON_UPDATER_NEW)))
+
+			oc.add(DirectoryObject(
+				key = Callback(Main), 
+				title = 'Update abbrechen',
+				summary = 'weiter im aktuellen Plugin',
+				thumb = R(ICON_UPDATER_NEW)))
+		else:
+			summary = 'keine neue Version / keine neue Einzeldateien gefunden'
+			oc.add(DirectoryObject(
+				#key = Callback(updater.menu, title='Update Plugin'), 
+				key = Callback(Main), 
+				title = 'Plugin Version %s ist aktuell | weiter zum aktuellen Plugin' % VERSION,
+				summary = summary,
+				tagline = cleanhtml(summ),
+				thumb = R(ICON_OK)))
 			
 	return oc
 	
@@ -4110,7 +4143,8 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
   lines = playlist.splitlines()
   # Log(lines)
   lines.pop(0)		# 1. Zeile entfernen (#EXTM3U)
-  BandwithOld = ''	# für Zwilling -Test (manchmal 2 URL für 1 Bandbreite + Auflösung) 
+  BandwithOld 	= ''	# für Zwilling -Test (manchmal 2 URL für 1 Bandbreite + Auflösung) 
+  urlOld	  	= ''	# dto
   i = 0
   #for line in lines[1::2]:	# Start 1. Element, step 2
   for line in lines:	
@@ -4122,39 +4156,48 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 
 		Bandwith = GetAttribute(line, 'BANDWIDTH')
 		Resolution = GetAttribute(line, 'RESOLUTION')
+		try:
+			BandwithInt	= int(Bandwith)
+		except:
+			BandwithInt = 0
 		if Resolution:	# fehlt manchmal (bei kleinsten Bandbreiten)
 			Resolution = 'Auflösung ' + Resolution
 		else:
 			Resolution = 'Auflösung unbekannt'	# verm. nur Ton? CODECS="mp4a.40.2"
 		Codecs = GetAttribute(line, 'CODECS')
 		# als Titel wird die  < angezeigt (Sender ist als thumb erkennbar)
-		if int(Bandwith) >  64000: 	# < 64000 vermutl. nur Audio, als Video keine Wiedergabe 
-			title='Bandbreite ' + Bandwith
-			if url.find('#') >= 0:	# Bsp. SR = Saarl. Rundf.: Kennzeichnung für abgeschalteten Link
-				Resolution = 'zur Zeit nicht verfügbar!'
-			if Bandwith == BandwithOld:	# Zwilling -Test
-				title = 'Bandbreite ' + Bandwith + ' (2. Alternative)'
-			if url.startswith('http') == False:   		# relativer Pfad? 
-				pos = url_m3u8.rfind('/')				# m3u8-Dateinamen abschneiden
-				url = url_m3u8[0:pos+1] + url 			# Basispfad + relativer Pfad
-				
-			Log(url); Log(title); Log(thumb); Log('Resolution')	
-			# Video-Sofort-Format = Qualität: auto (m3u8) - nur 1 Objekt, auto bereits abgehandelt?	
-			BandwithWish = Prefs['pref_setVideoFormatLive']			# leer, auto oder Bandbreitenwert
-			Log(BandwithWish); 
-			if BandwithWish and BandwithWish.endswith('auto') == False: 
-				BandwithWish = BandwithWish.split('>')[1].strip()	# Bsp. "m3u8-Streaming: Bandbreite > 100000"
-				Log(Bandwith); Log(BandwithWish);
-				if int(Bandwith) > int(BandwithWish):				# Bandbreite größer als Wunschbandbreite?
-					container.add(CreateVideoStreamObject(url=url, title=title, 		
-						summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
-						rtmp_live='nein', resolution=''))
-					return container					# nur dieser gewünscht
-			else:										# Objekte für alle gefundenen Bandbreiten
+		title='Bandbreite ' + Bandwith
+		if url.find('#') >= 0:	# Bsp. SR = Saarl. Rundf.: Kennzeichnung für abgeschalteten Link
+			Resolution = 'zur Zeit nicht verfügbar!'
+		if url.startswith('http') == False:   		# relativer Pfad? 
+			pos = url_m3u8.rfind('/')				# m3u8-Dateinamen abschneiden
+			url = url_m3u8[0:pos+1] + url 			# Basispfad + relativer Pfad
+		if Bandwith == BandwithOld:	# Zwilling -Test
+			if url == urlOld:
+				continue			# verwerfen, falls url übereinstimmt
+			title = 'Bandbreite ' + Bandwith + ' (2. Alternative)'
+			
+		BandwithWish = Prefs['pref_setVideoFormatLive']			# leer, auto oder Bandbreitenwert
+		# Log('BandwithWish: ' + str(BandwithWish)); Log(url); Log(urlOld); Log(title); 
+		# Log(thumb); Log(Resolution); Log(BandwithInt); 
+		# Video-Sofort-Format = Qualität: auto (m3u8) - nur 1 Objekt, auto bereits abgehandelt?	
+		if BandwithWish and BandwithWish.endswith('auto') == False: 
+			BandwithWish = BandwithWish.split('>')[1].strip()	# Bsp. "m3u8-Streaming: Bandbreite > 100000"
+			Log(Bandwith); Log(BandwithWish);
+			if int(Bandwith) > int(BandwithWish):				# Bandbreite größer als Wunschbandbreite?
 				container.add(CreateVideoStreamObject(url=url, title=title, 		
 					summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
-					rtmp_live='nein', resolution=''))								
+					rtmp_live='nein', resolution=''))
+				return container							# nur dieser gewünscht
+		else:												# Objekte für alle gefundenen Bandbreiten
+			if BandwithInt and BandwithInt <=  100000: 		# vermutl. nur Audio (Bsp. ntv 48000, ZDF 96000)
+				Resolution = Resolution + ' (vermutlich nur Audio)'
+				thumb = R(ICON_SPEAKER)
+			container.add(CreateVideoStreamObject(url=url, title=title, 		
+				summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
+				rtmp_live='nein', resolution=''))								
 			BandwithOld = Bandwith
+			urlOld		= url
 				
 
   	i = i + 1	# Index für URL

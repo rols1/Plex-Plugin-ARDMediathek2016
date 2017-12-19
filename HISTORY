@@ -3,6 +3,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
+19.12.2017 3.3.8	Modul updater_single (Update von einzelnen Dateien).
+			TV-Live-Sender: Wegfall 2. Alternative, wenn url übereinstimmt.
+			TV-Live-Sender: Hinweis auf Audio, falls Resolution <= 64000, einschl. Speaker-Icon. 	
+
 15.12.2017 3.3.7	TV-Live-Sender - Aktualisierung Stream-Url nt-v.
 			Radio-Live-Sender: Log(img_src) nötig gegen "Verschlucken" des Caches  (Icon vorhanden,
 			wird aber nicht gezeigt).   
