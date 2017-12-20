@@ -20,7 +20,7 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.3.8'		
+VERSION =  '3.3.9'		
 VDATE = '19.12.2017'
 
 # 
@@ -629,7 +629,7 @@ def SearchUpdate(title):		#
 				summary = 'weiter im aktuellen Plugin',
 				thumb = R(ICON_UPDATER_NEW)))
 		else:
-			summary = 'keine neue Version / keine neue Einzeldateien gefunden'
+			summary = 'keine neue Version / keine neuen Einzeldateien gefunden'
 			oc.add(DirectoryObject(
 				#key = Callback(updater.menu, title='Update Plugin'), 
 				key = Callback(Main), 
@@ -1356,7 +1356,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 		Log('title: ' + title); Log('url: ' + url); 
 		if url:
 			if url.find('.m3u8') >= 9:
-				del link_path[i]			# 1. master.m3u8 entfernen, oben bereits abgehandelt
+				# del link_path[i]			# 1. master.m3u8 entfernen, oben bereits abgehandelt
 				continue
 						
 			if url.find('rtmp://') >= 0:	# 2. rtmp-Links:	
@@ -2105,7 +2105,7 @@ def img_urlScheme(text, dim, ID):
 	
 		
 	if img_src and img_alt:
-		if img_src.startswith('http://') == False:		# Base ergänzen
+		if img_src.startswith('http') == False:			# Base ergänzen, auch https möglich
 			img_src = BASE_URL + img_src 
 		img_src = img_src + str(dim)					# dim getestet: 160,265,320,640
 		if ID == 'PODCAST':								# Format Quadrat klappt nur bei PODCAST,
@@ -2360,6 +2360,9 @@ def SenderLiveListe(title, listname, offset=0):	#
 	
 	liste = blockextract('<item>', mylist)
 	Log(len(liste));
+	EPG_ID_old = ''											# Doppler-Erkennung
+	sname_old=''; stime_old=''; summ_old=''; vonbis_old=''	# dto.
+	summary_old=''; tagline_old=''
 	for element in liste:							# EPG-Daten für einzelnen Sender holen 	
 		link = stringextract('<link>', '</link>', element) 	# HTML.StringFromElement unterschlägt </link>
 		link = unescape(link)						# amp; entfernen! Herkunft: HTML.ElementFromString bei &-Zeichen
@@ -2379,24 +2382,34 @@ def SenderLiveListe(title, listname, offset=0):	#
 		if Prefs['pref_use_epg'] == True:
 			# Indices EPG_rec: 0=starttime, 1=href, 2=img, 3=sname, 4=stime, 5=summ, 6=vonbis:
 			EPG_ID = stringextract('<EPG_ID>', '</EPG_ID>', element)
-			try:
-				rec = EPG.EPG(ID=EPG_ID, mode='OnlyNow')	# Daten holen - nur aktuelle Sendung
-				if rec == '':								# Fehler, ev. Sender EPG_ID nicht bekannt
-					sname=''; stime=''; summ=''; vonbis=''
+			Log(EPG_ID); Log(EPG_ID_old);
+			if  EPG_ID == EPG_ID_old:					# Doppler: EPG vom Vorgänger verwenden
+				sname=sname_old; stime=stime_old; summ=summ_old; vonbis=vonbis_old
+				summary=summary_old; tagline=tagline_old
+				Log('EPG_ID=EPG_ID_old')
+			else:
+				EPG_ID_old = EPG_ID
+				try:
+					rec = EPG.EPG(ID=EPG_ID, mode='OnlyNow')	# Daten holen - nur aktuelle Sendung
+					if rec == '':								# Fehler, ev. Sender EPG_ID nicht bekannt
+						sname=''; stime=''; summ=''; vonbis=''
+					else:
+						sname=rec[3]; stime=rec[4]; summ=rec[5]; vonbis=rec[6]	
+				except:
+					sname=''; stime=''; summ=''; vonbis=''						
+				if sname:
+					title = title + ': ' + sname
+				if summ:
+					summary = summ
 				else:
-					sname=rec[3]; stime=rec[4]; summ=rec[5]; vonbis=rec[6]	
-			except:
-				sname=''; stime=''; summ=''; vonbis=''						
-			if sname:
-				title = title + ': ' + sname
-			if summ:
-				summary = summ
-			else:
-				summary = ''
-			if vonbis:
-				tagline = 'Zeit: ' + vonbis
-			else:
-				tagline = ''			
+					summary = ''
+				if vonbis:
+					tagline = 'Zeit: ' + vonbis
+				else:
+					tagline = ''
+				# Doppler-Erkennung:	
+				sname_old=sname; stime_old=stime; summ_old=summ; vonbis_old=vonbis;
+				summary_old=summary; tagline_old=tagline
 		title = unescape(title)	
 		title = title.replace('JETZT:', '')					# 'JETZT:' hier überflüssig
 		title = title.decode(encoding="utf-8", errors="ignore")	

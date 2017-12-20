@@ -2,6 +2,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+20.12.2017 3.3.9	ARD - img_urlScheme: Bildquellen für https erweitert. 
+			ARD - SingleSendung: Indexfehler fixed (del link_path[i]).
+			SenderLiveListe: Mehrfach-Erkennung für EPG_ID's (Daten des Vorgängers werden
+			verwendet, EPG-Url nicht erneut aufgerufen). 	
 
 19.12.2017 3.3.8	Modul updater_single (Update von einzelnen Dateien).
 			TV-Live-Sender: Wegfall 2. Alternative, wenn url übereinstimmt.
