@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.3.9'		
-VDATE = '19.12.2017'
+VERSION =  '3.4.1'		
+VDATE = '23.12.2017'
 
 # 
 #	
@@ -376,6 +376,10 @@ def Main_ZDF(name):
 		thumb=R(ICON_ZDF_NEWCONTENT))) 
 	oc.add(DirectoryObject(key=Callback(BarriereArm, name="Barrierearm"), title="Barrierearm", 
 		thumb=R(ICON_ZDF_BARRIEREARM))) 
+	oc.add(DirectoryObject(key=Callback(International, name="ZDFenglish"), title="ZDFenglish", 
+		thumb=R('ZDFenglish.png'))) 
+	oc.add(DirectoryObject(key=Callback(International, name="ZDFarabic"), title="ZDFarabic", 
+		thumb=R('ZDFarabic.png'))) 
 		
 	oc.add(DirectoryObject(key=Callback(ZDF_Search, s_type='Bilderserien', title="Bilderserien", query="Bilderserien"), 
 		title="Bilderserien", thumb=R(ICON_ZDF_BILDERSERIEN))) 
@@ -1418,7 +1422,7 @@ def test_downloads(oc,download_list,title_org,summary_org,tagline_org,thumb,high
 				title = Format + 'Download: ' + title_org
 				dest_path = Prefs['pref_curl_download_path'] 
 				summary = Format + 'wird in ' + dest_path + ' gespeichert' 									
-				tagline = 'Der Download erfolgt durch im Hintergrund | ' + quality
+				tagline = 'Der Download erfolgt im Hintergrund | ' + quality
 				summary=summary.decode(encoding="utf-8", errors="ignore")
 				tagline=tagline.decode(encoding="utf-8", errors="ignore")
 				title=title.decode(encoding="utf-8", errors="ignore")
@@ -3370,14 +3374,14 @@ def NeuInMediathek(name, offset=0):
 	page = HTTP.Request(path).content
 	Log(len(page))
 	#  1. Block extrahieren (Blöcke: Neu, Nachrichten, Sport ...)
-	page = stringextract('<article class="b-cluster m-filter js-rb-live','<article class="b-cluster m-filter js-rb-live', page)
+	page = stringextract('>Neu in der Mediathek<','<h2 class="cluster-title"', page)
 	Log(len(page))
 	 			
 	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
 	
 	Log(offset)
 	if offset:
-		summ_mehr = 'Mehr zu >name<, Gesamt: %s' % (name, page_cnt)
+		summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (name, page_cnt)
 		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
 		oc.add(DirectoryObject(key=Callback(NeuInMediathek, name=name, offset=offset), 
 			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
@@ -3452,6 +3456,32 @@ def BarriereArmSingle(title, ID, offset=0):	# Aufruf: 1. Infos, 2. Hörfassungen
 	return oc
 	
 ####################################################################################################
+@route(PREFIX + '/International')
+def International(name, offset=0):
+	Log('International'); 
+	oc = ObjectContainer(title2=name, view_group="List")
+	oc = home(cont=oc, ID='ZDF')							# Home-Button
+	
+	if name == 'ZDFenglish':
+		path = 'https://www.zdf.de/international/zdfenglish'
+	if name == 'ZDFarabic':
+		path = 'https://www.zdf.de/international/zdfarabic'
+		
+	page = HTTP.Request(path).content
+	Log(len(page))
+	 			
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	
+	Log(offset);Log(page_cnt)
+	if offset:
+		summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (name, page_cnt)
+		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
+		oc.add(DirectoryObject(key=Callback(International, name=name, offset=offset), 
+			title='Mehr...', summary=summ_mehr,  thumb=R(ICON_MEHR)))	
+	
+	return oc	
+	
+####################################################################################################
 # @route(PREFIX + '/ZDF_get_content')	# Auswertung aller ZDF-Seiten
 #	Die Erkennung von Mehrfachseiten (multi=true) ist leider nicht allen Fällen möglich. Bsp.:
 #	Liveticker, Bilderserien usw. werden ohne bes. Kennung hier angezeigt. Bis auf Weiteres werden
@@ -3461,6 +3491,7 @@ def BarriereArmSingle(title, ID, offset=0):	# Aufruf: 1. Infos, 2. Hörfassungen
 
 def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'VERPASST' - Abweichungen zu Rubriken + A-Z
 	Log('ZDF_get_content'); Log(ID); Log(ref_path); Log(offset)					
+	Log(len(page)); 			
 	max_count = int(Prefs['pref_maxZDFContent'])				# max. Anzahl Einträge ab offset
 	offset = int(offset)																		
 	
@@ -3481,16 +3512,15 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			return oc, offset, page_cnt  		 	
 		
 	pos = page.find('class=\"content-box\"')					# ab hier verwertbare Inhalte 
+	Log('pos: ' + str(pos))
 	if pos >= 0:
 		page = page[pos:]
-				
 				
 	#if ID == 'Search' or ID == 'VERPASST':						# Unterscheidung ab 22.11.16 nicht mehr nötig
 	#	content =  blockextract('class=\"content-link\"', page)																			
 	content =  blockextract('class=\"artdirect\"', page)
 	if ID == 'NeuInMediathek':									# letztes Element entfernen (Verweis Sendung verpasst)
 		content.pop()	
-	Log(len(page)); 
 	page_cnt = len(content)
 	Log('content_Blocks: ' + str(page_cnt));
 	
@@ -3500,7 +3530,7 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
 		else:
 			msg_notfound = 'Leider keine Inhalte' 				# z.B. bei A-Z für best. Buchstaben 
-		
+		Log('msg_notfound: ' + str(page_cnt))
 		# kann entfallen - Blockbildung mit class="content-box" inzw. möglich. Modul zdfneo.py entfernt.
 		#	Zeilen hier ab 1.1.2018 löschen:
 		#if ref_path.startswith('https://www.zdf.de/comedy/neo-magazin-mit-jan-boehmermann'): # neue ZDF-Seite
@@ -3512,7 +3542,7 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 		summary = 'zurück zur ' + NAME.decode(encoding="utf-8", errors="ignore")		
 		oc.add(DirectoryObject(key=Callback(Main_ZDF, name=NAME), title=title, 
 			summary=summary, tagline='TV', thumb=R(ICON_MAIN_ZDF)))
-		return oc
+		return oc, offset, page_cnt
 		
 		
 	if page.find('class=\"b-playerbox') > 0 and page.find('class=\"item-caption') > 0:  # Video gesamte Sendung?
@@ -3859,7 +3889,7 @@ def ZDFotherSources(title, tagline, thumb, docId):
 	
 #-------------------------
 #	Ladekette für Videoquellen ab 30.05.2017:
-#		1. Ermittlung des apiToken (in configuration.json), bisher  unverändert, Verwendung in header
+#		1. Ermittlung des apiToken (in configuration.json), nur anfangs 2016 (unverändert), Verwendung in header
 #		2. Sender-ID sid ermitteln für profile_url (durch Aufrufer)
 #		3. Playerdaten ermitteln via profile_url (Basis bisher unverändert, injiziert: sid)
 #		4. Videodaten ermitteln via videodat_url (Basis bisher unverändert, injiziert: videodat)
@@ -3886,6 +3916,7 @@ def get_formitaeten(sid, ID=''):
 		apiToken = 'Bearer ' + str(Dict['apiToken'])		# s. GetZDFVideoSources. str falls None
 		# headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
 		headers = {'Api-Auth': apiToken,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+		Log('apiToken: ' + apiToken)
 	# Log(headers)		# bei Bedarf
 	
 	# Bei Anforderung von profile_url mittels urllib2.urlopen ssl.SSLContext erforderlich - entf. bei JSON.ObjectFromURL
@@ -3938,7 +3969,6 @@ def get_formitaeten(sid, ID=''):
 		
 		Log('videodat_url: Laden fehlgeschlagen')
 		return '', '', ''
-		
 	Log(page[:20])	# "{..attributes" ...
 		
 	'''

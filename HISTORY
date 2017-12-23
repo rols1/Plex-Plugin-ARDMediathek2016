@@ -2,6 +2,16 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+
+
+??.12.2017 3.4.1	ZDF: zusätzl. Seiten/Funktionen: ZDFenglish, ZDFarabic.
+			ZDF/Neu in der Mediathek: Fix Seitenausschnitt (nach Änd. durch ZDF).	
+
+21.12.2017 3.4.0	not on Github
+			Funktion ZDF_get_content: Fix 'return oc, offset, page_cnt' bei leerer Rückgabe.
+			ZDF - get_formitaeten: Log apiToken (Debugzwecke).
+			Funktion test_downloads: Korrektur tagline ('durch' hier falsch).
+
 20.12.2017 3.3.9	ARD - img_urlScheme: Bildquellen für https erweitert. 
 			ARD - SingleSendung: Indexfehler fixed (del link_path[i]).
 			SenderLiveListe: Mehrfach-Erkennung für EPG_ID's (Daten des Vorgängers werden
