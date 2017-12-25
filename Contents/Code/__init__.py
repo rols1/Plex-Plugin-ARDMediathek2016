@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.1'		
-VDATE = '23.12.2017'
+VERSION =  '3.4.2'		
+VDATE = '25.12.2017'
 
 # 
 #	
@@ -4181,13 +4181,12 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 			return ObjectContainer(message=msg)	  	# header=... ohne Wirkung	(?)			
   else:													
 	playlist = Resource.Load(url_m3u8) 
-  # Log(playlist)   # bei Bedarf
 	 
+  # Log(playlist)		# bei Bedarf
   lines = playlist.splitlines()
-  # Log(lines)
   lines.pop(0)		# 1. Zeile entfernen (#EXTM3U)
   BandwithOld 	= ''	# für Zwilling -Test (manchmal 2 URL für 1 Bandbreite + Auflösung) 
-  urlOld	  	= ''	# dto
+  thumb_org		= thumb # sichern
   i = 0
   #for line in lines[1::2]:	# Start 1. Element, step 2
   for line in lines:	
@@ -4216,13 +4215,11 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 			pos = url_m3u8.rfind('/')				# m3u8-Dateinamen abschneiden
 			url = url_m3u8[0:pos+1] + url 			# Basispfad + relativer Pfad
 		if Bandwith == BandwithOld:	# Zwilling -Test
-			if url == urlOld:
-				continue			# verwerfen, falls url übereinstimmt
 			title = 'Bandbreite ' + Bandwith + ' (2. Alternative)'
 			
 		BandwithWish = Prefs['pref_setVideoFormatLive']			# leer, auto oder Bandbreitenwert
 		# Log('BandwithWish: ' + str(BandwithWish)); Log(url); Log(urlOld); Log(title); 
-		# Log(thumb); Log(Resolution); Log(BandwithInt); 
+		Log(thumb); Log(Resolution); Log(BandwithInt); 
 		# Video-Sofort-Format = Qualität: auto (m3u8) - nur 1 Objekt, auto bereits abgehandelt?	
 		if BandwithWish and BandwithWish.endswith('auto') == False: 
 			BandwithWish = BandwithWish.split('>')[1].strip()	# Bsp. "m3u8-Streaming: Bandbreite > 100000"
@@ -4233,15 +4230,14 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 					rtmp_live='nein', resolution=''))
 				return container							# nur dieser gewünscht
 		else:												# Objekte für alle gefundenen Bandbreiten
+			thumb=thumb_org
 			if BandwithInt and BandwithInt <=  100000: 		# vermutl. nur Audio (Bsp. ntv 48000, ZDF 96000)
 				Resolution = Resolution + ' (vermutlich nur Audio)'
-				thumb = R(ICON_SPEAKER)
+				thumb=R(ICON_SPEAKER)
 			container.add(CreateVideoStreamObject(url=url, title=title, 		
 				summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
-				rtmp_live='nein', resolution=''))								
-			BandwithOld = Bandwith
-			urlOld		= url
-				
+				rtmp_live='nein', resolution=''))
+			BandwithOld = Bandwith												
 
   	i = i + 1	# Index für URL
   #Log (len(container))	# Anzahl Elemente

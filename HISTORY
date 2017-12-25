@@ -3,6 +3,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
+25.12.2017 3.4.2	TV-Live-Sender: falsches Icon korrigiert (ICON_SPEAKER nur bei 
+			BandwithInt <= 100000).
+			<EPG_ID> für Sender ONE aktualisiert.
+			'Wegfall 2. Alternative' wieder entfernt - kein Vorkommen gefunden.
 
 23.12.2017 3.4.1	ZDF: zusätzl. Seiten/Funktionen: ZDFenglish, ZDFarabic.
 			ZDF/Neu in der Mediathek: Fix Seitenausschnitt (nach Änd. durch ZDF).	
