@@ -7,6 +7,7 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 			BandwithInt <= 100000).
 			<EPG_ID> für Sender ONE aktualisiert.
 			'Wegfall 2. Alternative' wieder entfernt - kein Vorkommen gefunden.
+			update_single 26.12.2017: alle ZDF-Icons im Hauptmenü (Font, Ausrichtung).
 
 23.12.2017 3.4.1	ZDF: zusätzl. Seiten/Funktionen: ZDFenglish, ZDFarabic.
 			ZDF/Neu in der Mediathek: Fix Seitenausschnitt (nach Änd. durch ZDF).	
