@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.2'		
-VDATE = '25.12.2017'
+VERSION =  '3.4.3'		
+VDATE = '27.12.2017'
 
 # 
 #	
@@ -1211,16 +1211,26 @@ def SinglePage(title, path, next_cbKey, mode, ID, offset=0):	# path komplett
 			if func_path == BASE_URL + path: 	# überspringen - in ThemenARD erscheint der Dachdatensatz nochmal
 				Log('BASE_URL + path == func_path | Satz überspringen');
 				continue
+			if sid == '':
+				continue
 			#if subtitel == '':	# ohne subtitel verm. keine EinzelSendung, sondern Verweis auf Serie o.ä.
 			#	continue		#   11.10.2017: Rubrik "must see" ohne subtitel
 			if subtitel == summary or subtitel == '':
 				subtitel = img_alt.decode(encoding="utf-8", errors="ignore")
-			
-			path = BASE_URL + '/play/media/' + sid			# -> *.mp4 (Quali.-Stufen) + master.m3u8-Datei (Textform)
-			Log('Medien-Url: ' + path)
-			oc.add(DirectoryObject(key=Callback(SingleSendung, path=path, title=headline, thumb=img_src, 
-				duration=millsec_duration, tagline=subtitel, ID=ID, summary=summary), title=headline, tagline=subtitel, 
-				summary=summary, thumb=img_src))
+			# 27.12.2017 Sendungslisten (mode: Sendereihen) können (angehängte) Verweise auf Sendereihen enthalten,
+			#	Bsp. http://www.ardmediathek.de/tv/filme. Erkennung: die sid enthält die bcastId, Bsp. 1933898&bcastId=1933898
+			if '&bcastId=' in path:				#  keine EinzelSendung -> Sendereihe
+				Log('&bcastId= in path: ' + path)
+				if path.startswith('http') == False:	# Bsp. /tv/Film-im-rbb/Sendung?documentId=10009780&bcastId=10009780
+					path = BASE_URL + path
+				oc.add(DirectoryObject(key=Callback(PageControl, path=path, title=headline, cbKey='SinglePage', 
+					mode='Sendereihen', ID=ID), title=headline, tagline=subtitel, summary='Folgeseiten', thumb=img_src))
+			else:								# normale Einzelsendung, Bsp. für sid: 48545158
+				path = BASE_URL + '/play/media/' + sid			# -> *.mp4 (Quali.-Stufen) + master.m3u8-Datei (Textform)
+				Log('Medien-Url: ' + path)
+				oc.add(DirectoryObject(key=Callback(SingleSendung, path=path, title=headline, thumb=img_src, 
+					duration=millsec_duration, tagline=subtitel, ID=ID, summary=summary), title=headline, tagline=subtitel, 
+					summary=summary, thumb=img_src))
 		if next_cbKey == 'SinglePage':						# mit neuem path nochmal durchlaufen
 			Log('next_cbKey: SinglePage in SinglePage')
 			path = BASE_URL + path

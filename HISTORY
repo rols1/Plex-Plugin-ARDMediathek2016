@@ -3,6 +3,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
+27.12.2017 3.4.3	ARD - SinglePage: Berücksichtigung von Sendungslisten, die außer EinzelSendungen
+			auch Verweise auf Sendereihen enthalten. 
+			ARD: Icons im Hauptmenü aktualisiert (Font, Ausrichtung).
+	
 25.12.2017 3.4.2	TV-Live-Sender: falsches Icon korrigiert (ICON_SPEAKER nur bei 
 			BandwithInt <= 100000).
 			<EPG_ID> für Sender ONE aktualisiert.
