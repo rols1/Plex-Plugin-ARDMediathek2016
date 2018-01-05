@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.4'		
-VDATE = '??.12.2017'
+VERSION =  '3.4.5'		
+VDATE = '05.01.2018'
 
 # 
 #	
