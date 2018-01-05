@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.3'		
-VDATE = '27.12.2017'
+VERSION =  '3.4.4'		
+VDATE = '??.12.2017'
 
 # 
 #	
@@ -272,12 +272,12 @@ def Main():
 				title=title, summary=summary, tagline=cleanhtml(summary), thumb=R(ICON_UPDATER_NEW)))
 		else:	
 			# Update von Einzeldateien, wenn kein aktuelles Plugin-Update vorliegt: 
-			ret, info = update_single.check_repo()		# ret=1: Einzeldateien aktualisieren
+			ret, info = update_single.check_repo(mode='check')		# ret=1: Einzeldateien aktualisieren
 			Log('update_single: ' + str(ret)); 
 			if ret:
 				call_update = True
 				oc.add(DirectoryObject(
-					key = Callback(update_single.replace), 
+					key = Callback(update_single.check_repo, mode='replace'), 
 					title = 'neue Einzeldateien vorhanden - jetzt installieren',
 					summary = info,
 					tagline = 'Version bleibt %s' % VERSION,
@@ -291,8 +291,8 @@ def Main():
 			title=title, summary=summary, tagline=tagline, thumb=R(ICON_MAIN_UPDATER)))
 		
 	oc.add(DirectoryObject(key = Callback(Main_Options, title='Einstellungen'), title = 'Einstellungen', 
-		summary = 'Live-TV-Sender: EPG-Daten verwenden, verfuegbare Bandbreiten anzeigen', 
-		tagline = 'Die Downloadeinstellungen bitte im Webplayer vornehmen',
+		summary = 'ein-/ausschalten: EPG-Daten, Downloads, Podcasts, Update anzeigen,.. ', 
+		tagline = 'Verzeichniseinträge bitte im Webplayer (Zahnradsymbol) vornehmen'.decode(encoding="utf-8"),
 		thumb = R(ICON_PREFS)))
 					
 	return oc
@@ -617,11 +617,11 @@ def SearchUpdate(title):		#
 			thumb = R(ICON_UPDATER_NEW)))
 	else:	
 		# Update von Einzeldateien, wenn kein aktuelles Plugin-Update vorliegt: 
-		ret, info = update_single.check_repo()		# ret=1: Einzeldateien aktualisieren
+		ret, info = update_single.check_repo(mode='check')		# ret=1: Einzeldateien aktualisieren
 		Log('update_single: ' + str(ret)); 
 		if ret:
 			oc.add(DirectoryObject(
-				key = Callback(update_single.replace), 
+				key = Callback(update_single.check_repo, mode='replace'), 
 				title = 'neue Einzeldateien vorhanden - jetzt installieren',
 				tagline = 'Version bleibt %s' % VERSION,
 				summary = info,
@@ -1369,8 +1369,9 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 
 		Log('title: ' + title); Log('url: ' + url); 
 		if url:
-			if url.find('.m3u8') >= 9:
-				# del link_path[i]			# 1. master.m3u8 entfernen, oben bereits abgehandelt
+			if '.m3u8' in url:				# master.m3u8 überspringen, oben bereits abgehandelt
+				continue
+			if 'manifest.f4m' in url:		# manifest.f4m überspringen
 				continue
 						
 			if url.find('rtmp://') >= 0:	# 2. rtmp-Links:	
@@ -3163,11 +3164,13 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 		ZDF_Search_PATH	 = 'https://www.zdf.de/suche?q=%s&from=&to=&sender=alle+Sender&attrs=&contentTypes=&sortBy=date&page=%s'
 		ID=s_type
 	
+	if pagenr == '':		# erster Aufruf muss '' sein
+		pagenr = 1
 	path = ZDF_Search_PATH % (query, pagenr) 
 	Log(path)	
 	# page = HTTP.Request(path, cacheTime=1).content 		# Debug: cacheTime=1 
 	page = HTTP.Request(path).content 
-	searchResult = stringextract('data-loadmore-result-count=\"', '\"', page)	# Anzahl Ergebnisse
+	searchResult = stringextract('data-loadmore-result-count="', '"', page)	# Anzahl Ergebnisse
 	Log(searchResult);
 	
 	# Log(page)	# bei Bedarf		
@@ -3186,10 +3189,7 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 		return oc
 	
 	oc = home(cont=oc, ID='ZDF')							# Home-Button	
-	
-	if pagenr == '':		# erster Aufruf muss '' sein
-		pagenr = 1
-			
+				
 	# offset=0: anders als bei den übrigen ZDF-'Mehr'-Optionen gibt der Sender Suchergebnisse bereits
 	#	seitenweise aus, hier umgesetzt mit pagenr - offset entfällt	
 	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID=ID, offset=0)
@@ -3200,9 +3200,9 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 	pagenr = int(pagenr) + 1
 	path = ZDF_Search_PATH % (query, pagenr)
 	Log(pagenr); Log(path)
-	page = HTTP.Request(path).content
-	pos =  page.find('\"content-link\"')
-	if pos >= 0: 
+	page = HTTP.Request(path, cacheTime=1).content
+	content =  blockextract('class="artdirect"', page)
+	if len(content) > 0:
 		title = "Weitere Beiträge".decode(encoding="utf-8", errors="ignore")
 		oc.add(DirectoryObject(key=Callback(ZDF_Search, query=query, s_type=s_type, pagenr=pagenr), 
 			title=title, thumb=R(ICON_MEHR), summary=''))	
@@ -3265,12 +3265,11 @@ def SendungenAZList(title, element, offset=0):	# Sendungen zm gewählten Buchsta
 	Log(azPath);	
 
 	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=azPath, ID='DEFAULT', offset=offset)
-	  
-	if len(oc) == 1:	# home berücksichtigen
-		return NotFound('Leer - keine Sendung(en), die mit  >' + element + '< beginnen')
+	Log(page_cnt)  
+	if page_cnt == 0:	# Fehlerbutton bereits in ZDF_get_content
+		return oc
 		
 	summ_mehr = 'Mehr zu >%s<, Gesamt: %s' % (title2, page_cnt)
-	Log(offset)
 	if offset:
 		summ_mehr = summ_mehr.decode(encoding="utf-8", errors="ignore")
 		oc.add(DirectoryObject(key=Callback(SendungenAZList, title=title, element=element, offset=offset), 
@@ -3331,7 +3330,7 @@ def Rubriken(name):
 		if title == "Sendungen A-Z":	# Rest nicht mehr relevant
 			break
 		oc.add(DirectoryObject(key=Callback(RubrikSingle, title=title, path=path), 
-			title=title, thumb=R(ICON_ZDF_RUBRIKEN)))	
+			title=title, summary=title,  thumb=R(ICON_ZDF_RUBRIKEN)))	
 	
 	return oc
 #-------------------------
@@ -3342,7 +3341,7 @@ def RubrikSingle(title, path, offset=0):
 	oc = home(cont=oc, ID='ZDF')							# Home-Button
 	
 	page = HTTP.Request(path).content 			
-	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='Rubriken', offset=offset)
 	
 	Log(offset)
 	if offset:
@@ -3361,7 +3360,7 @@ def MeistGesehen(name, offset=0):
 	
 	path = ZDF_SENDUNGEN_MEIST
 	page = HTTP.Request(path).content 			
-	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='MeistGesehen', offset=offset)
 	
 	Log(offset)
 	if offset:
@@ -3387,7 +3386,7 @@ def NeuInMediathek(name, offset=0):
 	page = stringextract('>Neu in der Mediathek<','<h2 class="cluster-title"', page)
 	Log(len(page))
 	 			
-	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='NeuInMediathek', offset=offset)
 	
 	Log(offset)
 	if offset:
@@ -3448,13 +3447,13 @@ def BarriereArmSingle(title, ID, offset=0):	# Aufruf: 1. Infos, 2. Hörfassungen
 	Log(len(cont3))
 	
 	if ID == 'Infos':
-		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont1, ref_path=path, ID='DEFAULT', offset=offset)	
+		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont1, ref_path=path, ID='BARRIEREARM', offset=offset)	
 		summ_mehr = 'Infos zu >Barrierefreie Angebote<, Gesamt: %s' % page_cnt
 	if ID == 'Voice':
-		oc, offset, page_cnt = ZDF_get_content(oc=oc, page=cont2, ref_path=path, ID='DEFAULT', offset=offset)	
+		oc, offset, page_cnt = ZDF_get_content(oc=oc, page=cont2, ref_path=path, ID='BARRIEREARM', offset=offset)	
 		summ_mehr = 'Mehr zu >Hörfassungen<, Gesamt: %s' % page_cnt
 	if ID == 'UT':
-		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont3, ref_path=path, ID='DEFAULT', offset=offset)	
+		oc, offset, page_cnt  = ZDF_get_content(oc=oc, page=cont3, ref_path=path, ID='BARRIEREARM', offset=offset)	
 		summ_mehr = 'Mehr zu >Videos mit Untertitel<, Gesamt: %s' % page_cnt
 	
 	Log(offset)
@@ -3480,7 +3479,7 @@ def International(name, offset=0):
 	page = HTTP.Request(path).content
 	Log(len(page))
 	 			
-	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='DEFAULT', offset=offset)
+	oc, offset, page_cnt = ZDF_get_content(oc=oc, page=page, ref_path=path, ID='International', offset=offset)
 	
 	Log(offset);Log(page_cnt)
 	if offset:
@@ -3493,20 +3492,25 @@ def International(name, offset=0):
 	
 ####################################################################################################
 # @route(PREFIX + '/ZDF_get_content')	# Auswertung aller ZDF-Seiten
-#	Die Erkennung von Mehrfachseiten (multi=true) ist leider nicht allen Fällen möglich. Bsp.:
-#	Liveticker, Bilderserien usw. werden ohne bes. Kennung hier angezeigt. Bis auf Weiteres werden
-#	die Folgeseiten mit Fehlermeldung abgefangen (nach Test auf Videos) 
+#	 
 #	offset: für übergroße Seiten, die nicht wie die Suchergebn. als Folgeseiten mit pagenr organisiert sind.
 #		Bsp. für übergroße Seite: Hörfassungen (145 am 28.9.2017)
+#
+# 	ID='Search' od. 'VERPASST' - Abweichungen zu Rubriken + A-Z
 
-def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'VERPASST' - Abweichungen zu Rubriken + A-Z
+def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	
 	Log('ZDF_get_content'); Log(ID); Log(ref_path); Log(offset)					
-	Log(len(page)); 			
+	Log(len(page));			
 	max_count = int(Prefs['pref_maxZDFContent'])				# max. Anzahl Einträge ab offset
-	offset = int(offset)																		
+	offset = int(offset)
+	
+	Bilderserie = False	
+	if ID == 'Bilderserien':									# Aufruf: ZDF_Search
+		Bilderserie = True										# für Titelergänzung (Anz. Bilder)
+		ID='DEFAULT'											# Sätze ohne aufnehmen														
 	
 	img_alt = teilstring(page, 'class=\"m-desktop', '</picture>') # Bildsätze für b-playerbox
-	
+	title = ''
 	if page.find('class=\"content-box gallery-slider-box') >= 0: 	# Bildgalerie (hier aus Folgeseiten)
 		title = stringextract('\"big-headline\"  itemprop=\"name\" >', '</h1>', page)
 		title = unescape(title)
@@ -3521,14 +3525,20 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			page_cnt = len(oc)
 			return oc, offset, page_cnt  		 	
 		
-	pos = page.find('class=\"content-box\"')					# ab hier verwertbare Inhalte 
+	page_title = stringextract('<title>', '</title>', page)  # Seitentitel
+	page_title = page_title.strip()
+	msg_notfound = ''
+	if 'Leider kein Video verfügbar' in page:				# Verfügbarkeit vor class="artdirect"
+		msg_notfound = 'Leider kein Video verfügbar'		# z.B. Ausblick auf Sendung
+		if page_title:
+			msg_notfound = 'Leider kein Video verfügbar zu: ' + page_title
+		
+	pos = page.find('class="content-box"')					# ab hier verwertbare Inhalte 
 	Log('pos: ' + str(pos))
 	if pos >= 0:
 		page = page[pos:]
 				
-	#if ID == 'Search' or ID == 'VERPASST':						# Unterscheidung ab 22.11.16 nicht mehr nötig
-	#	content =  blockextract('class=\"content-link\"', page)																			
-	content =  blockextract('class=\"artdirect\"', page)
+	content =  blockextract('class="artdirect"', page)
 	if ID == 'NeuInMediathek':									# letztes Element entfernen (Verweis Sendung verpasst)
 		content.pop()	
 	page_cnt = len(content)
@@ -3539,39 +3549,44 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 		if page.find('\"title\">' + s) >= 0:
 			msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
 		else:
-			msg_notfound = 'Leider keine Inhalte' 				# z.B. bei A-Z für best. Buchstaben 
+			msg_notfound = 'Leider keine Inhalte verfügbar.' 	# z.B. bei A-Z für best. Buchstaben 
+			if page_title:
+				msg_notfound = 'Leider keine Inhalte verfügbar zu: ' + page_title
+			
 		Log('msg_notfound: ' + str(page_cnt))
 		# kann entfallen - Blockbildung mit class="content-box" inzw. möglich. Modul zdfneo.py entfernt.
 		#	Zeilen hier ab 1.1.2018 löschen:
 		#if ref_path.startswith('https://www.zdf.de/comedy/neo-magazin-mit-jan-boehmermann'): # neue ZDF-Seite
 		#	import zdfneo
 		#	oc = zdfneo.neo_content(path=ref_path, ID=ID)		# Abschluss dort
-		#	return oc, offset, page_cnt 
-			
+		#	return oc, offset, page_cnt 		
+		
+	if msg_notfound:											# gesamte Seite nicht brauchbar
 		title = msg_notfound.decode(encoding="utf-8", errors="ignore")					
 		summary = 'zurück zur ' + NAME.decode(encoding="utf-8", errors="ignore")		
 		oc.add(DirectoryObject(key=Callback(Main_ZDF, name=NAME), title=title, 
 			summary=summary, tagline='TV', thumb=R(ICON_MAIN_ZDF)))
 		return oc, offset, page_cnt
 		
-		
-	if page.find('class=\"b-playerbox') > 0 and page.find('class=\"item-caption') > 0:  # Video gesamte Sendung?
-		first_rec = img_alt +  stringextract('class=\"item-caption', 'data-tracking=', page) # mit img_alt
+	if page.find('class="b-playerbox') > 0 and page.find('class="item-caption') > 0:  # mehrspaltig: Video gesamte Sendung?
+		first_rec = img_alt +  stringextract('class="item-caption', 'data-tracking=', page) # mit img_alt
 		content.insert(0, first_rec)		# an den Anfang der Liste
-		# Log(content[0]) # bei Bedarf
+		# GNNLog(content[0]) # bei Bedarf
+					
 	
 	if 	max_count:								# 0 = 'Mehr..'-Option ausgeschaltet
 		delnr = min(page_cnt, offset)
 		del content[:delnr]						# Sätze bis offset löschen (bzw. bis Ende records)
 	Log(len(content))
 	for rec in content:	
-		pos = rec.find('</article>')		# Satz begrenzen - bis nächsten Satz nicht verwertbare Inhalte möglich
+		pos = rec.find('</article>')		   # Satz begrenzen - bis nächsten Satz nicht verwertbare Inhalte möglich
 		if pos > 0:
 			rec = rec[0:pos]
-			#Log(rec)  # bei Bedarf
+		# Log(rec)  # bei Bedarf
 			
-		teaser_cat=''; actionDetail=''; genre=''; summary=''; duration='';  title=''; airing=''; 
-		tagline=''; thumb =''; vid_content=''; video_datum=''; video_duration=''; other_teaser_label='';
+		if ID <> 'DEFAULT':					 			# DEFAULT: Übersichtsseite ohne Videos, Bsp. Sendungen A-Z
+			if 'title-icon icon-502_play' not in rec:  	# Videobeitrag?
+				continue		
 		multi = False			# steuert Mehrfachergebnisse 
 		
 		meta_image = stringextract('<meta itemprop=\"image\"', '>', rec)
@@ -3589,37 +3604,17 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			thumb  = stringextract('class=\"b-plus-button m-small', '\"', meta_image)
 		if thumb == '':											# 2. Fallback thumb (1. Bild aus img_alt)
 			thumb = stringextract('data-srcset=\"', ' ', img_alt) 	# img_alt s.o.	
-		Log(thumb)
+		Log('thumb: ' + thumb)
 			
 		if thumb.find('https://') == -1:	 # Bsp.: "./img/bgs/zdf-typical-fallback-314x314.jpg?cb=0.18.1787"
 				thumb = ZDF_BASE + thumb[1:] # 	Fallback-Image  ohne Host
-			
-		# python-Problem beim stringextract des gesamten plusbar-Blocks. Beschränkung auf einzelne strings			
-		path =  stringextract('plusbar-url=\"', '\"', rec)	# plusbar nicht vorh.? - sollte nicht vorkommen
-		if path == '' or path == ref_path:					# kein Pfad oder Selbstreferenz
-			continue
-		plusbar_title = stringextract('plusbar-title=\"', '\"', rec)	# Bereichs-, nicht Einzeltitel, nachrangig
-		plusbar_path = stringextract('plusbar-path=\"', '\"', rec)
-
-		# multi- und Teaser-Behandlung:	
+						
 		teaser_label = stringextract('class=\"teaser-label\"', '</div>', rec)
 		teaser_typ =  stringextract('<strong>', '</strong>', teaser_label)
-		if 	teaser_label:
-			dt1 =  stringextract('</span>', '<strong>', teaser_label)   
-			dt2 =  stringextract('<strong>', '</strong>', teaser_label)
-			# Log(teaser_label);Log(teaser_typ);
-			Log(dt1); Log(dt2);
-			
 		if teaser_typ == 'Beiträge':		# Mehrfachergebnisse ohne Datum + Uhrzeit
 			multi = True
 			summary = dt1 + teaser_typ 		# Anzahl Beiträge
 		#Log('teaser_typ: ' + teaser_typ)			
-			
-		if 	teaser_label.find('class=\"icon-301_clock') >= 0:							# Wochentag + Uhrzeit
-			airing = dt1 + ' | ' + dt2 + ' Uhr'
-		if 	teaser_label.find('class=\"icon-302_countdown') >= 0:						# Countdown
-			other_teaser_label = dt1 + ' ' + dt2			
-		#Log(airing); Log(other_teaser_label);
 			
 		subscription = stringextract('is-subscription=\"', '\"', rec)	# aus plusbar-Block	
 		Log(subscription)
@@ -3629,100 +3624,96 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			stage_title = stringextract('class=\"stage-title\"', '</h1>', rec)  
 			summary = teaser_count + ' ' + teaser_typ 
 
-		# Auswertung Datum + Uhrzeit
-		if rec.find('class=\"vid-content\"') >= 0:		# Bsp: <dd class="video-duration m-border">55 min</dd>
-			if rec.find('<time datetime=') > 0:	# airing ersetzt airing aus teaser_label 
-				airing_string = stringextract('<time datetime=\"', '\"', rec)
-				Log(airing_string)
-				airing = get_airing(airing_string)		# Bsp. airing_list 2016-11-12T21:45:00.000+01:00
-				Log(airing)	
-			video_datum = stringextract('video-airing\">', '<', rec)		# Video-Datum, kann fehlen	
-			video_duration = stringextract('video-duration', '/dd', rec)	# Video-Länge,  "      "	
-			duration = stringextract('>', '<', video_duration)			
-				
-			if video_datum:
-				vid_content = video_datum
-			if airing:		# aus teaser_label oder vid-content, so.o.
-				vid_content = airing 		# Wochentag + Uhrzeit aus teaser_label
-			if duration:
-				if vid_content == '':
-					vid_content = duration
-				else:
-					vid_content = vid_content + ' | ' + duration
-
-		if duration == '':
-			duration = stringextract('class="teaser-info ">', '</dd>', rec) # Länge bei Verpasst
-		Log(airing); Log(video_datum); Log(video_duration); Log(duration);  
-
-		# teaser_cat. div. Bezeichner + Textformate,  Bsp.: <span class="teaser-cat" itemprop="genre">
-		teaser_cat = stringextract('class=\"teaser-cat\"', '</span>', rec)
-		teaser_cat = teaser_cat.replace('>', "")
-		teaser_cat = teaser_cat.replace('itemprop=\"genre\"', "")	
-		teaser_cat = teaser_cat.strip()
-		if teaser_cat.find('|') > 0:  	# häufig über 3 Zeilen verteilt
-			tclist = teaser_cat.split('|')
-			teaser_cat = str.strip(tclist[0]) + ' | ' + str.strip(tclist[1])			# zusammenführen
-		Log('teaser_cat: ' + teaser_cat)
-			
-		href_title = stringextract('<a href=\"', '>', rec)		# href-link hinter teaser-cat kann Titel enthalten
-		href_title = stringextract('title="', '\"', href_title)
+		# Titel	
+		href_title = stringextract('<a href="', '>', rec)		# href-link hinter teaser-cat kann Titel enthalten
+		href_title = stringextract('title="', '"', href_title)
 		href_title = unescape(href_title)
 		Log('href_title: ' + href_title)
-		if 	href_title == 'ZDF Livestream':
+		if 	href_title == 'ZDF Livestream' or href_title == 'Sendung verpasst':
+			continue
+			
+		# Pfad				
+		plusbar_title = stringextract('plusbar-title=\"', '\"', rec)	# Bereichs-, nicht Einzeltitel, nachrangig
+		# plusbar_path = stringextract('plusbar-path=\"', '\"', rec)    # path ohne http(s)
+		path =  stringextract('plusbar-url=\"', '\"', rec)				# plusbar nicht vorh.? - sollte nicht vorkommen
+		Log('path: ' + path); Log('ref_path: ' + ref_path)	
+		if path == '' or path == ref_path:					# kein Pfad oder Selbstreferenz
 			continue
 		
-		genre = stringextract('itemprop=\"genre\">', '</span>', rec)
-		genre = mystrip(genre)
-		if genre.find('|') > 0:  	# häufig über 3 Zeilen verteilt
-			tclist = genre.split('|')
-			genre = str.strip(tclist[0]) + ' | ' + str.strip(tclist[1])			# zusammenführen
+		# Datum, Uhrzeit Länge	
+		if 'icon-301_clock icon' in rec:						# Uhrsymbol  am Kopf mit Datum/Uhrzeit
+			teaser_label = stringextract('class="teaser-label"', '</div>', rec)	
+			Log('teaser_label: ' + teaser_label)
+			video_datum =  stringextract('</span>', '<strong>', teaser_label)   
+			video_time =  stringextract('<strong>', '</strong>', teaser_label)
+		else:
+			if '<time datetime="' in rec:						# Datum / Zeit können fehlen
+				datum_line =  stringextract('<time datetime="', '/time>', rec) # datetime="2017-11-15T20:15:00.000+01:00">15.11.2017</time>
+				video_datum =  stringextract('">', '<', datum_line)
+				video_time = datum_line.split('T')[1]
+				video_time = video_time[:5] 
+			else:
+				video_datum=''; video_time=''			
+		Log(video_datum); Log(video_time);
+					
+		duration = stringextract('Videolänge:', '</dt>', rec) 		# Länge, kann fehlen
+		duration = stringextract('">', '</', duration)				# Ende </dd> od. </dt>
+		Log('duration: ' + duration);
+		
+		pic_cnt = stringextract('Anzahl Bilder:', '<dt class', rec)	# Bilderzahl bei Bilderserien
+		pic_cnt = stringextract('">', '</', pic_cnt)				# Ende </dd> od. </dt>
+		Log('Bilder: ' + pic_cnt);
 			
-		description = stringextract('itemprop=\"description\">', '</p>', rec)	# 
-		if description == '':
-			description = stringextract('class=\"item-description\">', '<', rec) 	# Bsp. Satz b-playerbox
-		description = description.strip()	
-		description = unescape(description)
-		Log('description: ' + description)
+		title = href_title 
+		if title == '':
+			title = plusbar_title
+		if Bilderserie == True:
+			title = title + " | %s"   % pic_cnt
+		if title.startswith(' |'):
+			title = title[2:]				# Korrektur
+			
+		category = stringextract('teaser-cat-category">', '</span>', rec)
+		category = mystrip(category)
+		brand = stringextract('teaser-cat-brand">', '</span>', rec)
+		brand = mystrip(brand)	
+			
+		tagline = video_datum
+		video_time = video_time.replace('00:00', '')		# ohne Uhrzeit
+		if video_time:
+			tagline = tagline + ' | ' + video_time
+		if duration:
+			tagline = tagline + ' | ' + duration
+		if category:
+			tagline = tagline + ' | ' + category
+		if brand:
+			tagline = tagline + ' | ' + brand
+		if tagline.startswith(' |'):
+			tagline = tagline[2:]			# Korrektur
+			
+		descr = stringextract('description">', '<', rec)
+		descr = mystrip(descr)
+		# Log('descr:' + descr)		# UnicodeDecodeError möglich
+		if descr:
+			summary = descr
+		else:
+			summary = href_title
+			
+		if 	'title-icon icon-502_play' in rec == False and 'icon-301_clock icon' in rec == False:
+			Log('icon-502_play und icon-301_clock nicht gefunden')
+			if ID == 'Bilderserien': 	# aber Bilderserien aufnehmen
+				Log('Bilderserien')
+			if plusbar_title.find(' in Zahlen') > 0:	# Statistik-Seite, voraus. ohne Galeriebilder 
+				continue
+			if plusbar_title.find('Liveticker') > 0:	#   Liveticker und Ergebnisse
+				continue
+			if plusbar_path.find('-livestream-') > 0:	#   Verweis Livestreamseite
+				continue
+			multi = True			# weitere Folgeseiten mit unbekanntem Inhalt, ev. auch Videos
+			tagline = 'Folgeseiten'
 		
-		# Titel + Beschreibung (einschl. Datum + Zeit) zusammenstellen
-		if teaser_cat:
-			title = teaser_cat
-		if href_title:				
-			title = title + ' | ' + href_title		
-		if title == '':				
-			title = plusbar_title 		# nachrangig, z.B. Zeitbereich: Morgens 5:30 - 12:00
-		
-		if description:
-			summary = description
-
 		if multi == True:			
 			tagline = 'Folgeseiten'
-		else:							# Videos prüfen + Titel kennzeichnen
-			if rec.find('title-icon icon-502_play') > 0 or  rec.find('icon-301_clock icon') > 0:
-				# title = 'Video' + ' | ' + title 			# kann entfallen, spart Platz
-				tagline = plusbar_title + ' | ' + duration 	# z.b. Nachts 0:00 - 05:30 | 43 min
-				if vid_content:
-					title = title  +  ' | ' + vid_content
-					tagline = plusbar_title 
-			else:	
-				Log('icon-502_play und icon-301_clock nicht gefunden')
-				if ID == 'Bilderserien': 	# aber Bilderserien aufnehmen
-					Log('Bilderserien')
-				if plusbar_title.find(' in Zahlen') > 0:	# Statistik-Seite, voraus. ohne Galeriebilder 
-					continue
-				if plusbar_title.find('Liveticker') > 0:	#   Liveticker und Ergebnisse
-					continue
-				if plusbar_path.find('-livestream-') > 0:	#   Verweis Livestreamseite
-					continue
-					
-				multi = True		# weitere Folgeseiten mit unbekanntem Inhalt, ev. auch Videos
-				tagline = 'Folgeseiten'
 		
-		if title[1] == '|':				# Fehlerkorrektur
-			title = title[2:]
-		Log('tagline: ' + tagline)
-		if tagline.strip()[-1] == '|':	# Fehlerkorrektur
-			tagline = tagline.strip()[:-1]
 		title = title.strip()
 		title = unescape(title)
 		summary = unescape(summary)
@@ -3737,12 +3728,11 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			title, tagline = tagline, title
 			
 		Log('neuer Satz')
-		Log(teaser_cat);Log(actionDetail);Log(genre);Log(thumb);			
-		Log(path);Log(title);Log(summary);Log(tagline);Log(multi);
+		Log(thumb);	Log(path);Log(title);Log(summary);Log(tagline); Log(multi);
 		title = title.decode(encoding="utf-8", errors="ignore")
 		summary = summary.decode(encoding="utf-8", errors="ignore")
 		tagline = tagline.decode(encoding="utf-8", errors="ignore")
-		
+		 
 		if multi == True:
 			oc.add(DirectoryObject(key=Callback(ZDF_Sendungen, url=path, title=title, ID=ID, offset=0), 
 				title=title, thumb=thumb, summary=summary, tagline=tagline))
@@ -3760,43 +3750,9 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):	# ID='Search' od. 'V
 			elif len(oc) >= max_count:	# Mehr, wenn max_count erreicht
 				offset = offset + max_count-1
 				break					# Schleife beenden
-
-	# Bildstrecken am Fuß des Dokuments anhängen (ZDF-Korrespondenten, -Mitarbeiter,...):
-	segment_start='<article class=\"b-group-persons\">'; segment_end = 'class="b-footer">'
-	if page.find(segment_start) > 0:  
-		rec = stringextract(segment_start, segment_end, page)
-		path = ref_path													# aktuelle Seite, Auswertung in Bildgalerie
-		title = stringextract('class="big-headline">', '</h2>', rec)	# 1. Titel
-		title = unescape(title)
-		thumb = stringextract('data-src=\"', '\"', rec)					# 1. Bild
-		summary = stringextract('class=\"desc-text\">', '</p>', rec)	# 1. Beschr.
-		summary = unescape(summary)
-		summary = cleanhtml(summary)
-		tagline = 'Bilder und Infos'
-		title = title.decode(encoding="utf-8", errors="ignore")
-		tagline = tagline.decode(encoding="utf-8", errors="ignore")
-		summary = summary.decode(encoding="utf-8", errors="ignore")
-		Log('Bildstrecke Footer');Log(thumb);Log(path);
-		oc.add(DirectoryObject(key=Callback(GetZDFVideoSources, title=title, url=path, tagline=tagline, thumb=thumb,
-			segment_start=segment_start, segment_end=segment_end),  title=title, thumb=thumb, summary=summary,
-			tagline=tagline))	
-				
+		# break # Test 1. Satz
+		
 	return oc, offset, page_cnt 
-#-------------
-def get_airing(airing_string):		# Datum + Uhrzeit, Bsp. airing_string 2016-11-12T21:45:00.000+01:00
-	# Log(airing_string)
-	airing = ''
-	
-	airing_date = airing_string.split('T')[0]	# 2016-11-12
-	airing_time = airing_string.split('T')[1]
-	
-	airing_date = airing_date[8:10] + '.' + airing_date[5:7] +  '.' + airing_date[0:4]  # 12.11.2016
-	airing_time = airing_time[0:5]  # 21:45
-	
-	if airing_date and airing_time:
-		airing = airing_date + ', ' + airing_time + ' Uhr'
-	
-	return airing
 	
 #-------------
 
@@ -4085,9 +4041,9 @@ def ZDF_Bildgalerie(oc, page, mode, title):	# keine Bildgalerie, aber ähnlicher
 		# Log(rec)  # bei Bedarf
 		summ = ''; 
 		if mode == 'is_gallery':				# "echte" Bildgalerie
-			img_src =  stringextract('data-srcset=\"', ' ', rec)			
-			item_title = stringextract('class=\"item-title', 'class=\"item-description\">', rec)  
-			teaser_cat =  stringextract('class=\"teaser-cat\">', '</span>', item_title)  
+			img_src =  stringextract('data-srcset="', ' ', rec)			
+			item_title = stringextract('class="item-title', 'class="item-description">', rec)  
+			teaser_cat =  stringextract('class="teaser-cat">', '</span>', item_title)  
 			teaser_cat = teaser_cat.strip()			# teaser_cat hier ohne itemprop
 			if teaser_cat.find('|') > 0:  			# über 3 Zeilen verteilt
 				tclist = teaser_cat.split('|')
@@ -4104,6 +4060,8 @@ def ZDF_Bildgalerie(oc, page, mode, title):	# keine Bildgalerie, aber ähnlicher
 			title = teaser_cat
 			if title_add:
 				title = title + ' |' + title_add
+			if title.startswith(' |'):
+				title = title[2:]				# Korrektur
 			if descript:		
 				summ = descript
 				
