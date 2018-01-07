@@ -20,7 +20,7 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.5'		
+VERSION =  '3.4.5'		# Wechsel: update_single_files löschen/leeren
 VDATE = '05.01.2018'
 
 # 
@@ -3656,8 +3656,11 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):
 				video_datum=''; video_time=''			
 		Log(video_datum); Log(video_time);
 					
-		duration = stringextract('Videolänge:', '</dt>', rec) 		# Länge, kann fehlen
-		duration = stringextract('">', '</', duration)				# Ende </dd> od. </dt>
+		duration = stringextract('Videolänge:', 'Datum', rec) 		# Länge - 1. Variante 
+		duration = stringextract('m-border">', '</', duration)		# Ende </dd> od. </dt>
+		if duration == '':
+			duration = stringextract('Videolänge:', '</dl>', rec) 	# Länge - 2. Variante bzw. fehlend
+			duration = stringextract('">', '</', duration)			
 		Log('duration: ' + duration);
 		
 		pic_cnt = stringextract('Anzahl Bilder:', '<dt class', rec)	# Bilderzahl bei Bilderserien

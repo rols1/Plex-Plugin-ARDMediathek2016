@@ -10,17 +10,17 @@ Plugin_FILE		= '/Contents/Resources/update_single_files'
 
 ################################################################################
 # Aufruf: 	wie Plugin-Update - bei Pluginstart oder manuell (Einstellungen)
-# Ablauf:		Funktion check_repo:
-#			1. Repo_FILE holen
+# Ablauf:		mode: check:
+#			1. Repo_FILE holen, HISTORY holen 
 #			2. je Zeile: Zeitstempel Repo_FILE gegen LOCAL_FILE  vergleichen
 #			2.1 Repo_FILE fehlt/leer: Abbruch - kein Austausch - Cancelsignal für laufende Single-Updates
 #			2.2 Zeitstempel fehlt oder jünger: Rückgabe 1 = Austauschsignal
 #
-#				Funktion replace:
+#				mode replace:
 #			1., 2. wie check_repo 
 #			3. update_single_files im  Plugin: altes Format/fehlt/leer: Austausch aller gelisteten Dateien
 #			4. Zeile: lokaler Zeitstempel ist jünger: Austausch der dazu gehörigen Datei
-#			5. Abschluss: Austausch update_single_files im Plugin gegen die Repo-Version
+#			5. Abschluss: Austausch update_single_files + HISTORY im Plugin gegen die Repo-Version
 #			6. Hinweis: Plugin neu starten | betroffene Dateien 
 #
 # 03.12.2018 Formatwechsel: jede Zeile mit Dateistempel + Datei
@@ -28,6 +28,7 @@ Plugin_FILE		= '/Contents/Resources/update_single_files'
 # Austausch erfolgt auch, wenn update_single_files: fehlt/leer/im alten Format
 # Für jede Datei existiert eine Zeile (ermöglicht inkrementelles Update)
 # Beim Versions-Update ist update_single_files manuell zu löschen, um Inkonsistenzen zu verhindern.
+# HISTORY enthält für jede hier geänderte Datei einen Eintrag zu aktuellen Version
 #
 # Format File:			Datum | UTC-Sekunden | File1
 #				inkrementell: neue Update-Dateien (innerhalb einer Version) werden jeweils 
@@ -46,20 +47,22 @@ def check_repo(mode=''):
 	Log('update_single: check_repo')
 	Log('mode: ' + mode)
 	
+	repo_cont = ''; hist_cont = ''
 	try:									# Repo_FILE laden
 		repo_cont = HTTP.Request(REPO_BASE + Plugin_FILE).content
 		# repo_cont = Core.storage.load('/tmp/update_single_files')	# Test lokal
 		repo_cont = repo_cont.strip()
+		hist_cont = HTTP.Request(REPO_BASE + '/HISTORY').content	
 	except Exception as exception:
 		Log(str(exception))
-		repo_cont = ''
 		return 0, str(exception) + ' (Github: update_single_files)'		
 	Log('repo_cont: ' + repo_cont)
+	Log('hist_cont: ' + hist_cont[:40])
 	
 	# Hinw.: storage.join_path erwartet Liste der Pfadelemente - anders als os.path.join
 	LOCAL_FILE = Core.storage.join_path(Core.bundle_path, 'Contents', 'Resources', 'update_single_files')
 	Log(LOCAL_FILE)
-	plugin_cont = ''
+	plugin_cont = ''; 
 	Log(os.path.exists(LOCAL_FILE))
 	if os.path.exists(LOCAL_FILE):
 		try:								# Plugin_FILE laden		
@@ -130,10 +133,12 @@ def check_repo(mode=''):
 			return ObjectContainer(header=L('Fehler'), message=msg)						
 		cnt = cnt + 1
 
-	# zum Schluß neues update_single_files speichern, für neue Vergleiche:
+	# zum Schluß neues update_single_files + neues HISTORY (hist_cont)speichern:
 	plugin_file = Core.storage.join_path(Core.bundle_path, 'Contents', 'Resources', 'update_single_files')
+	hist_file = Core.storage.join_path(Core.bundle_path, 'HISTORY')
 	try:							
 		Core.storage.save(plugin_file, repo_cont)	
+		Core.storage.save(hist_file, hist_cont)	
 	except Exception as exception:
 		msg =  str(exception) + ' (Plugin: update_single_files)'
 		Log(msg)

@@ -5,6 +5,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 
 04.01.2018 3.4.5	Modul updater_single erweitert: inkrementelles Update innerhalb einer Version.
 			TV-Live-Sender - Aktualisierung Stream-Url n-tv.
+			update_single 07.01.: init.py - ZDF | Videodauer: 2 Varianten berücksichtigt.
+			update_single 07.01.: update_single.py - Speichern Repo-HISTORY zum Abschluss.
 
 not Github 3.4.4	ARD - SingleSendung: Ausfilterung von manifest.f4m-Links.
 			ZDF_get_content: komplett überarbeitet (zuverlässige Erkennung von Videos, übersichtlichere
