@@ -87,7 +87,7 @@ def check_repo(mode=''):
 		if line.strip() == '' or '|' in line == False:	# leer, Format falsch?
 			continue
 		line_date, line_stamp, line_file = line.split('|') 					# Zeile  Repo_FILE lesen
-		Log(line_date); Log(line_stamp); Log(line_file);
+		Log('repo: date|stamp|file'); Log(line_date); Log(line_stamp); Log(line_file);
 		line_stamp = int(line_stamp.strip())
 		line_file = line_file.strip()
 		line_file = line_file.replace('./', '/')	# ls-Ausgabe bereinigen
@@ -120,6 +120,7 @@ def check_repo(mode=''):
 			
 # ----------------------------------------------------------------------			
 # ab hier wird ersetzt (mode=replace):
+	cnt = 1
 	for line in to_replace:					# Bsp. /Contents/Resources/ZDFarabic.png
 		try:
 			repo_url = REPO_BASE + line

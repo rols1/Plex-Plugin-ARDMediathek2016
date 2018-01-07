@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.5'		# Wechsel: update_single_files löschen/leeren
-VDATE = '05.01.2018'
+VERSION =  '3.4.6'		# Wechsel: update_single_files löschen/leeren
+VDATE = '07.01.2018'
 
 # 
 #	

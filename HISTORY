@@ -2,6 +2,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+07.01.2018 3.4.6	ZDF_get_content: 2 Varianten für Videodauer berücksichtigt.
+			Modul updater_single: fix unbelegte Variable cnt.	
 
 04.01.2018 3.4.5	Modul updater_single erweitert: inkrementelles Update innerhalb einer Version.
 			TV-Live-Sender - Aktualisierung Stream-Url n-tv.
