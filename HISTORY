@@ -3,12 +3,11 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 07.01.2018 3.4.6	ZDF_get_content: 2 Varianten für Videodauer berücksichtigt.
-			Modul updater_single: fix unbelegte Variable cnt.	
+			Modul updater_single: fix unbelegte Variable cnt.
+			update_single 08.01.: update_single.py | CacheTime auf 1 sec gesetzt.			
 
 04.01.2018 3.4.5	Modul updater_single erweitert: inkrementelles Update innerhalb einer Version.
 			TV-Live-Sender - Aktualisierung Stream-Url n-tv.
-			update_single 07.01.: init.py - ZDF | Videodauer: 2 Varianten berücksichtigt.
-			update_single 07.01.: update_single.py - Speichern Repo-HISTORY zum Abschluss.
 
 not Github 3.4.4	ARD - SingleSendung: Ausfilterung von manifest.f4m-Links.
 			ZDF_get_content: komplett überarbeitet (zuverlässige Erkennung von Videos, übersichtlichere
