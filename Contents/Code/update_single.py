@@ -49,10 +49,10 @@ def check_repo(mode=''):
 	
 	repo_cont = ''; hist_cont = ''
 	try:									# Repo_FILE laden
-		repo_cont = HTTP.Request(REPO_BASE + Plugin_FILE).content
+		repo_cont = HTTP.Request(REPO_BASE + Plugin_FILE, cacheTime=1).content
 		# repo_cont = Core.storage.load('/tmp/update_single_files')	# Test lokal
 		repo_cont = repo_cont.strip()
-		hist_cont = HTTP.Request(REPO_BASE + '/HISTORY').content	
+		hist_cont = HTTP.Request(REPO_BASE + '/HISTORY', cacheTime=1).content	
 	except Exception as exception:
 		Log(str(exception))
 		return 0, str(exception) + ' (Github: update_single_files)'		
