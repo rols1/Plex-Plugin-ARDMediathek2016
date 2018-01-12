@@ -120,13 +120,14 @@ def check_repo(mode=''):
 			
 # ----------------------------------------------------------------------			
 # ab hier wird ersetzt (mode=replace):
-	cnt = 1
+	cnt = 0
 	for line in to_replace:					# Bsp. /Contents/Resources/ZDFarabic.png
 		try:
 			repo_url = REPO_BASE + line
 			cont = HTTP.Request(repo_url).content
 			plugin_path = os.path.join(Core.bundle_path + line)
 			Log(plugin_path)
+			# Log(cont[2000:3000])
 			Core.storage.save(plugin_path, cont)	# verwendet temp-File: ..s/._file
 		except Exception as exception:			
 			msg = str(exception)

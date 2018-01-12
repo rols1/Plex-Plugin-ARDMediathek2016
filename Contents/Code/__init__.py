@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.6'		# Wechsel: update_single_files löschen/leeren
-VDATE = '07.01.2018'
+VERSION =  '3.4.7'		# Wechsel: update_single_files löschen/leeren
+VDATE = '12.01.2018'
 
 # 
 #	
@@ -590,7 +590,7 @@ def ValidatePrefs():
 ####################################################################################################
 @route(PREFIX + '/SearchUpdate')
 def SearchUpdate(title):		#
-	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art)	
+	oc = ObjectContainer(no_cache=True, view_group="InfoList", art=ObjectContainer.art)	
 
 	ret = updater.update_available(VERSION)
 	int_lv = ret[0]			# Version Github
@@ -3767,7 +3767,7 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 	Log('GetVideoSources'); Log(url); Log(tagline); 
 	title = title.decode(encoding="utf-8", errors="ignore")					
 	oc = ObjectContainer(title2=title.decode(encoding="utf-8", errors="ignore"), view_group="InfoList")
-	urlSource = url 	# für ZDFotherSources
+	urlSource = url 		# für ZDFotherSources
 
 	page, msg = get_page(url)
 	if page == '':
@@ -3788,9 +3788,14 @@ def GetZDFVideoSources(url, title, thumb, tagline, segment_start=None, segment_e
 		if page.find('class=\"content-box gallery-slider-box') >= 0:		# Bildgalerie
 			oc = ZDF_Bildgalerie(oc=oc, page=page, mode='is_gallery', title=title)
 			return oc
-	else:													# vorhanden: data-module="zdfplayer"
-		apiToken = stringextract('"apiToken": "', '"', page)# ab 08.10.2017 dyn. ermitteln (wieder mal vom ZDF geändert)
-		Dict['apiToken'] = apiToken
+		
+	# ab 08.10.2017 dyn. ermitteln (wieder mal vom ZDF geändert)
+	# 12.01.2018: ZDF verwendet nun 2 verschiedene Token - s. get_formitaeten: 1 x profile_url, 1 x videodat_url
+	apiToken1 = stringextract('apiToken: \'', '\'', page) 
+	apiToken2 = stringextract('"apiToken": "', '"', page)
+	Dict['apiToken1'] = apiToken1
+	Dict['apiToken2'] = apiToken2
+	Log('apiToken1: ' + apiToken1); Log('apiToken2: ' + apiToken2)
 					
 	# -- Ende Vorauswertungen
 			
@@ -3882,10 +3887,10 @@ def get_formitaeten(sid, ID=''):
 	if ID == 'NEO':
 		headers = {'Api-Auth': "Bearer d90ed9b6540ef5282ba3ca540ada57a1a81d670a",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
 	else:
-		apiToken = 'Bearer ' + str(Dict['apiToken'])		# s. GetZDFVideoSources. str falls None
+		apiToken1 = 'Bearer ' + str(Dict['apiToken1'])		# s. GetZDFVideoSources. str falls None
 		# headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
-		headers = {'Api-Auth': apiToken,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
-		Log('apiToken: ' + apiToken)
+		headers = {'Api-Auth': apiToken1,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+		Log('apiToken1: ' + apiToken1)
 	# Log(headers)		# bei Bedarf
 	
 	# Bei Anforderung von profile_url mittels urllib2.urlopen ssl.SSLContext erforderlich - entf. bei JSON.ObjectFromURL
@@ -3919,6 +3924,10 @@ def get_formitaeten(sid, ID=''):
 
 	# ab 28.05.2017: Verwendung JSON.ObjectFromURL - Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich
 	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei
+	apiToken2 = 'Bearer ' + str(Dict['apiToken2'])		# s. GetZDFVideoSources. str falls None
+	# headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+	headers = {'Api-Auth': apiToken2,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
+	Log('apiToken2: ' + apiToken2)
 	try:
 		request = JSON.ObjectFromURL(videodat_url, headers=headers)				
 		request = json.dumps(request, sort_keys=True, indent=2, separators=(',', ': '))  # sortierte Ausgabe
