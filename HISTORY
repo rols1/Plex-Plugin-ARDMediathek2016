@@ -3,7 +3,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 12.01.2018 3.4.7	GetZDFVideoSources: ZDF verwendet nun 2 verschiedene Token - Auswertung in
-			GetZDFVideoSources, Verwendung in get_formitaeten.	
+			GetZDFVideoSources, Verwendung in get_formitaeten.
+			update_single 20.01.:	tv-n24.png | Grafik erneuert
+			update_single 20.01.:	livesenderTV.xml | Eintrag Welt / N 24 aktualisiert
 
 07.01.2018 3.4.6	ZDF_get_content: 2 Varianten für Videodauer berücksichtigt.
 			Modul updater_single: fix unbelegte Variable cnt.

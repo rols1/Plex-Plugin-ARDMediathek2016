@@ -292,7 +292,7 @@
 		<date>25.02.2015</date>
 	</item>
 	<item>
-		<title>N24-Live</title>
+		<title>Welt / N24-Live</title>
 		<link>http://live2weltcms-lh.akamaihd.net/i/Live2WeltCMS_1@444563/index_1_av-p.m3u8?sd=10&rebase=on</link>
 		<thumbnail>tv-n24.png</thumbnail>
 		<genre>TV</genre>
@@ -300,7 +300,7 @@
 		<date>21.02.2017</date>
 	</item>
 	<item>
-		<title>N24-NEWS</title>
+		<title>Welt / N24-NEWS</title>
 		<link>http://news2weltcms-lh.akamaihd.net/i/News2WeltCMS_1@425444/index_1_av-p.m3u8?sd=10&rebase=on</link>
 		<thumbnail>tv-n24.png</thumbnail>
 		<genre>TV</genre>
