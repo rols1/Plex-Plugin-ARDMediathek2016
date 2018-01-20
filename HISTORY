@@ -6,6 +6,7 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 			GetZDFVideoSources, Verwendung in get_formitaeten.
 			update_single 20.01.:	tv-n24.png | Grafik erneuert
 			update_single 20.01.:	livesenderTV.xml | Eintrag Welt / N 24 aktualisiert
+			update_single 20.01.:	podcast-favorits.txt | Eintrag "Die GroKos" entfernt (dto. bei SWR3)
 
 07.01.2018 3.4.6	ZDF_get_content: 2 Varianten für Videodauer berücksichtigt.
 			Modul updater_single: fix unbelegte Variable cnt.
