@@ -1,8 +1,7 @@
 ﻿Plex-Plugin-ARDMediathek2016
 ===================
 Plex Plugin für die ARD Mediathek - mit Live-TV der ARD + weiteren Sendern
-ab Version 2.0.0 mit ZDF Mediathek
-ab Version 3.4.8 zusäzlich mit ZDFmobile 
+ab Version 2.0.0 mit ZDF Mediathek, ab Version 3.4.8 zusäzlich mit ZDFmobile 
 
 Download aktuelle Version: https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 ![Downloads](https://img.shields.io/github/downloads/rols1/Plex-Plugin-ARDMediathek2016/total.svg "Downloads")
