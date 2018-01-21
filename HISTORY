@@ -3,7 +3,7 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.7.0	
 
 
-??.01.2018 3.4.8	PodFavoriten(Pod_Content.py): Scheme_br_online erneuert (Anpassung an Webseite).	
+21.01.2018 3.4.8	PodFavoriten(Pod_Content.py): Scheme_br_online erneuert (Anpassung an Webseite).	
 
 12.01.2018 3.4.7	GetZDFVideoSources: ZDF verwendet nun 2 verschiedene Token - Auswertung in
 			GetZDFVideoSources, Verwendung in get_formitaeten.
