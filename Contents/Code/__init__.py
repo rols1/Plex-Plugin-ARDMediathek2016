@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.7'		# Wechsel: update_single_files löschen/leeren
-VDATE = '12.01.2018'
+VERSION =  '3.4.8'		# Wechsel: update_single_files löschen/leeren
+VDATE = '21.01.2018'
 
 # 
 #	
@@ -60,7 +60,8 @@ ICON_SEARCH 			= 'ard-suche.png'
 ICON_ZDF_SEARCH 		= 'zdf-suche.png'						
 
 ICON_MAIN_ARD 			= 'ard-mediathek.png'			
-ICON_MAIN_ZDF 			= 'zdf-mediathek.png'			
+ICON_MAIN_ZDF 			= 'zdf-mediathek.png'
+ICON_MAIN_ZDFMOBILE		= 'zdf-mobile.png'			
 ICON_MAIN_TVLIVE 		= 'tv-livestreams.png'		
 ICON_MAIN_RADIOLIVE 	= 'radio-livestreams.png' 	
 ICON_MAIN_UPDATER 		= 'plugin-update.png'		
@@ -232,8 +233,13 @@ def Main():
 	oc.add(DirectoryObject(key=Callback(Main_ARD, name="ARD Mediathek"), title="ARD Mediathek",
 		summary='', tagline='TV', thumb=R(ICON_MAIN_ARD)))
 		
-	oc.add(DirectoryObject(key=Callback(Main_ZDF, name="ZDF Mediathek"), title="ZDF Mediathek", 
-		summary='', tagline='TV', thumb=R(ICON_MAIN_ZDF)))
+	if Prefs['pref_use_zdfmobile']:
+		import zdfmobile
+		oc.add(DirectoryObject(key=Callback(zdfmobile.Main_ZDFmobile, name="ZDFmobile"), title="ZDFmobile", 
+			summary='', tagline='TV', thumb=R(ICON_MAIN_ZDFMOBILE)))
+	else:
+		oc.add(DirectoryObject(key=Callback(Main_ZDF, name="ZDF Mediathek"), title="ZDF Mediathek", 
+			summary='', tagline='TV', thumb=R(ICON_MAIN_ZDF)))
 		
 	oc.add(DirectoryObject(key=Callback(SenderLiveListePre, title='TV-Livestreams'), title='TV-Livestreams',
 		summary='', tagline='TV', thumb=R(ICON_MAIN_TVLIVE)))
@@ -445,6 +451,11 @@ def home(cont, ID):												# Home-Button, Aufruf: oc = home(cont=oc, ID=NAME
 		name = "ZDF Mediathek"
 		cont.add(DirectoryObject(key=Callback(Main_ZDF,name=name),title=title, summary=summary, tagline=name, 
 			thumb=R('home-zdf.png')))
+	if ID == 'ZDFmobile':
+		import zdfmobile		# ohne wird Callback nicht akzeptiert
+		name = "ZDFmobile"
+		cont.add(DirectoryObject(key=Callback(zdfmobile.Main_ZDFmobile,name=name),title=title, summary=summary, tagline=name, 
+			thumb=R(ICON_MAIN_ZDFMOBILE)))
 	if ID == 'PODCAST':
 		name = "Radio-Podcasts"
 		cont.add(DirectoryObject(key=Callback(Main_POD,name=name),title=title, summary=summary, tagline=name, 

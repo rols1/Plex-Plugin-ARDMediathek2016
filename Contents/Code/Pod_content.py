@@ -240,7 +240,7 @@ def get_pod_content(url, rec_per_page, baseurl, offset):
 #------------------------
 def Scheme_br_online(page, rec_per_page, offset):		# Schema www.br-online.de
 	Log('Scheme_br_online')
-	sendungen = blockextract('<table class="ci"', page)
+	sendungen = blockextract('class="episode-teaser"', page)
 	max_len = len(sendungen)					# Gesamtzahl gefundener Sätze
 	Log(max_len)
 	tagline = ''
@@ -256,18 +256,21 @@ def Scheme_br_online(page, rec_per_page, offset):		# Schema www.br-online.de
 		s = sendungen[cnt]
 		
 		single_rec = []		# Datensatz einzeln (2. Dim.)
-		title_org = stringextract('<td class="ci01" colspan="3">', '</td', s) 
+		title_org = stringextract('"podcast-title">', '</span>', s) 
 		title = title_org.strip(); title=cleanhtml(title)
-		summ = stringextract('<td class="ci02" colspan="3">', '</td', s) 
-		summ = summ.strip(); summ=cleanhtml(summ)
-		url = stringextract('href="', '\"', s) 
+		summ = stringextract('"episode-title">', '</h3>', s) 
+		summ = summ.strip(); summ=cleanhtml(summ); summ=unescape(summ)
+		playlist = stringextract('class="playlist"', 'Herunterladen', s)
+		url = stringextract('href="', '"', playlist) 
 		img =  ''						# Bild nicht vorhanden
 		
-		datum = stringextract('Datum:</strong>', '<br/>', s) 				# im Titel bereits vorhanden
-		dauer = stringextract('L&auml;nge:</strong>', '<br/>', s) 
+		datum = stringextract('publish-date">', '</span>', s) 				# im Titel bereits vorhanden
+		dauer = stringextract('duration">', '</span>', s) 
 		groesse = stringextract('Gr&ouml;&szlig;e:</strong>', '</span>', s)
 		
-		title = title_org + ' | %s | %s' % (dauer, groesse)
+		title = '%s | %s' % (datum, title)
+		if groesse:
+			title = '%s | %s' % (title, groesse)	
 		title = mystrip(title)
 		
 		Log(title); Log(summ); Log(url); 

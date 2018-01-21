@@ -2,12 +2,15 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
 --------------				gelöschte Releases: älter als  2.7.0	
 
+
+??.01.2018 3.4.8	PodFavoriten(Pod_Content.py): Scheme_br_online erneuert (Anpassung an Webseite).	
+
 12.01.2018 3.4.7	GetZDFVideoSources: ZDF verwendet nun 2 verschiedene Token - Auswertung in
 			GetZDFVideoSources, Verwendung in get_formitaeten.
 			update_single 20.01.:	tv-n24.png | Grafik erneuert
 			update_single 20.01.:	livesenderTV.xml | Eintrag Welt / N 24 aktualisiert
 			update_single 20.01.:	podcast-favorits.txt | Eintrag "Die GroKos" entfernt (dto. bei SWR3)
-
+			
 07.01.2018 3.4.6	ZDF_get_content: 2 Varianten für Videodauer berücksichtigt.
 			Modul updater_single: fix unbelegte Variable cnt.
 			update_single 08.01.: update_single.py | CacheTime auf 1 sec gesetzt.			
