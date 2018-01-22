@@ -12,7 +12,7 @@ PREFIX		 	= "/video/ardmediathek2016/zdfmobile.py"
 imgWidth		= 840			# max. Breite Teaserbild
 imgWidthLive	= 1280			# breiter für Videoobjekt
 
-@route(PREFIX + '/Main_ZDF')
+@route(PREFIX + '/Main_ZDFmobile')
 def Main_ZDFmobile(name):
 	Log('zdfmobile.Main_ZDF')
 	oc = ObjectContainer(title2='ZDFmobile', view_group="InfoList")
@@ -213,7 +213,6 @@ def Get_content(stageObject, maxWidth):
 			if int(width) <= maxWidth:
 				img=imageObject["url"];
 	if("visibleFrom" in stageObject):
-		# date = time.strptime(stageObject["visibleFrom"],"%d.%m.%Y %H:%M")
 		date = stageObject["visibleFrom"]
 	else:
 		now = datetime.datetime.now()
@@ -328,6 +327,14 @@ def ShowVideo(path, DictID):
 		url = detail[2]
 		url = url.replace('https', 'http')
 		typ = detail[3]
+		if url.endswith('mp4'):
+			bandbreite = url.split('_')[-2]
+			Log(bandbreite)
+			try:
+				bandbreite = url.split('_')[-2]		# Bsp. ../4/170703_despot1_inf_1496k_p13v13.mp4
+			except:
+				bandbreite = ''
+			
 		if url.find('master.m3u8') > 0:		# 
 			title=str(i) + '. ' + title_org + ' | ' + quality + ' [m3u8]'
 			tagline = 'Qualität: ' + quality + ' | Typ: ' + typ + ' [m3u8-Streaming]'
@@ -337,6 +344,8 @@ def ShowVideo(path, DictID):
 		else:
 			title=str(i) + '. ' + title_org + ' | ' + quality	
 			tagline = 'Qualität: ' + quality + ' | Typ: ' + typ
+			if bandbreite:
+				tagline = '%s | %s'	% (tagline, bandbreite)
 			tagline = tagline.decode(encoding="utf-8")
 			oc.add(CreateVideoClipObject(url=url, title=title, summary=descr,
 				meta= Plugin.Identifier + str(i), tagline=tagline, thumb=img, 
