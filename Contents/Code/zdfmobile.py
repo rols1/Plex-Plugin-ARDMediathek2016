@@ -328,8 +328,6 @@ def ShowVideo(path, DictID):
 		url = url.replace('https', 'http')
 		typ = detail[3]
 		if url.endswith('mp4'):
-			bandbreite = url.split('_')[-2]
-			Log(bandbreite)
 			try:
 				bandbreite = url.split('_')[-2]		# Bsp. ../4/170703_despot1_inf_1496k_p13v13.mp4
 			except:
