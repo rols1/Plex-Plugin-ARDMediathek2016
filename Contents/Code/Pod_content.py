@@ -463,8 +463,8 @@ def Scheme_rbb(page, rec_per_page, offset,sender, baseurl):		# Schema mediathek.
 			url = baseurl + '/play/media/%s?devicetype=pc&features=hls' % documentId
 			Log('hlsurl: ' + url)
 			try:
-				url_content, err = get_page(path=url)			# Textdatei, Format ähnlich parseLinks_Mp4_Rtmp
-				url = teilstring(url_content, 'http://', '.mp3') # i.d.R. 2 identische url	
+				url_content, err = get_page(path=url)				# Textdatei, Format ähnlich parseLinks_Mp4_Rtmp
+				url = stringextract('stream":"', '"}', url_content) # geändert 24.01-2018	
 			except:
 				url=''
 		Log(url)

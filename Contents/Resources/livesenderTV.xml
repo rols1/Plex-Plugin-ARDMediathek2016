@@ -4,7 +4,7 @@
   <genre>TV</genre>
   <description>Livestreams http://www.ardmediathek.de/tv/live</description>
   <thumbnail></thumbnail>
-   <date>13.09.2017 rols1</date>
+   <date>24.01.2018 rols1</date>
   <credits>Grafiken @Arauco (Plex-Forum)</credits>
  </channels_info>
  
@@ -266,15 +266,6 @@
 <thumbnail>tv-privat.png</thumbnail>
 <fanart></fanart>
 <items>
-	<item>
-		<title>NRW.TV</title>
-		<oldlink>http://streaming001.broadcast.tneg.de/nrwtv/nrwtv.stream</oldlink>
-		<link>http://streaming006.broadcast.tneg.de:1935/nrwtv-new/_definst_/smil:nrw.smil/playlist.m3u8</link>
-		<thumbnail>tv-nrw-tv.png</thumbnail>
-		<genre>TV</genre>
-		<EPG_ID></EPG_ID>
-		<date>01.10.2014</date>
-	</item>
 	<item>
 		<title>ServusTV</title>
 		<link>https://liveservustv-i.akamaihd.net/hls/live/271000/ServusTV_DE/master.m3u8</link>

@@ -322,7 +322,7 @@ def ShowVideo(path, DictID):
 	i=0
 	for detail in formitaeten:	
 		i = i + 1
-		quality = detail[0]
+		quality = detail[0]				# Bsp. auto [m3u8]
 		# hd = 'HD: ' + str(detail[1])	# falsch bei mp4-Dateien (False trotz high)
 		url = detail[2]
 		url = url.replace('https', 'http')
@@ -334,6 +334,8 @@ def ShowVideo(path, DictID):
 				bandbreite = ''
 			
 		if url.find('master.m3u8') > 0:		# 
+			if 'auto' in quality:			# speichern für ShowSingleBandwidth
+				url_auto = url
 			title=str(i) + '. ' + title_org + ' | ' + quality + ' [m3u8]'
 			tagline = 'Qualität: ' + quality + ' | Typ: ' + typ + ' [m3u8-Streaming]'
 			tagline = tagline.decode(encoding="utf-8")
@@ -347,8 +349,14 @@ def ShowVideo(path, DictID):
 			tagline = tagline.decode(encoding="utf-8")
 			oc.add(CreateVideoClipObject(url=url, title=title, summary=descr,
 				meta= Plugin.Identifier + str(i), tagline=tagline, thumb=img, 
-				duration='duration', resolution='unbekannt'))		
-		
+				duration='duration', resolution='unbekannt'))	
+	
+	# einzelne Auflösungen anbieten:
+	oc_title = 	'einzelne Bandbreiten/Auflösungen'.decode(encoding="utf-8")		
+	oc_descr = 	'einzelne Bandbreiten/Auflösungen'.decode(encoding="utf-8")	+ ' zu auto [m3u8]'	
+	oc.add(DirectoryObject(key=Callback(ShowSingleBandwidth,title=title_org, url_m3u8=url_auto, thumb=img),
+		title=oc_title, summary=oc_descr, thumb=R(ICON_MEHR)))			
+				
 	return oc
 # ----------------------------------------------------------------------
 def get_formitaeten(jsonObject):
@@ -366,6 +374,77 @@ def get_formitaeten(jsonObject):
 		forms.append(detail)
 	# Log('forms: ' + str(forms))
 	return forms		
+
+# ----------------------------------------------------------------------
+@route(PREFIX + '/ShowSingleBandwidth')
+def ShowSingleBandwidth(title,url_m3u8,thumb):	# .m3u8 -> einzelne Auflösungen
+	Log('ShowSingleBandwidth')
+	
+	playlist = loadPage(url_m3u8)
+	if playlist.startswith('Fehler'):
+		return ObjectContainer(header='Error', message=page)
+		
+	oc = ObjectContainer(no_cache=True, title2=title, view_group="InfoList")
+	oc =  Parseplaylist(oc, playlist=playlist, title=title, thumb=thumb)		
+	
+	return oc
+
+####################################################################################################
+#									Hilfsfunktionen
+####################################################################################################
+def Parseplaylist(oc, playlist, title, thumb):		# playlist (m3u8, ZDF-Format) -> einzelne Auflösungen
+	Log ('Parseplaylist')
+	title_org = title
+  
+	lines = playlist.splitlines()
+	# Log(lines)
+	lines.pop(0)		# 1. Zeile entfernen (#EXTM3U)
+	
+	line_inf=[]; line_url=[]
+	for i in xrange(0, len(lines),2):
+		line_inf.append(lines[i])
+		line_url.append(lines[i+1])
+	# Log(line_inf); Log(line_url); 	
+	
+	i=0; Bandwith_old = ''
+	for inf in line_inf:
+		url = line_url[i]
+		i=i+1		
+		inf = inf.split(',')
+		Log(inf)		
+		Bandwith=''; Resolution='Unbekannt'; Codecs=''; 
+		for part in inf:
+			part = part.strip()
+			if part.startswith('BANDWIDTH='):
+				Bandwith = part.split('=')[1]
+			if part.startswith('RESOLUTION='):
+				Resolution = part.split('=')[1]
+			if part.startswith('CODECS='):
+				Codecs = part.split('=')[1]
+		
+		descr= 'Bandbreite: %s' % Bandwith 
+		if Resolution:
+			descr= 'Bandbreite %s | Auflösung: %s' % (Bandwith, Resolution)
+		if Codecs:
+			descr= '%s | Codecs: %s' % (descr, Codecs)
+		descr = descr.replace('"', '')	# Bereinigung Codecs
+			
+		Log(Bandwith); Log(Resolution); Log(Codecs); 		
+		tagline='m3u8-Streaming'
+		meta = Plugin.Identifier + str(i)
+		title = '%s. %s' 	% (str(i), title_org)
+		if 	Bandwith_old == Bandwith:
+			title = '%s. %s | 2. Alternative' 	% (str(i), title_org)
+		Bandwith_old = Bandwith
+		if int(Bandwith) <=  100000: 		# Audio - PMS-Transcoder: Stream map '0:V:0' matches no streams 
+			tagline = '%s | nur Audio'	% tagline
+			thumb=R(ICON_SPEAKER)
+			
+		oc.add(CreateVideoStreamObject(url=url, title=title, rtmp_live='nein', summary=descr, 
+			tagline=tagline, meta=meta, thumb=thumb, resolution=Resolution))	
+
+	return oc
+	
 # ----------------------------------------------------------------------			
 def loadPage(url, maxTimeout = None):
 	try:
