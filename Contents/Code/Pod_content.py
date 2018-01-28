@@ -553,21 +553,25 @@ def Scheme_wdr(page, rec_per_page, offset):		# Schema WDR, XML-Format
 		
 # ------------------------
 def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
-	Log('Scheme_ndr'); Log(offset);
+	Log('Scheme_ndr'); Log(offset);Log(len(page))
 
 	baseurl = 'http://www.ndr.de'
 	POD_rec = []			# Datensaetze gesamt (1. Dim.)	
-	pages = stringextract('<div class="pagination">', 'googleoff: index', page)	# Seiten-Urls für Seitenkontrolle
-	page_href = baseurl + stringextract('href="', '"', pages)
+
+	pages = stringextract('<div class="pagination">', '<a title=', page)	# Seiten-Urls für Seitenkontrolle
+	page_href = baseurl + stringextract('href="', '-', pages)				# zum Ergänzen mit 1.html, 2.html usw.
+	# Log(page_href)
 	entry_type = '_page-'
-	page_href = page_href.split(entry_type)[0]						# Basis-url ohne Seitennummer
-	last_page = stringextract('class="page">', 'pseudobutton', pages)
-	last_page = stringextract('title="Zeige Seite ', '"', last_page) # Bsp.: title="Zeige Seite 9" 
-	Log(page_href); Log(last_page)
+	pages = pages.split(entry_type)				# .. href="/ndr2/programm/podcast2958_page-6.html" title="Zeige Seite 6">		
+	# Log(pages)
+	last_page = pages[-1]						# Bsp. 6.html
+	last_page = re.search('(\d+)', last_page).group(1)	
+	Log(last_page)
 	tagline = ''
 	
 	if offset == '0':									# 1. Durchlauf - Seitenkontrolle:
 		pagenr = 0
+		# Log(last_page)
 		for i in range(int(last_page)):
 			title_org=''; 
 			max_len = last_page
@@ -575,7 +579,7 @@ def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
 			pagenr = i + 1
 			if pagenr >= last_page:
 				break
-			url = page_href + entry_type + str(pagenr) + '.html' # url mit Seitennr. ergänzen
+			url = page_href + '-' + str(pagenr) + '.html' # url mit Seitennr. ergänzen
 			title = 'Weiter zu Seite %s' % pagenr
 			img = 'PageControl';						# 'PageControl' steuert in PodFavoriten
 			summ = ''; title_org = ''; datum = ''; dauer = ''; groesse = ''; 

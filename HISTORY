@@ -6,7 +6,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 26.01.2018 3.4.9	TV-Live-Sender: NRW.TV entfernt (seit längerem insolvent).
 			PodFavoriten(Pod_Content.py): Scheme_rbb erneuert (Anpassung an Webseite).
 			ZDFmobile (Videos+Live TV): einzelne Bandbreiten/Auflösungen, einschl. Audio
-			hinzugefügt.	
+			hinzugefügt.
+			update_single 28.01.: Pod_Content.py | Scheme_ndr erneuert (Anpassung an Webseite).
+			update_single 28.01.: tv-privat.png | Grafik erneuert	
 
 21.01.2018 3.4.8	Integration ZDFmobile (Abschluss).
 			PodFavoriten(Pod_Content.py): Scheme_br_online erneuert (Anpassung an Webseite).
