@@ -30,6 +30,7 @@
 		<EPG_ID>ZDF</EPG_ID>
 		<date>11.06.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>
 		<title>KiKA</title>
@@ -39,6 +40,7 @@
 		<EPG_ID>KIKA</EPG_ID>
 		<date>07.12.2017</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>
 		<title>Arte deutsch</title>
@@ -50,6 +52,7 @@
 		<EPG_ID>ARTE</EPG_ID>
 		<date>01.10.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>
 		<title>ARD ONE</title>
@@ -68,6 +71,7 @@
 		<EPG_ID>3SAT</EPG_ID>
 		<date>01.10.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>			
 		<title>ZDFneo</title>
@@ -77,6 +81,7 @@
 		<EPG_ID>2NEO</EPG_ID>
 		<date>11.06.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>			
 		<title>ZDFinfo</title>
@@ -86,6 +91,7 @@
 		<EPG_ID>ZINFO</EPG_ID>
 		<date>11.06.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>
 		<title>ARD-Alpha</title>
@@ -104,6 +110,7 @@
 		<EPG_ID>PHOEN</EPG_ID>
 		<date>01.10.2016</date>
 		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
 	</item>
 	<item>
 		<title>Tagesschau</title>
@@ -284,19 +291,11 @@
 	</item>
 	<item>
 		<title>Welt / N24-Live</title>
-		<link>http://live2weltcms-lh.akamaihd.net/i/Live2WeltCMS_1@444563/index_1_av-p.m3u8?sd=10&rebase=on</link>
+		<link>https://live2weltcms-lh.akamaihd.net/i/Live2WeltCMS_1@444563/index_3_av-b.m3u8?sd=10&dw=0&rebase=on</link>
 		<thumbnail>tv-n24.png</thumbnail>
 		<genre>TV</genre>
-		<EPG_ID>n24doku</EPG_ID>
-		<date>21.02.2017</date>
-	</item>
-	<item>
-		<title>Welt / N24-NEWS</title>
-		<link>http://news2weltcms-lh.akamaihd.net/i/News2WeltCMS_1@425444/index_1_av-p.m3u8?sd=10&rebase=on</link>
-		<thumbnail>tv-n24.png</thumbnail>
-		<genre>TV</genre>
-		<EPG_ID>N24</EPG_ID>
-		<date>21.02.2017</date>
+		<EPG_ID>WELT</EPG_ID>
+		<date>30.01.2018</date>
 	</item>
 	<item>
 		<title>n-tv</title>

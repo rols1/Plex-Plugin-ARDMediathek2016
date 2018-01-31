@@ -1,8 +1,14 @@
 CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
---------------				gelöschte Releases: älter als  2.7.0	
+--------------				gelöschte Releases: älter als  3.0.0	
 
 
+31.01.2018 3.5.0	TV-Live-Sender (SenderLiveListe, livesenderTV.xml): Hinweis auf Geoblocking für
+ 			die ZDF-Sender eingefügt. Dto. in zdfmobile.py.
+ 			Parseplaylist: Fehlerdiagnose für Laden der m3u8-Dateien erweitert.
+ 			TV-Live-Sender: N24 Doku entfernt (nicht mehr live). 
+ 			TV-Live-Sender: Streamlink für N24-Live aktualisiert, EPG-ID aktualisiert,
+	
 26.01.2018 3.4.9	TV-Live-Sender: NRW.TV entfernt (seit längerem insolvent).
 			PodFavoriten(Pod_Content.py): Scheme_rbb erneuert (Anpassung an Webseite).
 			ZDFmobile (Videos+Live TV): einzelne Bandbreiten/Auflösungen, einschl. Audio

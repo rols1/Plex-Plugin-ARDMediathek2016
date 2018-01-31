@@ -36,7 +36,7 @@ def Main_ZDFmobile(name):
 	oc.add(DirectoryObject(key=Callback(Hub, ID='Sendung verpasst'), title="Sendung verpasst", 
 		thumb=R(ICON_DIR_FOLDER)))	
 	oc.add(DirectoryObject(key=Callback(Hub, ID='Live TV'), title='Live TV',
-		thumb=R(ICON_DIR_FOLDER)))
+		summary='nur in Deutschland zu empfangen!', thumb=R(ICON_DIR_FOLDER)))
 		
 	return oc
 	
@@ -384,7 +384,7 @@ def ShowSingleBandwidth(title,url_m3u8,thumb):	# .m3u8 -> einzelne Auflösungen
 	if playlist.startswith('Fehler'):
 		return ObjectContainer(header='Error', message=page)
 		
-	oc = ObjectContainer(no_cache=True, title2=title, view_group="InfoList")
+	oc = ObjectContainer(no_cache=True, title2=title.decode(encoding="utf-8"), view_group="InfoList")
 	oc =  Parseplaylist(oc, playlist=playlist, title=title, thumb=thumb)		
 	
 	return oc
@@ -408,19 +408,14 @@ def Parseplaylist(oc, playlist, title, thumb):		# playlist (m3u8, ZDF-Format) ->
 	
 	i=0; Bandwith_old = ''
 	for inf in line_inf:
+		Log(inf)
 		url = line_url[i]
 		i=i+1		
-		inf = inf.split(',')
-		Log(inf)		
-		Bandwith=''; Resolution='Unbekannt'; Codecs=''; 
-		for part in inf:
-			part = part.strip()
-			if part.startswith('BANDWIDTH='):
-				Bandwith = part.split('=')[1]
-			if part.startswith('RESOLUTION='):
-				Resolution = part.split('=')[1]
-			if part.startswith('CODECS='):
-				Codecs = part.split('=')[1]
+		Bandwith=''; Resolution=''; Codecs=''; 
+		Bandwith = re.search('BANDWIDTH=(\d+)', inf).group(1)
+		if 'RESOLUTION=' in inf:		# fehlt ev.
+			Resolution = re.search('RESOLUTION=(\S+),CODECS', inf).group(1)
+		Codecs = re.search(r'"(.*)"', inf).group(1)	# Zeichen zw. Hochkommata
 		
 		descr= 'Bandbreite: %s' % Bandwith 
 		if Resolution:

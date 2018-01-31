@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.4.9'		# Wechsel: update_single_files löschen/leeren
-VDATE = '26.01.2018'
+VERSION =  '3.5.0'		# Wechsel: update_single_files löschen/leeren
+VDATE = '31.01.2018'
 
 # 
 #	
@@ -2430,7 +2430,7 @@ def SenderLiveListe(title, listname, offset=0):	#
 				else:
 					summary = ''
 				if vonbis:
-					tagline = 'Zeit: ' + vonbis
+					tagline = 'Sendung: %s Uhr' % vonbis
 				else:
 					tagline = ''
 				# Doppler-Erkennung:	
@@ -2446,6 +2446,11 @@ def SenderLiveListe(title, listname, offset=0):	#
 		img = stringextract('<thumbnail>', '</thumbnail>', element) 
 		if img.find('://') == -1:	# Logo lokal? -> wird aus Resources geladen, Unterverz. leider n.m.
 			img = R(img)
+			
+		geo = stringextract('<geoblock>', '</geoblock>', element)
+		Log(geo)
+		if geo:
+			tagline = 'Livestream nur in Deutschland zu empfangen! %s'	% tagline
 			
 		Log(link); Log(img); Log(summary); Log(tagline[0:80]);
 		Resolution = ""; Codecs = ""; duration = ""
@@ -4164,12 +4169,11 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 			playlist = r.read()			
 		else:
 			playlist = HTTP.Request(url_m3u8).content  			# HTTP: konventionell laden			
-	except:
-		if playlist == '':
-			msg = 'Playlist kann nicht geladen werden. URL: \r'
+	except Exception as exception:
+			msg = 'Playlist kann nicht geladen werden. URL: | %s | %s'	% (url_m3u8, str(exception))
 			msg = msg + url_m3u8
-			Log(msg.replace('\r', ''))
-			return ObjectContainer(message=msg)	  	# header=... ohne Wirkung	(?)			
+			Log(msg)
+			return ObjectContainer(header=L('Error'), message=msg)	  	# header=... ohne Wirkung	(?)			
   else:													
 	playlist = Resource.Load(url_m3u8) 
 	 
