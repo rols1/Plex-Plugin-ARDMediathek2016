@@ -7,7 +7,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
  			die ZDF-Sender eingefügt. Dto. in zdfmobile.py.
  			Parseplaylist: Fehlerdiagnose für Laden der m3u8-Dateien erweitert.
  			TV-Live-Sender: N24 Doku entfernt (nicht mehr live). 
- 			TV-Live-Sender: Streamlink für N24-Live aktualisiert, EPG-ID aktualisiert,
+ 			TV-Live-Sender: Streamlink für N24-Live aktualisiert, EPG-ID aktualisiert.
+ 			update_single 03.02.: Pod_Content.py | Scheme_ndr: Fixes "pagenr" + Indexfehler "sendungen".
 	
 26.01.2018 3.4.9	TV-Live-Sender: NRW.TV entfernt (seit längerem insolvent).
 			PodFavoriten(Pod_Content.py): Scheme_rbb erneuert (Anpassung an Webseite).

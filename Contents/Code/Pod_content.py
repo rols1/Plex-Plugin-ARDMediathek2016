@@ -558,17 +558,23 @@ def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
 	baseurl = 'http://www.ndr.de'
 	POD_rec = []			# Datensaetze gesamt (1. Dim.)	
 
-	pages = stringextract('<div class="pagination">', '<a title=', page)	# Seiten-Urls für Seitenkontrolle
+	pages = stringextract('<div class="pagination">', 'googleoff:', page)	# Seiten-Urls für Seitenkontrolle
 	page_href = baseurl + stringextract('href="', '-', pages)				# zum Ergänzen mit 1.html, 2.html usw.
-	# Log(page_href)
+	# Log(page_href)	
 	entry_type = '_page-'
-	pages = pages.split(entry_type)				# .. href="/ndr2/programm/podcast2958_page-6.html" title="Zeige Seite 6">		
-	# Log(pages)
-	last_page = pages[-1]						# Bsp. 6.html
-	last_page = re.search('(\d+)', last_page).group(1)	
+	pages = pages.split(entry_type)				# .. href="/ndr2/programm/podcast2958_page-6.html" title="Zeige Seite 6">			
+	# Log(pages[1])
+	page_nr = []
+	for line in pages:	
+		nr = re.search('(\d+)', line).group(1) # Bsp. 6.html
+		page_nr.append(nr)	
+	page_nr.sort()
+	Log(page_nr)
+	page_nr = repl_dop(page_nr)					# Doppler entfernen (zurück-Seite, nächste-Seite)
+	last_page = page_nr[-1]						# letzte Seite
 	Log(last_page)
-	tagline = ''
-	
+		
+	tagline = ''	
 	if offset == '0':									# 1. Durchlauf - Seitenkontrolle:
 		pagenr = 0
 		# Log(last_page)
@@ -599,11 +605,12 @@ def Scheme_ndr(page, rec_per_page, offset):		# Schema NDR
 		
 												# 2. Durchlauf - Inhalte der einzelnen Seiten:
 	sendungen = blockextract('class="module list w100">', page) 
-	if sendungen[2].find('urlScheme') >= 0:								# 2 = Episodendach
-		text = stringextract('urlScheme', '/noscript', sendungen[2])
-		img_src_header, img_alt_header = img_urlScheme(text, 320, ID='PODCAST') 
-		teasertext = stringextract('class="teasertext">', '</p>', sendungen[2])
-		Log(img_src_header);Log(img_alt_header);Log(teasertext);
+	if len(sendungen) > 1:
+		if sendungen[2].find('urlScheme') >= 0:								# 2 = Episodendach
+			text = stringextract('urlScheme', '/noscript', sendungen[2])
+			img_src_header, img_alt_header = img_urlScheme(text, 320, ID='PODCAST') 
+			teasertext = stringextract('class="teasertext">', '</p>', sendungen[2])
+			Log(img_src_header);Log(img_alt_header);Log(teasertext);
 	
 	
 	max_len = len(sendungen)					# Gesamtzahl gefundener Sätze dieser Seite
