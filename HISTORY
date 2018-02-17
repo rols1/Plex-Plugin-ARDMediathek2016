@@ -3,6 +3,10 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  3.0.0	
 
 
+17.02.2018 3.5.1	Video-Sofort-Format wieder entfernt (Forum:  https://forums.plex.tv/discussion/comment/1606010/#Comment_1606010)
+			PodFavoriten(Scheme_swr3): Fix "dauer"
+			podcast-favorits.txt: Eintrag "Botski und Trollstoi" entfernt (dto. bei SWR3)	
+
 31.01.2018 3.5.0	TV-Live-Sender (SenderLiveListe, livesenderTV.xml): Hinweis auf Geoblocking für
  			die ZDF-Sender eingefügt. Dto. in zdfmobile.py.
  			Parseplaylist: Fehlerdiagnose für Laden der m3u8-Dateien erweitert.

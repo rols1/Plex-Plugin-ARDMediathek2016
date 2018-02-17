@@ -39,6 +39,10 @@ def PodFavoriten(title, path, offset=1):
 	# Indices: 	0. Gesamtzahl, 1. Url, 2. Originaltitel, 3. Summary, 4. Datum,
 	#			5. Dauer, 6. Größe, 7. Titel (zusammengesetzt), 8. Bild	, 9. Tagline
 	POD_rec = get_pod_content(url=path, rec_per_page=rec_per_page, baseurl=Scheme, offset=offset)
+	if 'Seite nicht' in POD_rec:			# error_txt aus get_page, einschl. path
+		msg=POD_rec	
+		msg = msg.decode(encoding="utf-8", errors="ignore")
+		return ObjectContainer(header='Error', message=msg)
 	
 	rec_cnt = len(POD_rec)							# Anzahl gelesener Sätze
 	start_cnt = int(offset) + 1						# Startzahl diese Seite
@@ -213,6 +217,7 @@ def get_pod_content(url, rec_per_page, baseurl, offset):
 	url = unescape(url)							# einige url enthalten html-escapezeichen
 	page, err = get_page(path=url)				# Absicherung gegen Connect-Probleme
 	if page == '':
+		Log(err)
 		return err
 	Log(len(page))
 
@@ -309,14 +314,13 @@ def Scheme_swr3(page, rec_per_page, offset):	# Schema www.br-online.de
 		single_rec = []		# Datensatz einzeln (2. Dim.)
 		title_org = stringextract('data-title="', '\"', s) 
 		title = title_org.strip()
-		summ = stringextract('"duration" content="T', '\"', s) 			# Dauer statt Beschreibung (fehlt)
-		summ = summ.strip()
 		url = stringextract('data-mp3="', '\"', s) 
 		img =  stringextract('<img src="', '\"', s) 
 		img_alt =  stringextract('alt="', '\"', s) 						# Bildbeschr. - nicht verwendet
 		
 		datum = stringextract('datePublished">', '</time>', s) 			# im Titel ev. bereits vorhanden
-		dauer = stringextract('content="T', '">', s) 
+		dauer = stringextract('duration" content=', '/div>', s) 		# "P0Y0M0DT0H0M34.000S">0:34</div>
+		dauer = stringextract('>', '<', dauer) 
 		groesse = stringextract('data-ati-size="', '"', s)
 		groesse = float(int(groesse)) / 1000000						# Konvert. nach MB, auf 2 Stellen gerundet
 		groesse = '%.2f MB' % groesse

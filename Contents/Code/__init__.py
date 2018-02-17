@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.0'		# Wechsel: update_single_files löschen/leeren
-VDATE = '31.01.2018'
+VERSION =  '3.5.1'		# Wechsel: update_single_files löschen/leeren
+VDATE = '17.02.2018'
 
 # 
 #	
@@ -2357,12 +2357,7 @@ def SenderLiveListe(title, listname, offset=0):	#
 	# SenderLiveListe -> SenderLiveResolution (reicht nur durch) -> Parseplaylist (Ausw. m3u8)
 	#	-> CreateVideoStreamObject 
 	Log.Debug('SenderLiveListe')
-	
-	Log('Dict_Lock: ' + str(Dict['Lock']))
-	Dict['Lock'] = False			# schütz bei Back-Schritten vor erneuter Thread-Auslösung -
-	Log('Lock_geloest')				# 	siehe Thread remoteVideo
-		
-
+			
 	title2 = 'Live-Sender ' + title
 	title2 = title2.decode(encoding="utf-8", errors="ignore")	
 	oc = ObjectContainer(view_group="InfoList", title1='Live-Sender', title2=title2, art = ICON)
@@ -2463,157 +2458,10 @@ def SenderLiveListe(title, listname, offset=0):	#
 	return oc
 		
 #-----------------------------------------------------------------------------------------------------
-# remote: s. https://github.com/plexinc/plex-media-player/wiki/Remote-control-API
-#	TV-Livestreams:
-#		Filterung der Videoobjekte gemäß Video-Sofort-Format in Parseplaylist (auto, Bandbreite)
-#		Aufruf Thread.Create in SenderLiveResolution - für TV-Livestreams 
-#	Thread.Sleep() führt zu unmittelbar wiederholten Aufrufen der Funktion - dto. vom Nutzer 
-#		ausgeführte Back-Funktion. Div. negative Versuche mit Thread.Block() + Thread.Lock. Bisher beste 
-#		Lösung: globale Variable Dict['Lock'] - Freigabe erst bei Rückkehr in SenderLiveListe
- 
-def remoteVideo():	# Thread, Problem PHT: esc funktioniert nur 1 x (Video-Abbruch)
-	Log('Thread_remoteVideo')
-	plextoken = os.environ.get('PLEXTOKEN')	# 	id für diesen channel
-	Log('plextoken: ' + plextoken)						
-	myproduct = Client.Product					# für pref_setVideoFormatLive, none bei thread-python-Alternative
-	Log(myproduct)
-
-	delay = int(Prefs['pref_setVideoFormat_Delay'])	# Verzögerung in sec zwischen den remote-Requests
-	Log('delay (sec): ' + str(delay))			# 1-10 (Einstellungen)
-
-#	return		# todo. entfernen nach Konsolentests. DefaultPrefs.json aktualisieren
-# todo: delay in Lock_return (2-faches Durchlaufen verhindern, verursacht durch 2. Aufruf CreateVideoStreamObject?
-#		
-
-	if Dict['Lock'] == True:
-		Log('Lock_return')	
-		return		
-			
-	if myproduct == 'Plex Web' or myproduct == 'Plex Media Player':	# klappt bei beiden garantiert nicht
-		Log('remoteVideo nicht in: ' + myproduct)
-		return
-		
-	Dict['Lock']=True								# Global - Freigabe in SenderLiveListe
-	Log('Lock_gestartet')
-	Dict['remoteStart'] = datetime.datetime.now()	# Global - verhindert Doppel-Durchlauf 
-		
-#	Ermittlung des Zieldevice via https://plex.tv/devices.xml (Header: X-Plex-Token)
-#	Player-Unterschiede:
-#		PHT: Steuerungs-Requests reichen - Header, subscribe + unsubscribe nicht erforderlich
-#			Steuerungs-Sequenz: moveRight - select - select
-#		Android: subscribe mit Header erforderlich, Steuerungs-Requests ohne Header möglich.
-#			Steuerungs-Sequenz: moveDown - moveRight - moveRight - select - select
-#	Header: token (devices.xml) für X-Plex-Token, X-Plex-Client-Identifier + X-Plex-Target-Client-Identifier,
-#			Device name für X-Plex-Device-Name, commandID (1 bei subscribe, 2 bei Requests + unsubscribe)
-#	
-#	Problem Plex Media Player (PMP, Plex Web ähnlich): subscribe -> commands - unsubscribe
-#		Die vom PMP zur Steuerung gesendete timeline führt zum Error im PMP-Log, da wir im Plugin keinen 
-#		eigenen HTTP-Server aufspannen. Mit dem subscribe-Port  kann auch der PMS nichts anfangen.
-#		Innerhalb der 10sec-Timeout-Frist akzeptiert der PMP trotzdem die
-#		Steuerkommandos. Für diese ist jeweils der notwendige Headersatz erforderlich (s. Code).
-#		s.a. https://forums.plex.tv/discussion/190372/pmp-control-api-my-feedback
-#			 https://github.com/plexinc/plex-media-player/wiki/Remote-control-API
-
-# Delay erforderlich: 	1. um der Player-App vor dem Steuerkdo. den Aufbau der Objekte zu ermöglichen
-#						2. um beim Zurückblättern (Back-Taste) die Steuerkdo. nicht erneut auszulösen
-
-	Log('Thread remoteVideo: Start_Remote')
-	# Anmeldung bei https://plex.tv/pin, falls der Client nicht in devices.xml auftaucht
-	r=HTTP.Request('https://plex.tv/devices.xml', headers={'X-Plex-Token': plextoken}, cacheTime=0, immediate=True)
-	cont = r.content		# Liste devices
-	Log(cont[:60]); 	# Log(r.headers) 	r.headers enthält hier keine ID-Merkmale des Clients	
-
-	uri = ''; clientid = ''
-	RemoteModel = Prefs['pref_setRemoteModel']				# Voreinstellung
-	Log('RemoteModel: ' + RemoteModel)
-	devices = blockextract('<Device', cont)
-	for device in devices:
-		product = stringextract('product="', '"', device)	# Bsp. "Plex Home Theater"
-		Log(myproduct); Log(product)
-		if myproduct == product:
-			client_token = stringextract('token="', '"', device)	# wird Client- und Target-Client-Identifier
-			client_id =  stringextract('clientIdentifier="', '"', device)		
-			plex_device =  stringextract('Device name="', '"', device)		
-			uri =  stringextract('Connection uri="', '"', device)	# Bsp. "http://192.168.0.102:32500"
-			if uri:	 # anscheinend  nur steuerbar, falls Connection uri vorhanden 
-				Log('client_token: ' + client_token); Log('client_id: ' + client_id); 
-				Log('uri: ' + uri); Log('plex_device: ' + plex_device); 
-				
-				if TestOpenPort(uri) == True:		# IP/Port erreichbar? devices.xml enthält auch inaktive Clients						
-					headers={'X-Plex-Token': plextoken, 'X-Plex-Client-Identifier': client_token, 'X-Plex-Device-Name': plex_device,
-						'X-Plex-Target-Client-Identifier': client_token, 'commandID' : '1'}
-					Log('headers: ' + str(headers)); 
-							
-					# nur Richtungs-Kommandos, ohne subscribe, unsubscribe, headers 											
-					if 	myproduct == "Plex Home Theater" or RemoteModel  == "Plex Home Theater":
-						Thread.Sleep(delay)
-						# time.sleep(delay) 					# keine Änderungen im Thread-Verhalten
-						r = HTTP.Request('%s/player/navigation/moveRight' % (uri), cacheTime=0, immediate=True) 
-						Log(r.content)
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/select' % (uri), cacheTime=0, immediate=True) 
-						Log(r.content)				
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/select' % (uri), cacheTime=0, immediate=True) 
-						Log(r.content)
-						return True		
-						
-					# bisher nur getestet für "Plex for Android"
-					#	merkwürdige Rückmeldung im OK-Fall: Failure: 200 OK 
-					if 	myproduct == "Plex for Android" or RemoteModel  == "Plex for Android":				
-						# 1. Subscribe									
-						Thread.Sleep(delay)
-						r = HTTP.Request('%s/player/timeline/subscribe?protocol=http&port=32400&commandID=1' % (uri), 
-							headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)
-						# 2. Richtungs-Kommandos									
-						headers={'X-Plex-Token': plextoken, 'X-Plex-Client-Identifier': client_token, 'X-Plex-Device-Name': plex_device,
-							'X-Plex-Target-Client-Identifier': client_token, 'commandID' : '2'}
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/moveDown' % (uri), headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/moveRight' % (uri), headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)				
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/moveRight' % (uri), headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)				
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/select' % (uri), headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)
-						Thread.Sleep(delay)	
-						r = HTTP.Request('%s/player/navigation/select' % (uri), headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)
-						# 3. Unsubscribe		# unschädlich, falls vom Player nicht benötigt							
-						Thread.Sleep(delay)
-						commandID = 3							
-						r = HTTP.Request('%s/player/timeline/unsubscribe?protocol=http&port=32400&commandID=%s' % (uri, commandID), 
-							headers=headers, cacheTime=0, immediate=True) 
-						Log(r.content)				
-						Log('Thread remoteVideo: select-request erfolgt')
-						return True		
-				
-	Log('Thread remoteVideo: kein select-request')
-	return	
-
-def TestOpenPort(address_port):	# speziell für remoteVideo, Bsp. address_port: http://192.168.0.102:32500
-	import socket
-	tout = 1		# Timeout
-	
-	adress_port = address_port.split('://')[1]
-	address = adress_port.split(':')[0]; port = adress_port.split(':')[1];
-	
-	s = socket.socket()
-	s.settimeout(tout)
-	try:
-		s.connect((address, int(port)))
-		s.shutdown(1)
-		s.close()
-		Log("Verbindung zu %s auf Port %s erfolgreich" % (address, port))
-		return True
-	except socket.error, e:
-		Log("Verbindung zu %s auf Port %s fehlgeschlagen: %s" % (address, port, e))
-		return False
+#	17.02.2018 Video-Sofort-Format wieder entfernt (V3.1.6 - V3.5.0)
+#		Forum:  https://forums.plex.tv/discussion/comment/1606010/#Comment_1606010
+#		Funktionen: remoteVideo, Parseplaylist, SenderLiveListe, TestOpenPort
+#-----------------------------------------------------------------------------------------------------
 			
 ###################################################################################################
 @route(PREFIX + '/SenderLiveResolution')	# Auswahl der Auflösungstufen des Livesenders
@@ -2621,8 +2469,7 @@ def TestOpenPort(address_port):	# speziell für remoteVideo, Bsp. address_port: 
 	#	Videosegmenten (.ts-Files enthält). Diese  verarbeitet der Plexserver im Videoobject. 
 	#	10.08.2017: Video-Sofort-Format beschränkt die Auswahl auf 1 Element (der autom. Start funktioniert
 	#		aber nicht im Webplayer)
-	#		Bei lokalen m3u8-Dateien müssen die Bandbreiten aufsteiend sortiert sein für Abgleich mit
-	#			Video-Sofort-Format (Bsp. liveTV_cbcyoumain.m3u8, liveTV_ntvlive-ipadakamai.m3u8)
+	#	17.02.2018 Video-Sofort-Format wieder entfernt
 def SenderLiveResolution(path, title, thumb, include_container=False):
 	#page = HTML.ElementFromURL(path)
 	url_m3u8 = path
@@ -2641,20 +2488,12 @@ def SenderLiveResolution(path, title, thumb, include_container=False):
 		oc.add(CreateVideoStreamObject(url=url_m3u8, title=title, 		
 			summary='Bandbreite unbekannt', tagline=title, meta=Codecs, thumb=thumb, 	
 			rtmp_live='nein', resolution='unbekannt'))								
-		if Prefs['pref_setVideoFormatLive']:		
-			if Dict['Lock'] != True:		 	# läuft noch ein Thread? (z.B. Aktivierung  durch Back-Taste)
-				t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (auto)
-				Log(t)
 		return oc
 		
 	if url_m3u8.find('rtmp') == 0:		# rtmp, nur 1 Videoobjekt
 		oc.add(CreateVideoStreamObject(url=url_m3u8, title=title, 
 			summary='rtmp-Stream', tagline=title, meta=Codecs, thumb=thumb, 
 			rtmp_live='ja', resolution='unbekannt'))
-		if Prefs['pref_setVideoFormatLive']:		
-			if Dict['Lock'] != True:		 	# läuft noch ein Thread? (z.B. Aktivierung  durch Back-Taste)
-				t=Thread.Create(remoteVideo)		# Thread für Video-Sofort-Format TV-Live (auto)
-				Log(t)
 		return oc
 		
 	# alle übrigen (i.d.R. http-Links), Videoobjekte für einzelne Auflösungen erzeugen
@@ -2664,27 +2503,9 @@ def SenderLiveResolution(path, title, thumb, include_container=False):
 			oc.add(CreateVideoStreamObject(url=url_m3u8, title=title + ' | Bandbreite und Auflösung automatisch', 
 				summary='automatische Auflösung | Auswahl durch den Player', tagline=title,
 				meta=Codecs, thumb=thumb, rtmp_live='nein', resolution=''))
-		if Prefs['pref_setVideoFormatLive']:	# Video-Sofort-Format = Qualität: auto (m3u8)
-			if 'auto' in Prefs['pref_setVideoFormatLive']:
-				if len(oc) == 1:				# lokale Datei i.d.R. ohne 'auto'-Eintrag
-					return ObjectContainer(header='Fehler', message='lokale Datei ohne Video-Sofort-Format >auto<: ' + url_m3u8)
-				else:					
-					if Prefs['pref_setVideoFormatLive']:
-						Log(Dict['Lock'])
-						if Dict['Lock'] != True:		 	# läuft noch ein Thread? (z.B. Aktivierung  durch Back-Taste)
-							t=Thread.Create(remoteVideo)	# Thread für Video-Sofort-Format TV-Live (auto)
-							Log(t)
-					return oc					# Rückgabe Objekt 'auto' - Fernsteuerung in remoteVideo 
-			else:
-				# 'auto' entfernen, Ersatz durch gewähltes Format in Parseplaylist:
-				oc = ObjectContainer(view_group="InfoList", title1=title + ' Live', art=ICON)
 				
-		# hier weiter mit Auswertung der m3u8-Datei (lokal oder extern), Berücksichtigung pref_setVideoFormatLive
-		if Prefs['pref_setVideoFormatLive']:	# Video-Sofort-Format für andere als 'auto'	
-			if Dict['Lock'] != True:			# läuft noch ein Thread? (z.B. Aktivierung  durch Back-Taste)
-				t=Thread.Create(remoteVideo)	# Thread für Video-Sofort-Format TV-Live (ausgewählte Bandbreite)
-				Log(t)
-		 # Auswertung *.m3u8-Datei, Auffüllung Container mit Auflösungen. geoblock bei TV-Live nicht verwendet:	
+		# Auswertung *.m3u8-Datei  (lokal oder extern), Auffüllung Container mit Auflösungen. geoblock bei 
+		# TV-Live nicht verwendet:	
 		oc = Parseplaylist(oc, url_m3u8, thumb, geoblock='')
 		return oc							# (-> CreateVideoStreamObject pro Auflösungstufe)
 	else:	# keine oder unbekannte Extension - Format unbekannt
@@ -4155,7 +3976,7 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 #  3. Besonderheit: für manche Sendungen nur 1 Qual.-Stufe verfügbar (Bsp. Abendschau RBB)
 #  4. Besonderheit: manche Playlists enthalten zusätzlich abgeschaltete Links, gekennzeichnet mit #. Fehler Webplayer:
 #		 crossdomain access denied. Keine Probleme mit OpenPHT und VLC
-#  10.08.2017 Filter für Video-Sofort-Format, für m3u8-auto bereits in SenderLiveResolution erfolgt
+#  10.08.2017 Filter für Video-Sofort-Format - wieder entfernt 17.02.2018
 
   Log ('Parseplaylist: ' + url_m3u8)
   playlist = ''
@@ -4212,33 +4033,22 @@ def Parseplaylist(container, url_m3u8, thumb, geoblock, **kwargs):	# master.m3u8
 		if Bandwith == BandwithOld:	# Zwilling -Test
 			title = 'Bandbreite ' + Bandwith + ' (2. Alternative)'
 			
-		BandwithWish = Prefs['pref_setVideoFormatLive']			# leer, auto oder Bandbreitenwert
-		# Log('BandwithWish: ' + str(BandwithWish)); Log(url); Log(urlOld); Log(title); 
 		Log(thumb); Log(Resolution); Log(BandwithInt); 
-		# Video-Sofort-Format = Qualität: auto (m3u8) - nur 1 Objekt, auto bereits abgehandelt?	
-		if BandwithWish and BandwithWish.endswith('auto') == False: 
-			BandwithWish = BandwithWish.split('>')[1].strip()	# Bsp. "m3u8-Streaming: Bandbreite > 100000"
-			Log(Bandwith); Log(BandwithWish);
-			if int(Bandwith) > int(BandwithWish):				# Bandbreite größer als Wunschbandbreite?
-				container.add(CreateVideoStreamObject(url=url, title=title, 		
-					summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
-					rtmp_live='nein', resolution=''))
-				return container							# nur dieser gewünscht
-		else:												# Objekte für alle gefundenen Bandbreiten
-			thumb=thumb_org
-			if BandwithInt and BandwithInt <=  100000: 		# vermutl. nur Audio (Bsp. ntv 48000, ZDF 96000)
-				Resolution = Resolution + ' (vermutlich nur Audio)'
-				thumb=R(ICON_SPEAKER)
-			container.add(CreateVideoStreamObject(url=url, title=title, 		
-				summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
-				rtmp_live='nein', resolution=''))
-			BandwithOld = Bandwith												
+		thumb=thumb_org
+		if BandwithInt and BandwithInt <=  100000: 		# vermutl. nur Audio (Bsp. ntv 48000, ZDF 96000)
+			Resolution = Resolution + ' (vermutlich nur Audio)'
+			thumb=R(ICON_SPEAKER)
+		container.add(CreateVideoStreamObject(url=url, title=title, 		
+			summary=Resolution+geoblock, tagline=title, meta=Codecs, thumb=thumb, 	
+			rtmp_live='nein', resolution=''))
+						
+		BandwithOld = Bandwith												
 
   	i = i + 1	# Index für URL
   #Log (len(container))	# Anzahl Elemente
   if len(container) == 0:	# Fehler, zurück zum Hauptmenü
-  		container.add(DirectoryObject(key=Callback(Main),  title='Problem mit Video-Sofort-Format oder m3u8-Datei', 
-			tagline='Video-Sofort-Format nicht gefunden oder fehlerhafte m3u8-Datei', thumb=thumb)) 
+  		container.add(DirectoryObject(key=Callback(Main),  title='inkompatible m3u8-Datei', 
+			tagline='Kennung #EXT-X-STREAM-INF fehlt oder den Pfaden fehlt http / https', thumb=thumb)) 
 	
   return container
 
