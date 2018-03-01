@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.1'		# Wechsel: update_single_files löschen/leeren
-VDATE = '17.02.2018'
+VERSION =  '3.5.2'		# Wechsel: update_single_files löschen/leeren
+VDATE = '01.03.2018'
 
 # 
 #	
@@ -79,6 +79,8 @@ ICON_ARD_Dokus 			= 'ard-ausgewaehlte-dokus.png'
 ICON_ARD_DokusAll 		= 'ard-alle-dokus.png'		
 ICON_ARD_Serien 		= 'ard-serien.png'				
 ICON_ARD_MEIST 			= 'ard-meist-gesehen.png' 	
+ICON_ARD_BARRIEREARM 	= 'ard-barrierearm.png' 
+ICON_ARD_HOERFASSUNGEN	= 'ard-hoerfassungen.png' 
 ICON_ARD_NEUESTE 		= 'ard-neueste-videos.png' 	
 ICON_ARD_BEST 			= 'ard-am-besten-bewertet.png' 	
 
@@ -326,35 +328,39 @@ def Main_ARD(name):
 						
 		
 	title = 'Ausgewählte Filme'.decode(encoding="utf-8", errors="ignore")
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Filme, next_cbKey='SingleSendung', ID='ARD'),
-		title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_Filme)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Filme, next_cbKey='SingleSendung', 
+		ID='ARD', mode = 'Sendereihen'), title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_Filme)))
 	title = 'Alle Filme'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_FilmeAll, next_cbKey='SingleSendung', ID='ARD'),
-		title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_FilmeAll)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_FilmeAll, next_cbKey='SingleSendung', 
+		ID='ARD', mode = 'Sendereihen'), title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_FilmeAll)))
 	title = 'Ausgewählte Dokus'.decode(encoding="utf-8", errors="ignore")
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Dokus, next_cbKey='SingleSendung', ID='ARD'), 
-		title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_Dokus)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Dokus, next_cbKey='SingleSendung', ID='ARD', 
+		mode='Sendereihen'), title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_Dokus)))
 	title = 'Alle Dokus'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_DokusAll, next_cbKey='SingleSendung', ID='ARD'),
-		title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_DokusAll)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_DokusAll, next_cbKey='SingleSendung', ID='ARD', 
+		mode='Sendereihen'), title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_DokusAll)))
 	title = 'Themen'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Themen, next_cbKey='SinglePage', ID='ARD'),
-		 title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Themen)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Themen, next_cbKey='SinglePage', ID='ARD', 
+		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Themen)))
 	title = 'Serien'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Serien, next_cbKey='SinglePage', ID='ARD'), 
-		title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Serien)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Serien, next_cbKey='SinglePage', ID='ARD', 
+		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Serien)))
 	title = 'Rubriken'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Rubriken, next_cbKey='SinglePage', ID='ARD'),
-		 title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_RUBRIKEN)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Rubriken, next_cbKey='SinglePage', ID='ARD', 
+		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_RUBRIKEN)))
 	title = 'Meist Gesehen'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Meist, next_cbKey='SingleSendung', ID='ARD'), 
-		title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_MEIST)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Meist, next_cbKey='SingleSendung', ID='ARD', 
+		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_MEIST)))
 	title = 'neueste Videos'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Neu, next_cbKey='SingleSendung', ID='ARD'), 
-		title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_NEUESTE)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Neu, next_cbKey='SingleSendung', ID='ARD', 
+		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_NEUESTE)))
 	title = 'am besten bewertet'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Best, next_cbKey='SingleSendung', ID='ARD'),
-		 title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_BEST)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Best, next_cbKey='SingleSendung', ID='ARD', 
+		mode='Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_BEST)))
+		 	
+	oc.add(DirectoryObject(key=Callback(BarriereArmARD, name="Barrierearm"), title="Barrierearm", 
+		thumb=R(ICON_ARD_BARRIEREARM))) 
+		 		 
 	return oc	
 	
 #---------------------------------------------------------------- 
@@ -733,7 +739,7 @@ def Search(query=None, title=L('Search'), channel='ARD', s_type='video', offset=
 	
 	err = test_fault(page, path)		# ARD-spezif. Error-Test
 	if err:
-		return err		
+		return ObjectContainer(header='Fehler', message=err)	
 		
 	if page.find('<strong>keine Treffer</strong') >= 0:
 		msg_notfound = 'Leider kein Treffer.'
@@ -749,19 +755,23 @@ def Search(query=None, title=L('Search'), channel='ARD', s_type='video', offset=
 			oc.add(DirectoryObject(key=Callback(Main_POD, name="Radio-Podcasts"), title=msg_notfound, 
 				summary=summary, tagline='Radio', thumb=R(ICON_MAIN_POD)))
 	else:
+#		oc = ARDMore(title=name, morepath=path, next_cbKey='SinglePage', ID='ARD', mode = 'Suche')
 		oc = PageControl(title=name, path=path, cbKey=next_cbKey, mode='Suche', ID=ID) 	# wir springen direkt
 	 
 	return oc
  
 #-----------------------
 def test_fault(page, path):	# testet geladene ARD-Seite auf ARD-spezif. Error-Test
- 	error_txt = '<title>Leider liegt eine Störung vor | ARD Mediathek</title>'
+	Log('test_fault')
+	
+ 	error_txt = '<title>Leider liegt eine Störung vor | ARD Mediathek</title>'	
 	if page.find(error_txt) >= 0:
 		error_txt = 'Leider liegt eine Störung vor | ARD Mediathek | interne Serverprobleme'			 			 	 
 		msgH = 'Fehler'; msg = error_txt + ' | Seite: ' + path
 		Log(msg)
 		msg =  msg.decode(encoding="utf-8", errors="ignore")
-		return ObjectContainer(header=msgH, message=msg)	
+		# return ObjectContainer(header=msgH, message=msg)		# muss Aufrufer erledigen
+		return error_txt
 	else:
 		return ''
 #-----------------------
@@ -961,8 +971,11 @@ def PodFavoritenListe(title, offset=0):
 ####################################################################################################
 @route(PREFIX + '/ARDMore')	# Dachfunktion für 'Ausgewählte Filme' .. 'am besten bewertet' bis einschl. 'Rubriken'
 							# ab 06.04.2017 auch Podcasts: 'Rubriken' .. 'Meist abgerufen'
-def ARDMore(title, morepath, next_cbKey, ID):	# next_cbKey: Vorgabe für nächsten Callback in SinglePage
-	Log('ARDMore'); Log(morepath)
+# next_cbKey: Vorgabe für nächsten Callback in SinglePage
+# mode: 'Sendereihen', 'Suche' 	- steuert Ausschnitt in SinglePage + bei Podcast Kopfauswertung 1.Satz
+#									
+def ARDMore(title, morepath, next_cbKey, ID, mode):
+	Log('ARDMore'); Log(morepath); Log(ID)
 	title2=title.decode(encoding="utf-8", errors="ignore")
 	oc = ObjectContainer(view_group="InfoList", title1=NAME, title2=title2, art = ObjectContainer.art)
 	oc = home(cont=oc, ID=ID)							# Home-Button
@@ -972,7 +985,7 @@ def ARDMore(title, morepath, next_cbKey, ID):	# next_cbKey: Vorgabe für nächst
 	page = HTTP.Request(path).content
 	err = test_fault(page, path)			# ARD-spezif. Error-Test: 'Leider liegt eine..'
 	if err:
-		return err		
+		return ObjectContainer(header='Fehler', message=err)	
 							
 	pagenr_path =  re.findall("=page.(\d+)", page) # Mehrfachseiten?
 	Log(pagenr_path)
@@ -988,7 +1001,6 @@ def ARDMore(title, morepath, next_cbKey, ID):	# next_cbKey: Vorgabe für nächst
 	if page.find('mresults=page') >= 0: 		# Suche (hier i.d.R. nicht relevant, Direktsprung zu PageControl)
 		prefix = 'mresults=page.'
 
-	mode = 'Sendereihen'						# steuert Ausschnitt in SinglePage + bei Podcast Kopfauswertung 1.Satz
 	if pagenr_path:	 							# bei Mehrfachseiten Liste Weiter bauen, beginnend mit 1. Seite
 		title = 'Weiter zu Seite 1'
 		path = morepath + '&' + prefix + '1' # 1. Seite, morepath würde auch reichen
@@ -1041,10 +1053,33 @@ def Update_ARD_Path(path):		# aktualisiert den Zugriffspfad fallls mötig, z.B. 
 		return path
 	
 ####################################################################################################
+@route(PREFIX + '/BarriereArmARD')	# z.Z. nur Hörfassungen - siehe ZDF (BarriereArm)
+# ausbauen, falls PMS mehr erlaubt (Untertitle)
+# ohne offset - ARD-Ergebnisse werden vom Sender seitenweise ausgegeben 
+def BarriereArmARD(name):		# 
+	Log('BarriereArmARD')
+	
+	title = name.decode(encoding="utf-8", errors="ignore")
+	oc = ObjectContainer(title2='ARD: ' + title, view_group="List")
+	oc = home(cont=oc, ID='ARD')								# Home-Button
+
+	query = urllib2.quote('Hörfassung', "utf-8")
+	path = BASE_URL + ARD_Suche	%  query	
+	
+	title = 'Hörfassungen'.decode(encoding="utf-8")		
+	next_cbKey = 'SinglePage'	# cbKey = Callback für Container in PageControl
+	oc.add(DirectoryObject(key=Callback(PageControl,title=title, path=path, cbKey=next_cbKey, mode='Suche', 
+		ID='ARD'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_HOERFASSUNGEN)))			
+
+	return oc
+	
+####################################################################################################
 @route(PREFIX + '/PageControl')	# kontrolliert auf Folgeseiten. Mehrfache Verwendung.
 	# Wir laden beim 1. Zugriff alle Seitenverweise in eine Liste. Bei den Folgezugriffen können die Seiten-
 	# verweise entfallen - der Rückschritt zur Liste ist dem Anwender nach jedem Listenelement  möglich.
 	# Dagegen wird in der Mediathek geblättert.
+	# ARDMore stellt die Seitenverweise selbst zusammen.	
+	# 
 def PageControl(cbKey, title, path, mode, ID, offset=0):  # ID='ARD', 'POD', mode='Suche', 'VERPASST', 'Sendereihen'
 	Log('PageControl'); Log('cbKey: ' + cbKey); Log(path)
 	Log('mode: ' + mode); Log('ID: ' + str(ID))
@@ -1054,6 +1089,7 @@ def PageControl(cbKey, title, path, mode, ID, offset=0):  # ID='ARD', 'POD', mod
 	oc = home(cont=oc, ID=ID)							# Home-Button
 	
 	page = HTTP.Request(path).content
+	Log(len(page))
 	path_page1 = path							# Pfad der ersten Seite sichern, sonst gehts mit Seite 2 weiter	
 
 	pagenr_suche = re.findall("mresults=page", page)   
@@ -1081,21 +1117,26 @@ def PageControl(cbKey, title, path, mode, ID, offset=0):  # ID='ARD', 'POD', mod
 	Log(pagenr_path)		
 	
 	# ab hier Liste der Folgeseiten. Letzten Eintrag entfernen (Mediathek: Rückverweis auf vorige Seite)
+	# Hinw.: die Endmontage muss mit dem Pfad der 1. Seite erfolgen, da ev. Umlaute in den Page-Links 
+	#	nicht erfolgreich gequotet werden können (Bsp. Suche nach 'Hörfassung) - das ZDF gibt die
+	#	Page-Links unqoted aus, die beim HTTP.Request zum error führen.
 	list = blockextract('class=\"entry\"', page)  # sowohl in A-Z, als auch in Verpasst, 1. Element
 	del list[-1]				# letzten Eintrag entfernen - wie in pagenr_path
 	Log(len(list))
 
-
 	first_site = True								# falls 1. Aufruf ohne Seitennr.: im Pfad ergänzen für Liste		
-	if (pagenr_suche) or (pagenr_andere) or (pagenr_einslike) :		# re.findall s.o.  		
-		if path_page1.find('mcontents=page') == -1: 
-			path_page1 = path_page1 + 'mcontents=page.1'
-		if path_page1.find('mresults=page') == -1:
-			path_page1 = path_page1 + '&mresults=page.1'
-		if path_page1.find('searchText=') >= 0:			#  kommt direkt von Suche
-			path_page1 = path + '&source=tv&mresults=page.1'
-		if path_page1.find('mcontent=page') >= 0:			#  einslike oder Themen
-			path_page1 = path_page1 + 'mcontent=page.1'
+	if (pagenr_suche) or (pagenr_andere) or (pagenr_einslike) :		# re.findall s.o.  
+		if 	'=page'	not in path:
+			if pagenr_andere: 
+				path_page1 = path_page1 + 'mcontents=page.1'
+				path_end =  '&mcontents=page.'				# path_end für die Endmontage
+			if pagenr_suche:
+				path_page1 = path_page1 + '&mresults=page.1'# Suche
+				path_end = '&mresults=page.' 
+			if pagenr_einslike:								#  einslike oder Themen
+				path_page1 = path_page1 + 'mcontent=page.1'
+				path_end = '&mcontent=page.'
+		Log('path_end: ' + path_end)
 	else:
 		first_site = False
 		
@@ -1123,9 +1164,9 @@ def PageControl(cbKey, title, path, mode, ID, offset=0):  # ID='ARD', 'POD', mod
 		Log(pagenr); 
 					
 		if (pagenr):							# fehlt manchmal, z.B. bei Suche
-			if href.find('=page.') >=0:
+			if href.find('=page.') >=0:			# Endmontage
 				title = 'Weiter zu Seite ' + pagenr[0]
-				href = BASE_URL + href
+				href =  path_page1 + path_end + pagenr[0]
 			else:				
 				continue						# Satz verwerfen
 		else:
@@ -1149,28 +1190,26 @@ def SinglePage(title, path, next_cbKey, mode, ID, offset=0):	# path komplett
 	oc = ObjectContainer(view_group="InfoList", title1=title, art=ICON)
 	oc = home(cont=oc, ID=ID)					# Home-Button
 	
-	func_path = path								# für Vergleich sichern
-					
+	func_path = path								# für Vergleich sichern					
 	page = HTTP.Request(path).content
 	sendungen = ''
 	
 	if mode == 'Suche':									# relevanten Inhalt ausschneiden, Blöcke bilden
 		page = stringextract('data-ctrl-scorefilterloadableLoader-source', '<!-- **** END **** -->', page)	
-		sendungen = blockextract('class=\"teaser\"', page) 
 	if mode == 'Verpasst':								
 		page = stringextract('"boxCon isCollapsible', '<!-- **** END **** -->', page)	
-		sendungen = blockextract('<h3 class="headline"', page) 
 	if mode == 'Sendereihen':	
 		if ID == 'PODCAST':						       # auch A-Z 
 			# Filter nach next_cbKey (PageControl, 	SinglePage, SingleSendung) hier nicht erforderlich	
 			page = stringextract('class=\"section onlyWithJs sectionA\">', '<!-- content -->', page)
 		else:
 			page = stringextract('data-ctrl-layoutable', '<!-- **** END **** -->', page)	
-	sendungen = blockextract('class=\"teaser\"', page)	# Sendungsblöcke in PODCAST: 1. teaser=Sendungskopf, 
-														#   Rest Beiträge - Auswertung in get_sendungen	
+	sendungen = blockextract('class="teaser"', page)	# Sendungsblöcke in PODCAST: 1. teaser=Sendungskopf, 
+	Log('sendungen: ' + str(len(sendungen)))			#   Rest Beiträge - Auswertung in get_sendungen	
+	Log(len(page));													
 	if len(sendungen) == 0:								# Fallback 	
-		sendungen = blockextract('class=\"entry\"', page) 				
-	Log(len(sendungen))
+		sendungen = blockextract('class="entry"', page) 				
+		Log('sendungen, Fallback: ' + str(len(sendungen)))
 	
 	send_arr = get_sendungen(oc, sendungen, ID, mode)	# send_arr enthält pro Satz 9 Listen 
 	# Rückgabe send_arr = (send_path, send_headline, send_img_src, send_millsec_duration)

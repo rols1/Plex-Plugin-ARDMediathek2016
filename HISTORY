@@ -3,6 +3,14 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  3.0.0	
 
 
+
+28.02.2018 3.5.2	ARD: Barrierearme Angebote, zunächst nur Hörfassungen (siehe ZDF 18.11.2016, V2.5.5).
+			PageControl: Link-Zusammensetzung bei Mehrfachseiten neu kodiert - wg. quoten-/unquote-
+			Problemen i.V.m. HTTP.Request notwendig.
+			test_fault: return ObjectContainer ersetzt durch Rückgabe error_txt. Nutzende Funktionen
+			angepasst (Search, ARDMore).
+			Codebereinigung SinglePage (ARD): überflüssige blockextract-Statements entfernt.
+
 17.02.2018 3.5.1	Video-Sofort-Format wieder entfernt (Forum:  https://forums.plex.tv/discussion/comment/1606010/#Comment_1606010)
 			PodFavoriten(Scheme_swr3): Fix "dauer"
 			podcast-favorits.txt: Eintrag "Botski und Trollstoi" entfernt (dto. bei SWR3)	
