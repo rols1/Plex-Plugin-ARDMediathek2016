@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.2'		# Wechsel: update_single_files löschen/leeren
-VDATE = '01.03.2018'
+VERSION =  '3.5.3'		# Wechsel: update_single_files löschen/leeren
+VDATE = '07.03.2018'
 
 # 
 #	
@@ -83,6 +83,7 @@ ICON_ARD_BARRIEREARM 	= 'ard-barrierearm.png'
 ICON_ARD_HOERFASSUNGEN	= 'ard-hoerfassungen.png' 
 ICON_ARD_NEUESTE 		= 'ard-neueste-videos.png' 	
 ICON_ARD_BEST 			= 'ard-am-besten-bewertet.png' 	
+ICON_ARD_BILDERSERIEN 	= 'ard-bilderserien.png'
 
 ICON_ZDF_AZ 			= 'zdf-sendungen-az.png' 		
 ICON_ZDF_VERP 			= 'zdf-sendung-verpasst.png'	
@@ -227,7 +228,7 @@ def Main():
 	
 	Dict.Reset()							# Speicherobjekte des Plugins löschen
 	Dict['R'] = Core.storage.join_path(Core.bundle_path, 'Contents', 'Resources')
-	# Log(Dict['R'])
+	# Log(Dict['R'])	
 			
 	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art)	# Plex akzeptiert nur InfoList + List, keine
 																			# Auswirkung auf Wiedergabe im Webplayer																																						
@@ -302,7 +303,7 @@ def Main():
 		summary = 'ein-/ausschalten: EPG-Daten, Downloads, Podcasts, Update anzeigen,.. ', 
 		tagline = 'Verzeichniseinträge bitte im Webplayer (Zahnradsymbol) vornehmen'.decode(encoding="utf-8"),
 		thumb = R(ICON_PREFS)))
-					
+				
 	return oc
 	
 #----------------------------------------------------------------
@@ -359,8 +360,11 @@ def Main_ARD(name):
 		mode='Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_BEST)))
 		 	
 	oc.add(DirectoryObject(key=Callback(BarriereArmARD, name="Barrierearm"), title="Barrierearm", 
-		thumb=R(ICON_ARD_BARRIEREARM))) 
-		 		 
+		thumb=R(ICON_ARD_BARRIEREARM))) 			
+	title = 'Bilderserien'
+	oc.add(DirectoryObject(key=Callback(Search,  query=title, channel='ARD', s_type=title, title=title), title=title, 
+		thumb=R('ard-bilderserien.png'))) 	
+
 	return oc	
 	
 #---------------------------------------------------------------- 
@@ -714,20 +718,25 @@ def SendungenAZ(name, ID):
 ####################################################################################################
 @route(PREFIX + '/Search')	# Suche - Verarbeitung der Eingabe
 	# Vorgabe UND-Verknüpfung (auch Podcast)
-def Search(query=None, title=L('Search'), channel='ARD', s_type='video', offset=0, **kwargs):
-	Log('Search'); Log(query); Log(channel)
+	# offset: verwendet nur bei Bilderserien (Funktionen s. ARD_Bildgalerie.py)
+def Search(query=None, title=L('Search'), channel='ARD', s_type=None, offset=0, path=None, **kwargs):
+	Log('Search:'); Log(query); Log(channel); Log(str(offset))
 	query = query.replace(' ', '+')			# Leer-Trennung = UND-Verknüpfung bei Podcast-Suche 
 	query = urllib2.quote(query, "utf-8")
 	Log(query)
-	
+
 	name = 'Suchergebnis zu: ' + urllib2.unquote(query)
 	name = name.decode(encoding="utf-8", errors="ignore")
 	oc = ObjectContainer(view_group="InfoList", title1=NAME, title2=name, art = ObjectContainer.art)
 	next_cbKey = 'SinglePage'	# cbKey = Callback für Container in PageControl
 			
-	if channel == 'ARD':		
-		path =  BASE_URL +  ARD_Suche 
-		path = path % query
+	if channel == 'ARD':
+		if s_type == 'Bilderserien':
+			if path == None:			# path belegt bei offset > 0
+				path = 'http://www.ard.de/home/ard/23116/index.html?q=Bildergalerie'
+		else:
+			path =  BASE_URL +  ARD_Suche 
+			path = path % query
 		ID='ARD'
 	if channel == 'PODCAST':	
 		path =  BASE_URL  + POD_SEARCH
@@ -755,8 +764,47 @@ def Search(query=None, title=L('Search'), channel='ARD', s_type='video', offset=
 			oc.add(DirectoryObject(key=Callback(Main_POD, name="Radio-Podcasts"), title=msg_notfound, 
 				summary=summary, tagline='Radio', thumb=R(ICON_MAIN_POD)))
 	else:
-#		oc = ARDMore(title=name, morepath=path, next_cbKey='SinglePage', ID='ARD', mode = 'Suche')
-		oc = PageControl(title=name, path=path, cbKey=next_cbKey, mode='Suche', ID=ID) 	# wir springen direkt
+		if s_type == 'Bilderserien':
+			oc = home(cont=oc, ID='ARD')
+			entries = blockextract('class="entry">',  page)
+			if offset:		# 5 Seiten aus vorheriger Liste abziehen
+				entries = entries[4:]
+			Log(len(entries))
+			if len(entries) == 0:
+				err = 'keine weitere Bilderserie gefunden'
+				return ObjectContainer(header='Fehler', message=err)	
+			
+			
+			page_high = re.findall('ctype="nav.page">(\d+)', page)[-1]	# letzte NR der nächsten Seiten
+			Log(page_high)
+			href_high = blockextract('class="entry">',  page)[-1]		# letzter Pfad der nächsten Seiten
+			href_high = 'http://www.ard.de' + stringextract('href="', '"', href_high)
+			Log(href_high)
+			
+			import ARD_Bildgalerie
+			if offset == 0:
+				title = "Weiter zu Seite 1"						# 1. Link fehlt in entries
+				oc.add(DirectoryObject(key=Callback(ARD_Bildgalerie.page,name=s_type + ': 1', path=path, offset=0), 
+					title=title, thumb=R(ICON_NEXT)))
+			for rec in entries:
+				href =  'http://www.ard.de' + stringextract('href="', '"', rec)
+				Log(href[:44])
+				pagenr = re.search('ctype="nav.page">(\d+)', rec).group(1)
+				title = "Weiter zu Seite %s" % pagenr
+				title2 = name="%s: %s " %(s_type, pagenr)
+				oc.add(DirectoryObject(key=Callback(ARD_Bildgalerie.page,name=title2, path=href, offset=0), 
+					title=title, thumb=R(ICON_NEXT)))
+					
+			# Mehr Seiten Bilderserien anzeigen:
+			#	Ablauf im Web (Klick auf die höchste Seite): Paging zeigt 4 vorige und 5 nächste Seiten, 
+			#	Bsp. Seite 10: 6 -9, 11 - 15
+			#	Hier zeigen wir nur die nächsten 5, um Wiederholungen zu vermeiden
+			Log('page_high: ' + page_high)
+			title = 'Mehr %s'	% s_type					
+			oc.add(DirectoryObject(key=Callback(Search, query=query, channel='ARD', s_type=s_type, 
+				offset=page_high, path=href_high), title=title, thumb=R(ICON_MEHR)))	
+		else:	
+			oc = PageControl(title=name, path=path, cbKey=next_cbKey, mode='Suche', ID=ID) 	# wir springen direkt
 	 
 	return oc
  
@@ -3025,7 +3073,7 @@ def PlayAudio(url, location=None, includeBandwidths=None, autoAdjustQuality=None
 #									ZDF-Funktionen
 #
 @route(PREFIX + '/ZDF_Search')	# Suche - Verarbeitung der Eingabe. Neu ab 28.10.2016 (nach ZDF-Relaunch)
-# 	Voreinstellungen: alle DF-Sender, ganze Sendungen, sortiert nach Datum
+# 	Voreinstellungen: alle ZDF-Sender, ganze Sendungen, sortiert nach Datum
 #	Anzahl Suchergebnisse: 25 - nicht beeinflussbar
 # def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):

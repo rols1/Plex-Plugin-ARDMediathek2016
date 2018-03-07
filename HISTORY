@@ -3,10 +3,12 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  3.0.0	
 
 
+07.03.2018 3.5.3	ARD_Bildgalerie hinzugefügt - Sender-Schemata ausgelagert in ARD_Bildgalerie.py.
+			Schemata: Hessenschau, ARD, BR, Bremen, Südwestfunk, Das Erste. Zur Zeit ca. 950 Serien.
 
-28.02.2018 3.5.2	ARD: Barrierearme Angebote, zunächst nur Hörfassungen (siehe ZDF 18.11.2016, V2.5.5).
-			PageControl: Link-Zusammensetzung bei Mehrfachseiten neu kodiert - wg. quoten-/unquote-
-			Problemen i.V.m. HTTP.Request notwendig.
+01.03.2018 3.5.2	ARD: Barrierearme Angebote, zunächst nur Hörfassungen (siehe ZDF 18.11.2016, V2.5.5).
+			PageControl: Link-Zusammensetzung bei Mehrfachseiten neu kodiert - erorderlich wegen 
+			quote-/unquote-Problemen i.V.m. HTTP.Request.
 			test_fault: return ObjectContainer ersetzt durch Rückgabe error_txt. Nutzende Funktionen
 			angepasst (Search, ARDMore).
 			Codebereinigung SinglePage (ARD): überflüssige blockextract-Statements entfernt.
