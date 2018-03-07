@@ -25,6 +25,11 @@ Funktionen ab Version 2.2.0:
 - Serien
 - Themen
 - Rubriken
+- MeistGesehen
+- Neueste Videos
+- am besten bewertet
+- Barrierearm (Hörfassung)
+- Bilderserien
 
 #### ZDF Mediathek: 
 - Suche nach Sendungen
