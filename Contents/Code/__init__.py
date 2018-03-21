@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.3'		# Wechsel: update_single_files löschen/leeren
-VDATE = '07.03.2018'
+VERSION =  '3.5.4'		# Wechsel: update_single_files löschen/leeren
+VDATE = '21.03.2018'
 
 # 
 #	
@@ -164,7 +164,7 @@ POD_FEATURE = 'http://www.ardmediathek.de/radio/das-ARD-radiofeature/Sendung?doc
 POD_TATORT 	= 'http://www.ardmediathek.de/radio/ARD-Radio-Tatort/Sendung?documentId=1998988&bcastId=1998988'
 POD_NEU 	= 'http://www.ardmediathek.de/radio/Neueste-Audios/mehr?documentId=23644358'
 POD_MEIST 	= 'http://www.ardmediathek.de/radio/Meistabgerufene-Audios/mehr?documentId=23644364'
-POD_REFUGEE = 'http://www1.wdr.de/radio/cosmo/programm/refugee-radio/refugee-radio-112.html'	# z.Z. Refugee Radio via Suche
+POD_REFUGEE = 'https://www1.wdr.de/radio/cosmo/programm/refugee-radio/refugee-radio-112.html'	# z.Z. Refugee Radio via Suche
 
 # Relaunch der Mediathek beim ZDF ab 28.10.2016: xml-Service abgeschaltet
 ZDF_BASE				= 'https://www.zdf.de'
@@ -417,20 +417,20 @@ def Main_POD(name):
 	title = 'Sendungen A-Z'
 	oc.add(DirectoryObject(key=Callback(SendungenAZ, name=title, ID='PODCAST'), title=title, thumb=R(ICON_ARD_AZ)))			
 	title = 'Rubriken'	
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_RUBRIK, next_cbKey='SinglePage', ID='PODCAST'),
-		title=title, summary=title, thumb=R(ICON_POD_RUBRIK)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_RUBRIK, next_cbKey='SinglePage', ID='PODCAST',
+		mode='Sendereihen'), title=title, summary=title, thumb=R(ICON_POD_RUBRIK)))
 	title="Radio-Feature"	 
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_FEATURE, next_cbKey='SingleSendung', ID='PODCAST'),
-		title=title, summary=title, thumb=R(ICON_POD_FEATURE)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_FEATURE, next_cbKey='SingleSendung', ID='PODCAST',
+		mode='Sendereihen'), title=title, summary=title, thumb=R(ICON_POD_FEATURE)))
 	title="Radio-Tatort"	 
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_TATORT, next_cbKey='SingleSendung', ID='PODCAST'),
-		title=title, summary=title, thumb=R(ICON_POD_TATORT)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_TATORT, next_cbKey='SingleSendung', ID='PODCAST',
+		mode='Sendereihen'), title=title, summary=title, thumb=R(ICON_POD_TATORT)))
 	title="Neueste Audios"	 
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_NEU, next_cbKey='SingleSendung', ID='PODCAST'),
-		title=title, summary=title, thumb=R(ICON_POD_NEU)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_NEU, next_cbKey='SingleSendung', ID='PODCAST',
+		mode='Sendereihen'), title=title, summary=title, thumb=R(ICON_POD_NEU)))
 	title="Meist abgerufen"	 
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_MEIST, next_cbKey='SingleSendung', ID='PODCAST'),
-		title=title, summary=title, thumb=R(ICON_POD_MEIST)))
+	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=POD_MEIST, next_cbKey='SingleSendung', ID='PODCAST',
+		mode='Sendereihen'), title=title, summary=title, thumb=R(ICON_POD_MEIST)))
 	
 	title="Refugee-Radio"; query='Refugee Radio'	# z.Z. Refugee Radio via Suche
 	oc.add(DirectoryObject(key=Callback(Search, query=query, channel='PODCAST'), title=title, 
