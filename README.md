@@ -57,7 +57,7 @@ Funktionen ab Version 2.2.0:
 - alle Radiosender von Bayern, HR, mdr, NDR, Radio Bremen, RBB, SR, SWR, WDR, Deutschlandfunk. Insgesamt 10 Stationen, 63 Sender
  
 #### Videobehandlung ARD Mediathek und ZDF Mediathek:
-- Videostreams: Auflistung der verfügbaren Angebote an Bandbreiten + Auflösungen (Ausnahme Audio ohne Video)
+- Videostreams: Auflistung der verfügbaren Angebote an Bandbreiten + Auflösungen (falls verfügbar: Audio ohne Video)
 - Videoclips: Auflistung der verfügbaren Angebote an Qualitätstufen sowie zusätzlich verfügbarer Videoformate (Ausnahme HDS + SMIL) 
 
 #### Downloadoption ab Version 2.6.7
