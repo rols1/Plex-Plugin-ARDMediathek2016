@@ -60,10 +60,10 @@ Funktionen ab Version 2.2.0:
 - Videostreams: Auflistung der verfügbaren Angebote an Bandbreiten + Auflösungen (falls verfügbar: Audio ohne Video)
 - Videoclips: Auflistung der verfügbaren Angebote an Qualitätstufen sowie zusätzlich verfügbarer Videoformate (Ausnahme HDS + SMIL) 
 
-#### Downloadoption ab Version 2.6.7
+#### Downloadoption ab Version 2.6.7 (cURL oder wget eforderlich)
 - Download von Videos im ARD-Bereich
 - Download von Videos im ZDF-Bereich
-- Tools zum Bearbeiten des Download-Verzeichnisses
+- Tools zum Bearbeiten des Download-Verzeichnisses (Verzeichnisse festlegen, Verschieben, Löschen)
 
 #### Update-Modul
 - nach der Erst-Installation können weitere Updates durch das Plugin installiert werden
