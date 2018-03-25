@@ -10,7 +10,7 @@ Das Plugin löst den Vorgänger Plex-Plugin-ARDMediathek2015 ab. Die ZDF Mediath
 Der Relaunch des ZDF-Mediathek-Internetangebots vom 28.10.2016 ist eingearbeitet 
 
 #### Rückmeldungen willkommen:
-Im Forum: https://forums.plex.tv/discussion/213947/plex-plugin-ardmediathek2016
+Im Forum: https://forums.plex.tv/discussion/213947/rel-plex-plugin-ardmediathek2016
 direkt: rols1@gmx.de 
   
 Funktionen ab Version 2.2.0: 
