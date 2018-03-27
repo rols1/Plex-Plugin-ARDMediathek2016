@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.4'		# Wechsel: update_single_files löschen/leeren
-VDATE = '21.03.2018'
+VERSION =  '3.5.5'		# Wechsel: update_single_files löschen/leeren
+VDATE = '27.03.2018'
 
 # 
 #	
@@ -174,9 +174,7 @@ ZDF_SENDUNGEN_AZ		= 'https://www.zdf.de/sendungen-a-z?group=%s'			# group-Format
 ZDF_WISSEN				='https://www.zdf.de/doku-wissen'						# Basis für Ermittlung der Rubriken
 ZDF_SENDUNGEN_MEIST		= 'https://www.zdf.de/meist-gesehen'
 ZDF_BARRIEREARM			= 'https://www.zdf.de/barrierefreiheit-im-zdf'
-# 26.02.2017 alternative Seiten (vollständig im Vergleich mit Web-Version?): 
-#	https://config-cdn.cellular.de/zdf/mediathek/config/android/4_0/zdf_mediathek_android_live_4_0.json
-#	Siehe https://github.com/raptor2101/Mediathek/issues/85 Kodi-Plugin Mediathek
+
 
 REPO_NAME		 	= 'Plex-Plugin-ARDMediathek2016'
 GITHUB_REPOSITORY 	= 'rols1/' + REPO_NAME
@@ -4295,12 +4293,13 @@ def make_filenames(title):
 	
 	fname = transl_umlaute(title)		# Umlaute
 	# Ersatz: 	Leerz., Pipe, mehrf. Unterstriche -> 1 Unterstrich, Doppelp. -> Bindestrich	
-	# Entferne: Frage-, Ausrufez., Hochkomma, Komma und #@!%^&*()+
+	#			+ /  -> Bindestrich	
+	# Entferne: Frage-, Ausrufez., Hochkomma, Komma und #@!%^&*()
 	fname = (fname.replace(' ','_').replace('|','_').replace('___','_').replace('.','_')) 
 	fname = (fname.replace('__','_').replace(':','-'))
 	fname = (fname.replace('?','').replace('!','').replace('"','').replace('#','')
 		.replace('*','').replace('@','').replace('%','').replace('^','').replace('&','')
-		.replace('(','').replace(')','').replace(',','').replace('+','-'))	
+		.replace('(','').replace(')','').replace(',','').replace('+','-').replace('/','-'))	
 	
 	# Die Variante .join entfällt leider, da die Titel hier bereits
 	# in Unicode ankommen -	Plex code/sandbox.py:  

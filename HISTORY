@@ -3,6 +3,8 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  3.0.0	
 
 
+27.03.2018 3.5.5	make_filenames: "/" ersetzt durch "-".
+
 21.03.2018 3.5.4	Main_POD: fehlenden Parameter "mode" für Callbacks ARDMore ergänzt (5 Menüs ausgefallen).
 	
 07.03.2018 3.5.3	ARD_Bildgalerie hinzugefügt - Sender-Schemata ausgelagert in ARD_Bildgalerie.py.
