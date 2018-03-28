@@ -37,7 +37,10 @@ Funktionen ab Version 2.2.0:
 - Sendungen A-Z
 - Rubriken
 - MeistGesehen
+- Neu in der Mediathek
 - Barrierearm (Hörfassung)
+- ZDFenglish
+- ZDFarabic
 - Bilderserien
 
 #### Radio-Podcasts:
