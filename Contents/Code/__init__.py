@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.5'		# Wechsel: update_single_files löschen/leeren
-VDATE = '27.03.2018'
+VERSION =  '3.5.6'		# Wechsel: update_single_files löschen/leeren
+VDATE = '11.04.2018'
 
 # 
 #	
@@ -1484,7 +1484,7 @@ def SingleSendung(path, title, thumb, duration, summary, tagline, ID, offset=0):
 					#	mit http, während bei m3u8-Url https durch http ersetzt werden MUSS. 
 					url = url.replace('https', 'http')	
 					oc.add(CreateVideoClipObject(url=url, title=title, 
-						summary=summary+geoblock, meta=path, thumb=thumb, tagline='', duration=duration, resolution=''))
+						summary=summary+geoblock, meta=path, thumb=thumb, tagline='leer', duration='leer', resolution='leer'))
 	Log(download_list)
 	if 	download_list:			
 		# high=-1: letztes Video bisher höchste Qualität
@@ -1871,7 +1871,7 @@ def VideoTools(httpurl,path,dlpath,txtpath,title,summary,thumb,tagline):
 		title=title.decode(encoding="utf-8", errors="ignore")
 		summary=summary.decode(encoding="utf-8", errors="ignore")
 		oc.add(CreateVideoClipObject(url=httpurl, title=title , summary=summary, 
-			meta=httpurl, thumb=thumb, tagline=tagline, duration='leer', resolution='leer'))
+			meta=httpurl, thumb=thumb, tagline='leer', duration='leer', resolution='leer'))
 	else:										# 'mp3' = Podcast
 		if httpurl.startswith('http'):			# Dateiname bei fehl. Beschreibung, z.B. Sammeldownloads
 			title = title_org + ' | Anhören' 										# 1. Anhören
@@ -2730,13 +2730,14 @@ def CreateVideoStreamObject(url, title, summary, tagline, meta, thumb, rtmp_live
 	#	s.a. https://github.com/sander1/channelpear.bundle/tree/8605fc778a2d46243bb0378b0ab40a205c408da4
 def CreateVideoClipObject(url, title, summary, tagline, meta, thumb, duration, resolution, include_container=False, **kwargs):
 	Log('CreateVideoClipObject')
-	Log(url); Log(duration); Log(tagline)
+	Log(url); Log(duration); Log(tagline); Log(resolution)
 	Log(Client.Platform)
 	Log('Plattform: ' + sys.platform)
 	Log(Client.Product)
 	
 	# resolution = ''					# leer - Clients skalieren besser selbst
 	resolution=[720, 540, 480]			# wie VideoClipObject: Vorgabe für Webplayer entbehrlich, für PHT erforderlich
+	tagline = tagline.replace('leer', ' ') # leer = Stammhalter für PHT
 
 	mo = MediaObject(parts=[PartObject(key=Callback(PlayVideo, url=url))],
 		container = Container.MP4,  	# weitere Video-Details für Chrome nicht erf., aber Firefox 
@@ -3845,7 +3846,8 @@ def get_formitaeten(sid, ID=''):
 	Log('old_videodat_url: ' + old_videodat_url); Log('videodat_url: ' + videodat_url); Log('uurl: ' + videodat); 	
 
 	# ab 28.05.2017: Verwendung JSON.ObjectFromURL - Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich
-	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei
+	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei (V3.0.2. 15.05.2017)
+	#	Falls erneut erforderlich s. https://stackoverflow.com/questions/1087227/validate-ssl-certificates-with-python/28325763#28325763
 	apiToken2 = 'Bearer ' + str(Dict['apiToken2'])		# s. GetZDFVideoSources. str falls None
 	# headers = {'Api-Auth': "Bearer d2726b6c8c655e42b68b0db26131b15b22bd1a32",'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
 	headers = {'Api-Auth': apiToken2,'Host':"api.zdf.de", 'Accept-Encoding':"gzip, deflate, sdch, br", 'Accept':"application/vnd.de.zdf.v1.0+json"}
