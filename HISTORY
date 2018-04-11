@@ -1,6 +1,6 @@
 CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
---------------				gelöschte Releases: älter als  3.0.0	
+--------------				gelöschte Releases: älter als  2.5.1	
 
 
 11.03.2018 3.5.6	PHT-Fix (Ausfall ARD-Videos): in Callbacks für CreateVideoClipObject Leerstring '' für
