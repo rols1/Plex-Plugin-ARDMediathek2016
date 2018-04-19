@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.6'		# Wechsel: update_single_files löschen/leeren
-VDATE = '11.04.2018'
+VERSION =  '3.5.7'		# Wechsel: update_single_files löschen/leeren
+VDATE = '19.04.2018'
 
 # 
 #	
@@ -3819,7 +3819,7 @@ def get_formitaeten(sid, ID=''):
 	# Bei Anforderung von profile_url mittels urllib2.urlopen ssl.SSLContext erforderlich - entf. bei JSON.ObjectFromURL
 	request = JSON.ObjectFromURL(profile_url, headers=headers)				# 3. Playerdaten ermitteln
 	request = json.dumps(request, sort_keys=True, indent=2, separators=(',', ': '))  # sortierte Ausgabe
-	Log(request[:20])	# "canonical" ...
+	Log(request[:20])	# "additionalPaths ...
 	request = str(request)				# json=dict erlaubt keine Stringsuche, json.dumps klappt hier nicht
 	request = request.decode('utf-8', 'ignore')	
 	# Log(request)		# bei Bedarf, ev. reicht nachfolg. mainVideoContent
@@ -3827,15 +3827,13 @@ def get_formitaeten(sid, ID=''):
 	pos = request.rfind('mainVideoContent')				# 'mainVideoContent' am Ende suchen
 	request_part = request[pos:]
 	# Log(request_part)			# bei Bedarf
-	old_videodat = stringextract('http://zdf.de/rels/streams/ptmd\": \"', '\",', request_part)	
+	video_ptmd = stringextract('http://zdf.de/rels/streams/ptmd": "', '",', request_part)	
 	# Bsp.: /tmd/2/portal/vod/ptmd/mediathek/161021_hsh_hsh'
-	# Log(old_videodat)	
-	old_videodat_url = 'https://api.zdf.de' + old_videodat					# 4. Videodaten ermitteln
+	# Log(video_ptmd)	
+	old_videodat_url = 'https://api.zdf.de' + video_ptmd					# 4. Videodaten ermitteln
+	Log(old_videodat_url)	
 	# neu ab 20.1.2016: uurl-Pfad statt ptmd-Pfad ( ptmd-Pfad fehlt bei Teilvideos)
-	videodat = stringextract('"uurl": "', '"', request_part)	# Bsp.: 161118_clip_5_hsh
-	if videodat == '':												# fehlt manchmal, dann auch kein Video verfügbar
-		Log('videodat: nicht in request_part enthalten')
-		return '','',''
+	# neu ab19.04.2018: Videos ab heute auch ohne uurl-Pfad möglich, Code einschl. Abbruch entfernt 
 	
 	ptmd_player = 'ngplayer_2_3'
 	videodat_url = stringextract('ptmd-template": "', '",', request_part)
@@ -3843,7 +3841,7 @@ def get_formitaeten(sid, ID=''):
 	videodat_url = 'https://api.zdf.de' + videodat_url
 	# videodat_url = 'https://api.zdf.de/tmd/2/portal/vod/ptmd/mediathek/'  	# unzuverlässig
 	# videodat_url = videodat_url + videodat
-	Log('old_videodat_url: ' + old_videodat_url); Log('videodat_url: ' + videodat_url); Log('uurl: ' + videodat); 	
+	Log('old_videodat_url: ' + old_videodat_url); Log('videodat_url: ' + videodat_url); 	
 
 	# ab 28.05.2017: Verwendung JSON.ObjectFromURL - Laden mittels urllib2.urlopen + ssl.SSLContext entbehrlich
 	#	damit entfällt auch die Plattformunterscheidung Linux/Windows sowie die Nutzung einer Zertifikatsdatei (V3.0.2. 15.05.2017)

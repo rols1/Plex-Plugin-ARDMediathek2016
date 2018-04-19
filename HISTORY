@@ -3,6 +3,9 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
+19.04.2018 3.5.7	ZDF (Videos nicht mehr verfügbar): Anpassung an Änderungen in der json-Datei in 
+			get_formitaeten.	
+
 11.03.2018 3.5.6	PHT-Fix (Ausfall ARD-Videos): in Callbacks für CreateVideoClipObject Leerstring '' für
  			tagline ersetzt durch 'leer' (Stammhalter für PHT, ersetzt in CreateVideoClipObject 
  			durch ' ').
