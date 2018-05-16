@@ -3,6 +3,15 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
+16.05.2018 3.5.8	Pod_Content.py | Scheme_ndr: Seiten ohne Seitenkontrolle berücksichtigt. 
+			Pod_Content.py | Scheme_br_online: umgestellt auf Archivdaten https://www.br.de/mediathek,
+			Auswertung via API-Seite https://www.br.de/mediathek/podcast/api/podcasts/..
+			Pod_Content.py | Scheme_swr3: img fixed, Url Tatort-mit-Til aktualisiert.
+			livesenderRadio.xml: Url der Radiosender von HTTP auf HTTPS geändert.
+			Funktion unescape: erweitert mit "&shy;" -> "".
+			Menü Einstellungen ersetzt durch Info-Button (Störungsmeldungen), Icon plugin-preferences.png
+			ersetzt durch icon-info.png, Funktion Main_Options entfernt (obsolet). 
+			
 19.04.2018 3.5.7	ZDF (Videos nicht mehr verfügbar): Anpassung an Änderungen in der json-Datei in 
 			get_formitaeten.	
 

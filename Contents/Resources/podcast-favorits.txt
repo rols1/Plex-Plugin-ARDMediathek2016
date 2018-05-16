@@ -13,14 +13,15 @@
 #   -------------------------------------------------
 #	Unterstützte Seiten/Sender - weitere Auswahl dort:	
 #			
-#		www.ardmediathek.de/radio			http://www.ardmediathek.de/radio
-#		www.br-online.de					http://www.br-online.de/podcast/index.shtml
-#		www.swr3.de/mehr/podcasts			https://www.swr3.de/mehr/podcasts/-/id=279178/1hsl7ys/index.html
-#		www.deutschlandfunk.de				http://www.deutschlandfunk.de/podcasts.2516.de.html?drpp%3Ahash=displayAllBroadcasts
-#		mediathek.rbb-online.de				http://mediathek.rbb-online.de/radio (Seitendene: NEUESTE CLIPS, MEISTABGERUFEN)
-#		www1.wdr.de/mediathek/podcast		http://www1.wdr.de/mediathek/podcast  (Achtung: in "WDR Fernsehen Podcasts" nur Videos)
-#		www1.wdr.de/mediathek/audio			http://www1.wdr.de/mediathek/audio
-#		www.ndr.de/radio/podcasts			http://www.ndr.de/radio/podcasts/   (nur: NDR2)
+#		www.ardmediathek.de/radio	http://www.ardmediathek.de/radio
+#		www.br-online.de		http://www.br-online.de/podcast/index.shtml
+#		www.br.de/mediathek/podcast	https://www.br.de/mediathek/podcast/podcasts/..
+#		www.swr3.de/mehr/podcasts	https://www.swr3.de/mehr/podcasts/-/id=279178/1hsl7ys/index.html
+#		www.deutschlandfunk.de		http://www.deutschlandfunk.de/podcasts.2516.de.html?drpp%3Ahash=displayAllBroadcasts
+#		mediathek.rbb-online.de		http://mediathek.rbb-online.de/radio (Seitendene: NEUESTE CLIPS, MEISTABGERUFEN)
+#		www1.wdr.de/mediathek/podcast	http://www1.wdr.de/mediathek/podcast  (Achtung: in "WDR Fernsehen Podcasts" nur Videos)
+#		www1.wdr.de/mediathek/audio	http://www1.wdr.de/mediathek/audio
+#		www.ndr.de/radio/podcasts	http://www.ndr.de/radio/podcasts/   (nur: NDR2)
 #
 #	
 #	-------------------------------------------------
@@ -29,15 +30,15 @@
 #-------------------------------------------------------------------------------------------------------------------------------------
  
 ## Magazine          
-Dossier Politik - Bayern 2  			| http://www.br-online.de/podcast/mp3-download/bayern2/mp3-download-podcast-dossier-politik.shtml
-IQ - Wissenschaft und Forschung - Bayern 2  	| http://www.br-online.de/podcast/mp3-download/bayern2/mp3-download-podcast-iq.shtml
-radioWissen - Bayern 2  			| http://www.br-online.de/podcast/mp3-download/bayern2/mp3-download-podcast-radiowissen.shtml
-Das Campusmagazin - B5 aktuell  		| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-campusmagazin.shtml
-Das Computermagazin - B5 aktuell  		| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-computermagazin.shtml
-Das Gesundheitsmagazin - B5 aktuell 		| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-gesundheitsmagazin.shtml
-Das Verbrauchermagazin - B5 aktuell 		| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-verbrauchermagazin.shtml
-Magazin für Wirtschaft und Soziales - B5 aktuell| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-magazin-fuer-wirtschaft-und-soziales.shtml
-Aus Wissenschaft und Technik - B5 aktuell 	| http://www.br-online.de/podcast/mp3-download/b5aktuell/mp3-download-podcast-aus-wissenschaft-und-technik.shtml
+Dossier Politik - Bayern 2  			| https://www.br.de/mediathek/podcast/podcasts/dossier-politik/archiv/684
+IQ - Wissenschaft und Forschung - Bayern 2  	| https://www.br.de/mediathek/podcast/podcasts/iq-wissenschaft-und-forschung/archiv/651
+radioWissen - Bayern 2  			| https://www.br.de/mediathek/podcast/podcasts/radiowissen/archiv/488
+Das Campusmagazin - B5 aktuell  		| https://www.br.de/mediathek/podcast/podcasts/das-campusmagazin/archiv/634
+Das Computermagazin - B5 aktuell  		| https://www.br.de/mediathek/podcast/podcasts/das-computermagazin/archiv/576
+Das Gesundheitsmagazin - B5 aktuell 		| https://www.br.de/mediathek/podcast/podcasts/das-gesundheitsmagazin/archiv/628
+Das Verbrauchermagazin - B5 aktuell 		| https://www.br.de/mediathek/podcast/podcasts/das-verbrauchermagazin/archiv/489
+Magazin für Wirtschaft und Soziales - B5 aktuell| https://www.br.de/mediathek/podcast/podcasts/magazin-fuer-wirtschaft-und-soziales/archiv/498
+Aus Wissenschaft und Technik - B5 aktuell 	| 
 
 WDR 5 Leonardo Service Computer			| http://www1.wdr.de/mediathek/audio/wdr5/wdr5-leonardo-service-computer/service_computer100.podcast         
 
@@ -46,7 +47,7 @@ Dossier - Deutschlandfunk				| http://www.deutschlandfunk.de/podcast-dossier.117
 Forschung Aktuell - Deutschlandfunk		| http://www.deutschlandfunk.de/podcast-forschung-aktuell.677.de.podcast.xml
 
 ## Kabarett / Humor
-Tatort mit Til Schweiger				| https://www.swr3.de/mehr/podcasts/Tatort-mit-Til/-/id=279178/did=1442354/1p9bh1o/index.html
+Tatort mit Til Schweiger				| https://www.swr3.de/podcasts/Tatort-mit-Til/-/id=279178/did=1442354/1p9bh1o/index.html
 ARD Radio Kabarett & Comedy				| http://www.ardmediathek.de/radio/Kabarett-Comedy/mehr?documentId=37915182
 Wir sind die Freeses					| http://www.ndr.de/ndr2/wir_sind_die_freeses/podcast4250_page-1.html
 

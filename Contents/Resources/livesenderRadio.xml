@@ -1,9 +1,9 @@
 <channels>
  <channels_info>
   <title>Radio-Livestreams</title>
-  <link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&amp;kanal=Alle</link>
+  <link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&amp;kanal=Alle</link>
   <thumbnail>Icon-ARDRadio.png</thumbnail>
-  <date>11.10.2017</date>
+  <date>07.05.2018</date>
   <note>ab 11.10.2017 Ermittlung der Sendernamen via Web ("headline") - Plugin sucht hier das passende Icon</note>
  </channels_info>
  
@@ -14,7 +14,7 @@
 <items>
 	<item>
 		<title>BR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=508</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=508</link>
 		<thumbnail>radio-br.png</thumbnail>
 		<sender>B5 aktuell:radio-b5-aktuell.png|B5 plus:radio-b5-plus.png|Bayern 3:radio-bayern3.png|
 			BR Heimat:radio-br-heimat.png|BR-KLASSIK:radio-br-klassik.png|Bayern 1:radio-bayern1.png|
@@ -23,7 +23,7 @@
 	</item>
 	<item>
 		<title>HR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=750</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=750</link>
 		<thumbnail>radio-hr.png</thumbnail>
 		<sender>hr-iNFO:radio-hr-info.png|hr1:radio-hr1.png|hr2-kultur:radio-hr2.png|
 			hr3:radio-hr3.png|hr4:radio-hr4.png|YOU-FM:radio-you-fm.png</sender>			
@@ -31,7 +31,7 @@
 	</item>
 	<item>
 		<title>mdr</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=620</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=620</link>
 		<thumbnail>radio-mdr.png</thumbnail>
 		<sender>MDR AKTUELL:radio-mdr-aktuell.png|MDR JUMP:radio-mdr-jump.png|MDR KLASSIK:radio-mdr-klassik.png|
 			MDR KULTUR:radio-mdr-kultur.png|MDR SACHSEN:radio-mdr1-sachsen.png|MDR Sachsen-Anhalt:radio-mdr1-sachsen-anhalt.png|
@@ -40,7 +40,7 @@
 	</item>
 	<item>
 		<title>NDR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=680</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=680</link>
 		<thumbnail>radio-ndr.png</thumbnail>
 		<sender>NDR Blue:radio-ndr-blue.png|NDR Info:radio-ndr-info.png|NDR Info Spezial:radio-ndr-info-spezial.png|
 			NDR Kultur:radio-ndr-kultur.png|NDR Plus:radio-ndr-plus.png|NDR 1 Niedersachsen:radio-ndr1-niedersachsen.png|
@@ -50,7 +50,7 @@
 	</item>
 	<item>
 		<title>Radio Bremen</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=1116</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=1116</link>
 		<thumbnail>radio-radio-bremen.png</thumbnail>
 		<sender>Bremen Eins:radio-bremen-eins.png|bremen NEXT:radio-bremen-next.png|
 			Bremen Vier:radio-bremen-vier.png|Bremen Zwei:radio-bremen-zwei.png</sender>			
@@ -58,7 +58,7 @@
 	</item>
 	<item>
 		<title>RBB</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=570</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=570</link>
 		<thumbnail>radio-rbb.png</thumbnail>
 		<sender>Antenne Brandenburg:radio-antenne-brandenburg.png|Fritz:radio-rbb-fritz.png|Inforadio:radio-rbb-inforadio.png|
 			kulturradio:radio-rbb-kulturradio.png|radioBERLIN 88,8:radio-rbb-radio-berlin.png|radioeins:radio-rbb-radio-eins.png</sender>			
@@ -66,7 +66,7 @@
 	</item>
 	<item>
 		<title>SR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=1128</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=1128</link>
 		<thumbnail>radio-sr.png</thumbnail>
 		<sender>AntenneSaar:radio-antennesaar.png|SR 1:radio-sr1.png|SR 2 KulturRadio:radio-sr2.png|
 			SR 3 Saarlandwelle:radio-sr3.png|103.7 UnserDing:radio-unser-ding.png</sender>	
@@ -74,7 +74,7 @@
 	</item>
 	<item>
 		<title>SWR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=728</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=728</link>
 		<thumbnail>radio-swr.png</thumbnail>
 		<sender>DASDING:radio-dasding.png|SWR Aktuell:radio-swr-info.png|SWR1 Baden-Württemberg:radio-swr1.png|
 			SWR1 Rheinland-Pfalz:radio-swr1.png|SWR2:radio-swr2.png|SWR3:radio-swr3.png|
@@ -83,7 +83,7 @@
 	</item>
 	<item>
 		<title>WDR</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=638</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=638</link>
 		<thumbnail>radio-wdr.png</thumbnail>
 		<sender>Cosmo:radio-wdr-cosmo.png|WDR Event:radio-wdr-event.png|WDR 2:radio-wdr2.png|
 			WDR 3:radio-wdr3.png|WDR 4:radio-wdr4.png|WDR 5:radio-wdr5.png|KiRaKa:radio-kiraka.png|
@@ -92,7 +92,7 @@
 	</item>
 	<item>
 		<title>Deutschlandradio</title>
-		<link>http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=21475696</link>
+		<link>https://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=21475696</link>
 		<thumbnail>radio-dradio.png</thumbnail>
 		<sender>Deutschlandfunk Kultur:radio-dradio-kultur.png|Deutschlandfunk:radio-deutschlandfunk.png|
 			Deutschlandfunk Nova:radio-dradio-nova.png</sender>		

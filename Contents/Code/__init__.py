@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.7'		# Wechsel: update_single_files löschen/leeren
-VDATE = '19.04.2018'
+VERSION =  '3.5.8'		# Wechsel: update_single_files löschen/leeren
+VDATE = '07.05.2018'
 
 # 
 #	
@@ -66,8 +66,6 @@ ICON_MAIN_TVLIVE 		= 'tv-livestreams.png'
 ICON_MAIN_RADIOLIVE 	= 'radio-livestreams.png' 	
 ICON_MAIN_UPDATER 		= 'plugin-update.png'		
 ICON_UPDATER_NEW 		= 'plugin-update-new.png'
-ICON_PREFS 				= 'plugin-preferences.png'
-
 
 ICON_ARD_AZ 			= 'ard-sendungen-az.png'
 ICON_ARD_VERP 			= 'ard-sendung-verpasst.png'			
@@ -109,6 +107,7 @@ ICON_POD_FAVORITEN		= 'pod-favoriten.png'
 
 
 ICON_OK 				= "icon-ok.png"
+ICON_INFO 				= "icon-info.png"
 ICON_WARNING 			= "icon-warning.png"
 ICON_NEXT 				= "icon-next.png"
 ICON_CANCEL 			= "icon-error.png"
@@ -296,12 +295,11 @@ def Main():
 		tagline='Bezugsquelle: ' + repo_url			
 		oc.add(DirectoryObject(key=Callback(SearchUpdate, title='Plugin-Update'), 
 			title=title, summary=summary, tagline=tagline, thumb=R(ICON_MAIN_UPDATER)))
-		
-	oc.add(DirectoryObject(key = Callback(Main_Options, title='Einstellungen'), title = 'Einstellungen', 
-		summary = 'ein-/ausschalten: EPG-Daten, Downloads, Podcasts, Update anzeigen,.. ', 
-		tagline = 'Verzeichniseinträge bitte im Webplayer (Zahnradsymbol) vornehmen'.decode(encoding="utf-8"),
-		thumb = R(ICON_PREFS)))
-				
+
+	# Menü Einstellungen (obsolet) ersetzt durch Info-Button
+	summary = 'Störungsmeldungen an Forum oder rols1@gmx.de'.decode(encoding="utf-8")
+	oc.add(DirectoryObject(key = Callback(Main), title = 'Info', summary = summary, thumb = R(ICON_INFO)))
+						
 	return oc
 	
 #----------------------------------------------------------------
@@ -472,135 +470,7 @@ def home(cont, ID):												# Home-Button, Aufruf: oc = home(cont=oc, ID=NAME
 	return cont
 	
 ####################################################################################################
-@route(PREFIX + '/Main_Options')
-# DumbTools (https://github.com/coder-alpha/DumbTools-for-Plex) getestet, aber nicht verwendet - wiederholte 
-#	Aussetzer bei Aufrufen nach längeren Pausen (mit + ohne secure-Funktion) - Textfelder werden daher hier in
-#		den Main_Options nicht unterstützt (Eingabe aber Plex-intern z.B. im Web-Player möglich)
-#	Framework: code/preferences.py
 
-def Main_Options(title):
-	Log('Funktion Main_Options')	
-	# Log(Prefs['pref_use_epg']); 
-	
-	# hier zeigt Plex die Einstellungen (Entwicklervorgabe in DefaultPrefs.json):
-	# 	http://127.0.0.1:32400/:/plugins/com.plexapp.plugins.ardmediathek2016/prefs
-	#	geänderte Daten legt Plex persistent ab (nicht in DefaultPrefs.json) - Löschen nur 
-	#	möglich mit Löschen des Caches (Entfernen ../Caches/com.plexapp.plugins.ardmediathek2016)
-	myplugin = Plugin.Identifier
-	data = HTTP.Request("%s/:/plugins/%s/prefs" % (myhost, myplugin), # als Text, nicht als HTML-Element
-						immediate=True).content 
-	
-	# Zeilenaufbau
-	#	1. Zeile "<?xml version='1.0' encoding='utf-8'?>"
-	#	2. Zeile (..identifier="com.plexapp.plugins.ardmediathek2016"..) 
-	#   ab 3.Zeile Daten
-	# Log(data)
-	myprefs = data.splitlines() 
-	Log(myprefs)
-	myprefs = myprefs[2:-1]		# letzte Zeile + Zeilen 1-2 entfernen 
-		
-	oc = ObjectContainer(no_cache=True, view_group="InfoList", title1='Einstellungen')
-	oc = home(cont=oc, ID=NAME)				# Home-Button - in den Untermenüs Rücksprung hierher zu Einstellungen 
-	for i in range (len(myprefs)):
-		do = DirectoryObject()
-		summary = ''
-		element = myprefs[i]		# Muster: <Setting secure="false" default="true" value="true" label=...
-		Log(element)
-		secure = stringextract('secure=\"', '\"', element)		# nicht verwendet
-		default = stringextract('default=\"', '\"', element)	# Vorgabe
-		id = stringextract('id=\"', '\"', element)
-		value = stringextract('value=\"', '\"', element)		# akt. Wert (hier nach dem Setzen nicht mehr aktuell)
-		pref_value = Prefs[id]									# akt. Wert via Prefs - OK
-		label = stringextract('label=\"', '\"', element)
-		values = stringextract('values=\"', '\"', element)
-		mytype = stringextract('type=\"', '\"', element)
-		Log(secure);Log(default);Log(label);Log(values);Log(mytype); Log(id);
-		Log(pref_value);
-		if mytype == 'bool':										# lesbare Anzeige (statt bool, true, false)
-			#oc_type = '| JA / NEIN | aktuell: '
-			if str(pref_value).lower() == 'true':
-				oc_wert = 'JA'
-				oc_type = '| für NEIN  klicken | aktuell: '
-			else:
-				oc_wert = 'NEIN'
-				oc_type = '| für JA  klicken | aktuell: '
-		if mytype == 'enum':
-			#oc_type = '|  Aufzählung | aktuell: '
-			oc_type = '|  für Liste klicken | aktuell: '
-			oc_wert = pref_value
-		if mytype == 'text':
-			oc_type = '| aktuell: '
-			oc_wert = pref_value
-		title = u'%s  %s  %s' % (label, oc_type, oc_wert)
-		title = title.decode(encoding="utf-8", errors="ignore")
-		summary = 'zum Ändern bitte Webplayer benutzen (Zahnradsymbol)'
-		summary = summary.decode(encoding="utf-8", errors="ignore")
-		tagline = 'an dieser Stelle ist keine Texteingabe möglich'
-		tagline = tagline.decode(encoding="utf-8", errors="ignore")
-		Log(title); Log(mytype)
-
-		if mytype == 'bool':
-			Log('mytype == bool')	
-			do.key = Callback(Set, key=id, value=not Prefs[id], oc_wert=not Prefs[id]) 	# Wert direkt setzen (groß/klein egal)		
-		if mytype == 'enum':
-			do.key = Callback(ListEnum, id=id, label=label, values=values)			# Werte auflisten
-		elif mytype == 'text':
-			Log(title); Log(id)									# Eingabefeld für neuen Wert (Player-abhängig)
-			#continue											# Textfelder hier nicht unterstützt			
-			do.key = Callback(Main_Options, title='Einstellungen')  # nur Anzeige
-			do.summary = summary
-			do.tagline = tagline
-			
-		do.title = title		
-		oc.add(do)			
-		
-	return oc
-#------------
-@route(PREFIX + '/ListEnum')
-def ListEnum(id, label, values):
-	Log(ListEnum); Log(id); 
-	label = label.decode(encoding="utf-8", errors="ignore")
-	oc = ObjectContainer(no_cache=True, view_group="InfoList", title1=label)	
-	title = 'zurück zu den Einstellungen'.decode(encoding="utf-8", errors="ignore")		# statt Home-Button	
-	oc.add(DirectoryObject(key = Callback(Main_Options, title=title), title = title, 
-		summary = title, 
-		thumb = R(ICON_PREFS)))
-	values = values.split('|') 
-	Log(values);
-	for i in range(len(values)):
-		pref = values[i]
-		pref = unescape(pref)
-		oc_wert = pref
-		Log('value: ' + str(i) + ' Wert: ' + oc_wert)
-		oc.add(DirectoryObject(key=Callback(Set, key=id, value=i, oc_wert=oc_wert), title = u'%s' % (pref)))				
-	return oc
-#------------
-@route(PREFIX + '/SetText')
-def SetText(query, id):
-	if query == None:
-		query=''
-	return Set(key=id, value=query, oc_wert=query)
-#------------
-@route(PREFIX + '/Set')
-def Set(key, value, oc_wert):
-	Log('Set: key, value ' + key + ', ' + value); 
-	#oc_wert = value
-	if str(value).lower() == 'true':
-		oc_wert = 'JA'
-	if str(value).lower() == 'false':
-		oc_wert = 'NEIN'
-
-	oc = ObjectContainer(no_cache=True, view_group="InfoList", title1='eingestellt auf: ' + oc_wert)	
-	title = 'zurück zu den Einstellungen'.decode(encoding="utf-8", errors="ignore")		# statt Home-Button	
-	oc.add(DirectoryObject(key = Callback(Main_Options, title=title), title = title, 
-		summary = title, 
-		thumb = R(ICON_PREFS)))
-	
-	# Bsp.: http://127.0.0.1:32400/:/plugins/com.plexapp.plugins.ardmediathek2016/prefs/set?pref_use_epg=True
-	HTTP.Request("%s/:/plugins/%s/prefs/set?%s=%s" % (myhost, Plugin.Identifier, key, value), immediate=True)
-	#return ObjectContainer()
-	return oc
-#--------------------------------
 def ValidatePrefs():
 	Log('ValidatePrefs')
 	# Dict.Save()	# n.b. - Plex speichert in Funktion Set, benötigt trotzdem Funktion ValidatePrefs im Plugin
@@ -3833,7 +3703,7 @@ def get_formitaeten(sid, ID=''):
 	old_videodat_url = 'https://api.zdf.de' + video_ptmd					# 4. Videodaten ermitteln
 	Log(old_videodat_url)	
 	# neu ab 20.1.2016: uurl-Pfad statt ptmd-Pfad ( ptmd-Pfad fehlt bei Teilvideos)
-	# neu ab19.04.2018: Videos ab heute auch ohne uurl-Pfad möglich, Code einschl. Abbruch entfernt 
+	# neu ab19.04.2018: Videos ab heute auch ohne uurl-Pfad möglich, Code einschl. Abbruch entfernt - s.a. KIKA_und_tivi.
 	
 	ptmd_player = 'ngplayer_2_3'
 	videodat_url = stringextract('ptmd-template": "', '",', request_part)
