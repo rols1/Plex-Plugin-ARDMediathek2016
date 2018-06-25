@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Pod_content.py	- Aufruf durch __init__.py/PodFavoritenListe 
 #
-# Die Funktionen dienen zur Auswertung von Podcasts außerhalb www.ardmediathek.de/radio
+# Die Funktionen dienen der Auswertung von Podcasts außerhalb www.ardmediathek.de/radio
 # Basis ist die Liste podcast-favorits.txt (Default/Muster im Ressourcenverzeichnis), die
 # 	Liste enthält weitere  Infos zum Format und zu bereits unterstützten Podcast-Seiten
 # 	- siehe nachfolgende Liste Podcast_Scheme_List

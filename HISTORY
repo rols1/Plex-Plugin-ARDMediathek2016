@@ -3,6 +3,12 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
+25.06.2018 3.5.9	DownloadExtern: für curl Parameter -k (keine Zertifikateprüfung) hinzugefügt. Erforderlich 
+			wg. curl-Problem mit dem Systemzertifikat auf manchen Systemen.
+			Deko-Suche-Button auf Web-Cients beschränkt Main_ARD, Main_ZDF) - für 
+			andere Clients unnötig.	
+			Main: im Info-Button Link zum Forum hinzugefügt. 
+
 16.05.2018 3.5.8	Pod_Content.py | Scheme_ndr: Seiten ohne Seitenkontrolle berücksichtigt. 
 			Pod_Content.py | Scheme_br_online: umgestellt auf Archivdaten https://www.br.de/mediathek,
 			Auswertung via API-Seite https://www.br.de/mediathek/podcast/api/podcasts/..

@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.8'		# Wechsel: update_single_files löschen/leeren
-VDATE = '07.05.2018'
+VERSION =  '3.5.9'		# Wechsel: update_single_files löschen/leeren
+VDATE = '25.06.2018'
 
 # 
 #	
@@ -170,7 +170,7 @@ ZDF_BASE				= 'https://www.zdf.de'
 # ZDF_Search_PATH: siehe ZDF_Search, ganze Sendungen, sortiert nach Datum, bei Bilderserien ohne ganze Sendungen
 ZDF_SENDUNG_VERPASST 	= 'https://www.zdf.de/sendung-verpasst?airtimeDate=%s'  # Datumformat 2016-10-31
 ZDF_SENDUNGEN_AZ		= 'https://www.zdf.de/sendungen-a-z?group=%s'			# group-Format: a,b, ... 0-9: group=0+-+9
-ZDF_WISSEN				='https://www.zdf.de/doku-wissen'						# Basis für Ermittlung der Rubriken
+ZDF_WISSEN				= 'https://www.zdf.de/doku-wissen'						# Basis für Ermittlung der Rubriken
 ZDF_SENDUNGEN_MEIST		= 'https://www.zdf.de/meist-gesehen'
 ZDF_BARRIEREARM			= 'https://www.zdf.de/barrierefreiheit-im-zdf'
 
@@ -229,7 +229,6 @@ def Main():
 			
 	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art)	# Plex akzeptiert nur InfoList + List, keine
 																			# Auswirkung auf Wiedergabe im Webplayer																																						
-	# folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
 	oc.add(DirectoryObject(key=Callback(Main_ARD, name="ARD Mediathek"), title="ARD Mediathek",
 		summary='', tagline='TV', thumb=R(ICON_MAIN_ARD)))
 		
@@ -298,6 +297,7 @@ def Main():
 
 	# Menü Einstellungen (obsolet) ersetzt durch Info-Button
 	summary = 'Störungsmeldungen an Forum oder rols1@gmx.de'.decode(encoding="utf-8")
+	tagline = 'Forum: https://forums.plex.tv/discussion/213947/rel-plex-plugin-ardmediathek2016#latest'
 	oc.add(DirectoryObject(key = Callback(Main), title = 'Info', summary = summary, thumb = R(ICON_INFO)))
 						
 	return oc
@@ -310,9 +310,11 @@ def Main_ARD(name):
 	oc = home(cont=oc, ID=NAME)							# Home-Button
 		
 	
-	# Web-Player: folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
-	oc.add(DirectoryObject(key=Callback(Main_ARD, name=name),title='Suche: im Suchfeld eingeben', 
-		summary='', tagline='TV', thumb=R(ICON_SEARCH)))
+	if 'Web' in str(Client.Product):
+		# Web-Player: folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
+		oc.add(DirectoryObject(key=Callback(Main_ARD, name=name),title='Suche: im Suchfeld eingeben', 
+			tagline='TV', thumb=R(ICON_SEARCH)))
+			
 	oc.add(InputDirectoryObject(key=Callback(Search,  channel='ARD', s_type='video', title=u'%s' % L('Search Video')),
 		title=u'%s' % L('Search'), prompt=u'%s' % L('Search Video'), thumb=R(ICON_SEARCH)))
 		
@@ -370,9 +372,10 @@ def Main_ZDF(name):
 	oc = ObjectContainer(view_group="InfoList", art=ObjectContainer.art, title1=name)	
 	oc = home(cont=oc, ID=NAME)								# Home-Button	
 	
-	# folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
-	oc.add(DirectoryObject(key=Callback(Main_ZDF, name=name),title='Suche: im Suchfeld eingeben', 
-		summary='', tagline='TV', thumb=R(ICON_ZDF_SEARCH)))
+	if 'Web' in str(Client.Product):
+		# folgendes DirectoryObject ist Deko für das nicht sichtbare InputDirectoryObject dahinter:
+		oc.add(DirectoryObject(key=Callback(Main_ZDF, name=name),title='Suche: im Suchfeld eingeben', 
+			summary='', tagline='TV', thumb=R(ICON_ZDF_SEARCH)))
 	oc.add(InputDirectoryObject(key=Callback(ZDF_Search, s_type='video', title=u'%s' % L('Search Video')),
 		title=u'%s' % L('Search'), prompt=u'%s' % L('Search Video'), thumb=R(ICON_ZDF_SEARCH)))
 		
@@ -1491,12 +1494,15 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 
 		# 08.06.2017 wget-Alternative wg. curl-Problem auf Debian-System (Forum: 
 		#	https://forums.plex.tv/discussion/comment/1454827/#Comment_1454827
+		# 25.062018 Parameter -k (keine Zertifikateprüfung) erforderlich wg. curl-Problem
+		#	mit dem Systemzertifikat auf manchen Systemen.
+		# Debug curl: --trace file anhängen. 
 		#
 		# http://stackoverflow.com/questions/3516007/run-process-and-dont-wait
 		#	creationflags=DETACHED_PROCESS nur unter Windows
 		if AppPath.find('curl') > 0:									# curl-Call
-			Log('%s %s %s %s' % (AppPath, url, "-o", curl_fullpath))	
-			sp = subprocess.Popen([AppPath, url, "-o", curl_fullpath])	# OK, wartet nicht (ohne p.communicate())
+			Log('%s %s %s %s %s' % (AppPath, url, "-o", curl_fullpath, "-k"))	
+			sp = subprocess.Popen([AppPath, url, "-o", curl_fullpath, "-k"])	# OK, wartet nicht (ohne p.communicate())
 			# sp = subprocess.Popen([AppPath, url, "-N", "-o", curl_fullpath])	# Buffering für curl abgeschaltet
 		else:															# wget-Call
 			Log('%s %s %s %s %s %s' % (AppPath, "--no-use-server-timestamps", "-q", "-O", curl_fullpath, url))	
