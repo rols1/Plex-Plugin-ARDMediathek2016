@@ -31,6 +31,7 @@ def page(name, path, offset):
 		teasertext =  stringextract('class="teasertext">', '</a></p>', rec)
 		# Log(teasertext)
 		teasertext = cleanhtml(teasertext)
+		teasertext = unescape(teasertext)
 		teasertext = teasertext.replace('Bild lädt...', '')
 		summ = teasertext
 		title = cleanhtml(title)
@@ -52,7 +53,8 @@ def page(name, path, offset):
 #-----------------------
 @route(PREFIX + '/Hub')	# einzelne Bilderserie ARD
 def Hub(title, path):		
-	Log('Hub')
+	Log('Hub: %s' % path)
+	title = title.decode(encoding="utf-8")
 	oc = ObjectContainer(title2=title.decode(encoding="utf-8"), art = ObjectContainer.art)
 	
 	page = HTTP.Request(path).content				# 1. Seite laden
@@ -66,7 +68,7 @@ def Hub(title, path):
 		href_rec, summ_rec, picnr_rec, cr_rec = get_pics_br(page)
 	if '//www.radiobremen.de' in path:			# Schema Bremen
 		href_rec, summ_rec, picnr_rec, cr_rec = get_pics_bremen(page)
-	if '//swr.de' in path:						# Schema Südwestfunk
+	if 'swr.de' in path:						# Schema Südwestfunk	//www.swr.de, //swr.de
 		href_rec, summ_rec, picnr_rec, cr_rec = get_pics_swr(page)
 	if '//www.daserste.de' in path:			# Schema Das Erste
 		href_rec, summ_rec, picnr_rec, cr_rec = get_pics_daserste(page)
@@ -225,8 +227,9 @@ def get_pics_swr(page):		# extrahiert Bildergalerie aus SWR-Seite
 	Log('get_pics_swr')
 	href_rec=[]; summ_rec=[]; picnr_rec=[]; cr_rec=[]
 
-	page =  stringextract('bildgalerie-scroll-box', '</ul>',page)
-	records = blockextract('<li><img',  page)
+	page1 =  stringextract('bildgalerie-scroll-box', '</ul>',page)
+	records = blockextract('<li><img',  page1)
+	Log('records: ' + str(len(records)))
 	
 	i=0
 	for rec in records:	
@@ -241,7 +244,47 @@ def get_pics_swr(page):		# extrahiert Bildergalerie aus SWR-Seite
 		Log(pic_nr); Log(summ); Log(pic_href);
 		href_rec.append(pic_href); summ_rec .append(summ); picnr_rec.append(pic_nr); cr_rec.append(cr)
 		i=i+1
-	
+		
+	if len(href_rec) == 0:						# 2. Variante, Blöcke data-ctrl-gallerylayoutable
+		records = blockextract('data-ctrl-gallerylayoutable',  page)
+		Log('records: ' + str(len(records)))		
+		for rec in records:	
+			pics = stringextract('<img src', '>',rec)
+			pics = blockextract('https', pics)			# Set verschied. Größen
+			summ = ''
+			try:
+				Log(pics[-1])							# letztes = größtes
+				summ   =  stringextract('teasertext">', '</p>',rec) # kann fehlen, s.o. (alt)
+				pic_href = re.search(r'https(.*)jpg',pics[-1]).group(0)
+			except:
+				continue
+			
+			pic_nr = "%s/%s" % (str(i+1), str(len(records)))
+			if summ == '':
+				summ   =  stringextract('alt="', '"', pics[-1]) 
+			summ   =  unescape(summ)
+			summ = summ.decode(encoding="utf-8")		
+			cr = summ							# Titel: "Bild %s | %s" % (picnr, cr)
+									
+			Log(pic_nr); Log(summ); Log(pic_href);
+			href_rec.append(pic_href); summ_rec .append(summ); picnr_rec.append(pic_nr); cr_rec.append(cr)
+			i=i+1	
+			
+	if len(href_rec) == 0:						# 3. Variante, Blöcke class="mediagallery-backlink"
+		records = blockextract('class="mediagallery-backlink"',  page)
+		Log('records: ' + str(len(records)))
+		for rec in records:	
+			pic_href = stringextract('itemprop="url" href="', '"', rec)
+			pic_nr = "%s/%s" % (str(i+1), str(len(records)))
+			summ   =  stringextract('description">', '<',rec) 	
+			summ   =  unescape(summ.strip())
+			summ = summ.decode(encoding="utf-8")		
+			cr = summ							# Titel: "Bild %s | %s" % (picnr, cr)
+									
+			Log(pic_nr); Log(summ); Log(pic_href);
+			href_rec.append(pic_href); summ_rec .append(summ); picnr_rec.append(pic_nr); cr_rec.append(cr)
+			i=i+1		
+						
 	return href_rec, summ_rec, picnr_rec, cr_rec
 
 #-----------------------
@@ -254,15 +297,22 @@ def get_pics_daserste(page):		# extrahiert Bildergalerie aus Das Erste-Seite
 	
 	i=0
 	for rec in records:	
-		pic_href =  'http://www.daserste.de'+ stringextract('src="', '"', rec)
-		pic_href = pic_href.replace('-bildergaleriethumb.jpg', '-slideshow.jpg') # s. id="grosses_bild"
+		pic_href =   'http://www.daserste.de' + stringextract("'xl':{'src':'", "'", rec)	# img data set
+		Log(pic_href)
+		if  pic_href == 'http://www.daserste.de':
+			pic_href =  'http://www.daserste.de' + stringextract('src="', '"', rec)
+			pic_href = pic_href.replace('-bildergaleriethumb.jpg', '-slideshow.jpg') # s. id="grosses_bild"
+		
 		pic_nr = "%s/%s" % (str(i+1), str(len(records)))
-		summ   =  stringextract('alt="', '"',rec) 	 
+		summ   =  stringextract('teasertext">', '</p>',rec) # kann fehlen, s.o. (alt)
+		summ   =  summ.strip()
+		if summ == '':
+			summ   =  stringextract('alt="', '"',rec) 	 
 		summ   =  unescape(summ)
 		summ = summ.decode(encoding="utf-8")		
 		cr = stringextract('title="', '"',rec) 					# Titel: "Bild %s | %s" % (picnr, cr)
 								
-		Log(pic_nr); Log(summ); Log(pic_href);
+		Log(pic_nr); Log(summ[:40]); Log(pic_href);
 		href_rec.append(pic_href); summ_rec .append(summ); picnr_rec.append(pic_nr); cr_rec.append(cr)
 		i=i+1
 	

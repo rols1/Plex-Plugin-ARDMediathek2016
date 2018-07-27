@@ -3,7 +3,14 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
-25.06.2018 3.5.9	DownloadExtern: für curl Parameter -k (keine Zertifikateprüfung) hinzugefügt. Erforderlich 
+27.07.2018 3.6.0	Podcast-Favoriten | podcast-favorits.txt: Deutschlandfunk-Link für  Dossier Politik aktualisiert.
+			ARD_Bildgalerie.py: Links angepasst für Schema Südwestfunk (//www.swr.de, //swr.de).
+			ARD_Bildgalerie.py | get_pics_swr: 2 Auswertungsvarianten hinzugefügt.
+			ARD_Bildgalerie.py | get_pics_daserste: in ev. vorh. img-Set das größte Bild ermittelt.
+			Funktion blockextract: Wiedergabe blockmark im Log bei Fehlschlag. 
+
+25.06.2018 3.5.9	update_single 15.07.: podcast-favorits.txt | Deutschlandfunk-Link für  Dossier Politik aktualisiert.
+			DownloadExtern: für curl Parameter -k (keine Zertifikateprüfung) hinzugefügt. Erforderlich 
 			wg. curl-Problem mit dem Systemzertifikat auf manchen Systemen.
 			Deko-Suche-Button auf Web-Cients beschränkt Main_ARD, Main_ZDF) - für 
 			andere Clients unnötig.	

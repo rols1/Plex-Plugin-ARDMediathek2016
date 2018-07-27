@@ -20,8 +20,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.5.9'		# Wechsel: update_single_files löschen/leeren
-VDATE = '25.06.2018'
+VERSION =  '3.6.0'		# Wechsel: update_single_files löschen/leeren
+VDATE = '27.07.2018'
 
 # 
 #	
@@ -4096,7 +4096,7 @@ def blockextract(blockmark, mString):  	# extrahiert Blöcke begrenzt durch bloc
 	
 	pos = mString.find(blockmark)
 	if 	mString.find(blockmark) == -1:
-		Log('blockextract: blockmark nicht in mString enthalten')
+		Log('blockextract: blockmark <%s> nicht in mString enthalten' % blockmark)
 		# Log(pos); Log(blockmark);Log(len(mString));Log(len(blockmark));
 		return rlist
 	pos2 = 1

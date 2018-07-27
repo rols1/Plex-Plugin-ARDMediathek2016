@@ -42,8 +42,8 @@ Aus Wissenschaft und Technik - B5 aktuell 	|
 
 WDR 5 Leonardo Service Computer			| http://www1.wdr.de/mediathek/audio/wdr5/wdr5-leonardo-service-computer/service_computer100.podcast         
 
-Computer und Kommunikation				| http://www.deutschlandfunk.de/podcast-computer-und-kommunikation-beitraege.685.de.podcast
-Dossier - Deutschlandfunk				| http://www.deutschlandfunk.de/podcast-dossier.1171.de.podcast.xml
+Computer und Kommunikation			| http://www.deutschlandfunk.de/podcast-computer-und-kommunikation-beitraege.685.de.podcast
+Dossier Politik- Deutschlandfunk		| http://www.deutschlandfunk.de/podcast-der-politik-podcast.3292.de.podcast
 Forschung Aktuell - Deutschlandfunk		| http://www.deutschlandfunk.de/podcast-forschung-aktuell.677.de.podcast.xml
 
 ## Kabarett / Humor
