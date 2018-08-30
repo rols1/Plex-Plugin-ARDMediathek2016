@@ -53,7 +53,7 @@ Funktionen ab Version 2.2.0:
 - Refugee-Radio
 - Podcast-Favoriten (manuell erweiterbar)
 
-#### TV-Live-Streams (11.03.2017: 34 Sender): 
+#### TV-Live-Streams (30.08.2018: 33 Sender), Aufnahmefunktion: 
 - ARD- und ZDF-Sender überregional und regional, einige ausgewählte Privatsender
 
 #### Radio-Live-Streams der ARD:
