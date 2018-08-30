@@ -3,6 +3,22 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
+30.08.2018 3.6.2	Option "Recording TV-Live": Menübutton in TV-Livestreams, Einträge in Einstellungen
+			(Ein/Aus, Aufnahmedauer, ffmpeg-Parameter), Funktionen: TVLiveRecordSender,  LiveRecord.
+			Anpassungen in DownloadsList (Bearbeiten-Button, Icon).
+			Lösung gegen ungewollten Wiedereintritt nach Aufruf ffmpeg: Abgleich Dict['PIDffmpeg']
+			als "Türsteher" in LiveRecord.
+			Lösung gegen ungewollten Wiedereintritt nach Aufruf curl/wget: Abgleich Dict['PIDcurl']
+			als "Türsteher" in DownloadExtern.
+			Anpassungen für PHT in LiveRecord und DownloadExtern.			
+			Eintrag index_1500_av-p.m3u8 in LiveTV_ntv.m3u8 entfernt (nicht mehr verfügbar)
+
+not on Github		Podcast-Favoriten | podcast-favorits.txt: Kurzform für Podcast-Suche eingeführt (Suche
+			in www.ardmediathek.de/radio).
+			Podcast-Suche: "WDR 5 Quarks - Wissenschaft und mehr" ergänzt.
+			Pod_Content.py: Schema ARD für Podcast-Suche in Favoriten angepasst.
+			ZDF_Search: urllib2.quote-Behandlung für Umlaute und Sonderz. im Suchtext.
+
 27.07.2018 3.6.0	Podcast-Favoriten | podcast-favorits.txt: Deutschlandfunk-Link für  Dossier Politik aktualisiert.
 			ARD_Bildgalerie.py: Links angepasst für Schema Südwestfunk (//www.swr.de, //swr.de).
 			ARD_Bildgalerie.py | get_pics_swr: 2 Auswertungsvarianten hinzugefügt.

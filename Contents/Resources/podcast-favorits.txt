@@ -14,6 +14,7 @@
 #	Unterstützte Seiten/Sender - weitere Auswahl dort:	
 #			
 #		www.ardmediathek.de/radio	http://www.ardmediathek.de/radio
+#		www.ardmediathek.de/suche?	https://www.ardmediathek.de/suche?source=radio&sort=date&searchText=Suchtext
 #		www.br-online.de		http://www.br-online.de/podcast/index.shtml
 #		www.br.de/mediathek/podcast	https://www.br.de/mediathek/podcast/podcasts/..
 #		www.swr3.de/mehr/podcasts	https://www.swr3.de/mehr/podcasts/-/id=279178/1hsl7ys/index.html
@@ -22,6 +23,7 @@
 #		www1.wdr.de/mediathek/podcast	http://www1.wdr.de/mediathek/podcast  (Achtung: in "WDR Fernsehen Podcasts" nur Videos)
 #		www1.wdr.de/mediathek/audio	http://www1.wdr.de/mediathek/audio
 #		www.ndr.de/radio/podcasts	http://www.ndr.de/radio/podcasts/   (nur: NDR2)
+#		Podcast-Suche: 			Suchbegriff (sucht in www.ardmediathek.de/radio, Beispiel siehe "WDR 5 Quarks")
 #
 #	
 #	-------------------------------------------------
@@ -41,6 +43,7 @@ Magazin für Wirtschaft und Soziales - B5 aktuell| https://www.br.de/mediathek/p
 Aus Wissenschaft und Technik - B5 aktuell 	| 
 
 WDR 5 Leonardo Service Computer			| http://www1.wdr.de/mediathek/audio/wdr5/wdr5-leonardo-service-computer/service_computer100.podcast         
+WDR 5 Quarks - Wissenschaft und mehr		| Podcast-Suche: Quarks - Wissenschaft und mehr        
 
 Computer und Kommunikation			| http://www.deutschlandfunk.de/podcast-computer-und-kommunikation-beitraege.685.de.podcast
 Dossier Politik- Deutschlandfunk		| http://www.deutschlandfunk.de/podcast-der-politik-podcast.3292.de.podcast

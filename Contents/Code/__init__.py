@@ -5,14 +5,15 @@ import urllib			# urllib.quote(),
 import urllib2			# urllib2.Request
 import ssl				# HTTPS-Handshake
 import os, subprocess 	# u.a. Behandlung von Pfadnamen
+import shlex			# Parameter-Expansion für subprocess.Popen (os != windows)
 import sys				# Plattformerkennung
 import shutil			# Dateioperationen
 import re				# u.a. Reguläre Ausdrücke, z.B. in CalculateDuration
 import time
 import datetime
 import json				# json -> Textstrings
-
 import locale
+
 import updater
 import EPG
 import update_single
@@ -20,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.0'		# Wechsel: update_single_files löschen/leeren
-VDATE = '27.07.2018'
+VERSION =  '3.6.2'		# Wechsel: update_single_files löschen/leeren
+VDATE = '30.08.2018'
 
 # 
 #	
@@ -1437,12 +1438,27 @@ def MakeDetailText(title, summary,tagline,quality,thumb,url):	# Textdatei für D
 # url=Video-/Podcast-Quelle, dest_path=Downloadverz.
 # Bei Verwendung weiterer Videoformate (neben mp4, webm, mp3) Extensionsbehandlung anpassen: hier sowie
 #	DownloadsTools, DownloadsList
+
+# 30.08.2018:
+# Zum Problemen "autom. Wiedereintritt" - auch bei PHT siehe Doku in LiveRecord.
+#	Die Lösungen / Anpassungen für PHT  wurden hier analog umgesetzt. 
 #
+
 def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels curl/wget
 	Log('DownloadExtern: ' + title)
 	Log(url); Log(dest_path); Log(key_detailtxt)
 	title=title.decode(encoding="utf-8", errors="ignore")	
 	
+	if Dict['PIDcurl']:								# ungewollten Wiedereintritt abweisen 
+		Log('PIDcurl: %s' % Dict['PIDcurl'])
+		Log('PIDcurl = %s | Blocking DownloadExtern' % Dict['PIDcurl'])
+		Dict['PIDcurl'] = ''						# löschen für manuellen Aufruf 
+		# Für PHT Info erst hier nach autom. Wiedereintritt nach Popen möglich:
+		title1 = 'curl/wget: Download erfolgreich gestartet'
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Info', message=title1)
+		return DownloadsTools()
+
 	oc = ObjectContainer(view_group="InfoList", title1='curl/wget-Download', art=ICON)
 	oc = home(cont=oc, ID=NAME)					# Home-Button	
 
@@ -1477,7 +1493,10 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 	detailtxt = Dict[key_detailtxt]					
 	storetxt = 'Details zum ' + dtyp +  dfname + ':\r\n\r\n' + detailtxt	
 			
+	Log('Client-Platform: ' + str(Client.Platform))
+	Log(sys.platform)
 	try:
+		Dict['PIDcurl'] = ''
 		Core.storage.save(pathtextfile, storetxt)			# Text speichern
 		
 		AppPath = Prefs['pref_curl_path']
@@ -1485,6 +1504,7 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 		Log(AppPath); Log(i)
 		if AppPath == '' or i == False:
 			msg='Pfad zu curl/wget fehlt oder curl/wget nicht gefunden'
+			Log(msg)
 			return ObjectContainer(header='Error', message=msg)
 			
 		# i = os.access(curl_dest_path, os.W_OK)		# Zielverz. prüfen - nicht relevant für curl/wget
@@ -1494,7 +1514,7 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 
 		# 08.06.2017 wget-Alternative wg. curl-Problem auf Debian-System (Forum: 
 		#	https://forums.plex.tv/discussion/comment/1454827/#Comment_1454827
-		# 25.062018 Parameter -k (keine Zertifikateprüfung) erforderlich wg. curl-Problem
+		# 25.06.2018 Parameter -k (keine Zertifikateprüfung) erforderlich wg. curl-Problem
 		#	mit dem Systemzertifikat auf manchen Systemen.
 		# Debug curl: --trace file anhängen. 
 		#
@@ -1512,9 +1532,15 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 		Log('sp = ' + str(sp))
 	
 		if str(sp).find('object at') > 0:  				# subprocess.Popen object OK
+			Dict['PIDcurl'] = sp.pid					# PID zum Abgleich gegen Wiederholung sichern
+			Log('PIDcurl neu: %s' % Dict['PIDcurl'])
+			Log(msgH)			
 			tagline = 'Zusatz-Infos in Textdatei gespeichert:' + textfile
 			summary = 'Ablage: ' + curl_fullpath
-			summary = summary.decode(encoding="utf-8", errors="ignore")				
+			summary = summary.decode(encoding="utf-8", errors="ignore")	
+			# PHT springt hier zurück an den Funktionskopf - Info dort
+			#if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			#	return ObjectContainer(header='Info', message=msgH)
 			oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Download-Tools', summary=summary, 
 				thumb=R(ICON_OK), tagline=tagline))						
 			return oc				
@@ -1527,6 +1553,9 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 		summary = summary.decode(encoding="utf-8", errors="ignore")
 		Log(summary)		
 		tagline='Download fehlgeschlagen'
+		# bei Fehlschlag gibt PHT die message aus (im Gegensatz zu oben):
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Info', message=tagline)
 		oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Fehler', summary=summary, 
 				thumb=R(ICON_CANCEL), tagline=tagline))		
 		return oc
@@ -1706,14 +1735,16 @@ def DownloadsList():
 				title = fname
 				httpurl = fname							# Berücksichtigung in VideoTools - nicht abspielbar
 				summary = 'Beschreibung fehlt - Abspielen nicht möglich'
-				tagline = 'Sammeldownload  oder Beschreibung gelöscht'
-				thumb = R(ICON_NOTE)
+				tagline = 'Beschreibung fehlt - Beschreibung gelöscht, Sammeldownload oder TVLive-Video'
 				
 			Log(httpurl); Log(tagline); Log(quality); # Log(txt); 			
 			if httpurl.endswith('mp3'):
 				oc_title = 'Bearbeiten: Podcast | ' + title
+				thumb = R(ICON_NOTE)
 			else:
 				oc_title='Bearbeiten: ' + title
+				if thumb == '':							# nicht in Beschreibung
+					thumb = R(ICON_DIR_VIDEO)
 			summary=summary.decode(encoding="utf-8", errors="ignore")
 			tagline=tagline.decode(encoding="utf-8", errors="ignore")
 			title=title.decode(encoding="utf-8", errors="ignore")
@@ -2136,15 +2167,24 @@ def SenderLiveListePre(title, offset=0):	# Vorauswahl: Überregional, Regional, 
 
 	title = 'EPG Alle JETZT'; summary='elektronischer Programmführer'.decode(encoding="utf-8", errors="ignore")
 	oc.add(DirectoryObject(key=Callback(EPG_ShowAll, title=title),  				# EPG-Button All anhängen
-			title=title, thumb=R('tv-EPG-all.png'), summary=summary, tagline='aktuelle Sendungen aller Sender'))				
+			title=title, thumb=R('tv-EPG-all.png'), summary=summary, tagline='aktuelle Sendungen aller Sender'))
+							
 	title = 'EPG Sender einzeln'; summary='elektronischer Programmführer'.decode(encoding="utf-8", errors="ignore")
 	tagline = 'Sendungen für ausgewählten Sender'.decode(encoding="utf-8", errors="ignore")
 	oc.add(DirectoryObject(key=Callback(EPG_Sender, title=title),  					# EPG-Button Einzeln anhängen
-			title=title, thumb=R('tv-EPG-single.png'), summary=summary, tagline=tagline))				
+			title=title, thumb=R('tv-EPG-single.png'), summary=summary, tagline=tagline))
+	
+	if Prefs['pref_LiveRecord']:		
+		title = 'Recording TV-Live'													# TVLiveRecord-Button anhängen
+		duration = Prefs['pref_LiveRecord_duration']
+		duration, laenge = duration.split('/')
+		tagline = Prefs['pref_curl_download_path'] 				
+		oc.add(DirectoryObject(key=Callback(TVLiveRecordSender, title=title),  		
+				title=title, thumb=R('icon-record.png'), summary=laenge, tagline=tagline))
 	return oc
 	
 #-----------------------------------------------------------------------------------------------------
-@route(PREFIX + '/EPG_Sender')		# EPG Vorauswahl, Daten holen in Modul EPG.py, Anzeige in EPG_Show
+@route(PREFIX + '/EPG_Sender')		# EPG SenderListe , EPG-Daten holen in Modul EPG.py, Anzeige in EPG_Show
 def EPG_Sender(title):
 	Log('EPG_Sender')
 	
@@ -2168,6 +2208,139 @@ def EPG_Sender(title):
 			oc.add(DirectoryObject(key=Callback(EPG_ShowSingle, ID=ID, name=title, stream_url=link, pagenr=0),
 				title=title, thumb=R(rec[2]), summary=summ, tagline=''))		
 
+	return oc
+#-----------------------------
+@route(PREFIX + '/TVLiveRecordSender')	
+#	Liste aller TV-Sender wie EPG_Sender, hier mit Aufnahme-Button
+def TVLiveRecordSender(title):
+	Log('TVLiveRecordSender')
+	Log('PID: %s' % Dict['PID'])
+	Log(Prefs['pref_LiveRecord_ffmpegCall'])
+		
+	oc = ObjectContainer(view_group="InfoList", title1='Recording TV-Live', title2='Sender Auswahl', art = ICON)	
+	oc = home(cont=oc, ID=NAME)				# Home-Button	
+	
+	duration = Prefs['pref_LiveRecord_duration']
+	duration, laenge = duration.split('/')
+	duration = duration.strip()
+
+	sort_playlist = get_sort_playlist()		# Senderliste
+	# Log(sort_playlist)
+	for rec in sort_playlist:
+		title 	= rec[0].decode(encoding="utf-8", errors="ignore")
+		link 	= rec[3]
+		title1 	= title + ': Aufnahme starten' 
+		summ 	= 'Aufnahmedauer: %s' 	% laenge
+		tag		= 'Zielverzeichnis: %s' % Prefs['pref_curl_download_path']
+		oc.add(DirectoryObject(key=Callback(LiveRecord, url=link, title=title, duration=duration,
+			laenge=laenge), title=title1, summary=summ,  tagline=tag, thumb=R(rec[2])))
+	
+	return oc
+
+#-----------------------------
+@route(PREFIX + '/LiveRecord')	
+# 30.08.2018 Start Recording TV-Live
+#	Problem: autom. Wiedereintritt hier + erneuter Popen-call nach Rückkehr zu TVLiveRecordSender 
+#		(Ergebnis-Button nach subprocess.Popen, bei PHT vor Ausführung des Buttons)
+#		OS-übergreifender Abgleich der pid problematisch - siehe
+#		https://stackoverflow.com/questions/4084322/killing-a-process-created-with-pythons-subprocess-popen
+#		Der Wiedereintritt tritt sowohl unter Linux als auch Windows auf.
+#		Ursach n.b. - tritt in DownloadExtern mit curl/wget nicht auf.
+#	1. Lösung: Verwendung des psutil-Moduls (../Contents/Libraries/Shared/psutil ca. 400 KB)
+#		und pid-Abgleich Dict['PID'] gegen psutil.pid_exists(pid) - s.u.
+#		verworfen - Modul lässt sich unter Windows nicht laden. Linux OK
+#	2. Lösung: Dict['PIDffmpeg'] wird nach subprocess.Popen belegt. Beim ungewollten Wiedereintritt
+#		wird nach TVLiveRecordSender (Senderliste) zurück gesprungen und Dict['PIDffmpeg'] geleert.
+#		Beim nächsten manuellen Aufruf wird LiveRecord wieder frei gegeben ("Türsteherfunktion").
+#
+#	PHT-Problem: wie in TuneIn2017 (streamripper-Aufruf) sprint PHT bereits vor dem Ergebnis-Buttons (DirectoryObject)
+#		in LiveRecord zurück.
+#		Lösung: Ersatz des Ergebnis-Buttons durch return ObjectContainer. PHT steigt allerdings danach mit 
+#			"GetDirectory failed" aus (keine Abhilfe bisher). Der ungewollte Wiedereintritt findet trotzdem
+#			statt.
+#
+#	Siehe auch verwandtes Problem in TuneIn2017 mit subprocess.Popen für streamripper:
+#		https://forums.plex.tv/t/pht-problem-wrong-jump-after-after-os-functions-in-combination-with-writing-to-dict/212656
+#		Nach den Tests in diesem Plugin scheint die Ursache aber nicht im Dict-Gebrauch zu liegen. Vermutung: Framework-
+#			Problem im Umgang mit subprocess.Popen (Thread-Konflikt?).
+#
+def LiveRecord(url, title, duration, laenge):
+	Log('LiveRecord')
+	Log(url); Log(title); 
+	Log('duration: %s, laenge: %s' % (duration, laenge))
+		
+	if Dict['PIDffmpeg']:								# ungewollten Wiedereintritt abweisen 
+		Log('PIDffmpeg: %s' % Dict['PIDffmpeg'])
+		Log('PIDffmpeg = %s | Blocking LiveRecord' % Dict['PIDffmpeg'])
+		Dict['PIDffmpeg'] = ''							# löschen für manuellen Aufruf 
+		# Für PHT Info erst hier nach autom. Wiedereintritt nach Popen möglich:
+		title1 = 'Aufnahme gestartet: %s' % title
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Info', message=title1)
+		return TVLiveRecordSender(title)
+
+	title2 = 'Recording TV-Live: ' + title
+	oc = ObjectContainer(view_group="InfoList", title1='Sender Auswahl', title2=title2, art = ICON)
+	oc = home(cont=oc, ID=NAME)				# Home-Button
+	
+	if Prefs['pref_curl_download_path'] == None or Prefs['pref_curl_download_path'].strip() == '':
+		title1 	= 'Downloadverzeichnis fehlt in Einstellungen'
+		summ	= 'zur Sender Auswahl'
+		oc.add(DirectoryObject(key=Callback(TVLiveRecordSender, title=title),  		
+				title=title1, thumb=R('icon-error.png'), summary=summ))
+		return oc
+		
+	dest_path = Prefs['pref_curl_download_path']  	# Downloadverzeichnis fuer curl/wget verwenden
+	now = datetime.datetime.now()
+	mydate = now.strftime("%Y-%m-%d_%H-%M-%S")		# Zeitstempel
+	dfname = make_filenames(title)					# Dateiname aus Sendername generieren
+	dfname = "%s_%s.mp4" % (dfname, mydate) 	
+	dest_file = os.path.join(dest_path, dfname)
+	if url.startswith('http') == False:				# Pfad bilden für lokale m3u8-Datei
+		if url.startswith('rtmp') == False:
+			url 	= os.path.join(Dict['R'], url)	# rtmp-Url's nicht lokal
+			url 	= '"%s"' % url						# Pfad enthält Leerz. - für ffmpeg in "" kleiden						
+	
+	cmd = Prefs['pref_LiveRecord_ffmpegCall']	% (url, duration, dest_file)
+	Log(cmd); 
+	
+	Log('Client-Platform: ' + str(Client.Platform))
+	Log(sys.platform)
+	if sys.platform == 'win32':							
+		args = cmd
+	else:
+		args = shlex.split(cmd)							
+
+	try:
+		Dict['PIDffmpeg'] = ''
+		call = subprocess.Popen(args, shell=False)
+		Log('call: ' + str(call))
+
+		if str(call).find('object at') > 0:  			# subprocess.Popen object OK
+			Dict['PIDffmpeg'] = call.pid				# PID zum Abgleich gegen Wiederholung sichern
+			Log('PIDffmpeg neu: %s' % Dict['PIDffmpeg'])
+			title1 = 'Aufnahme gestartet: %s' % dfname
+			summ	= 'zur Sender Auswahl'
+			Log(title1)
+			# PHT springt hier zurück an den Funktionskopf - Info dort
+			#if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			#	return ObjectContainer(header='Info', message=title1)
+			oc.add(DirectoryObject(key=Callback(TVLiveRecordSender, title=title),  		
+					title=title1, thumb=R('icon-ok.png'), summary=summ))				
+			return oc
+	
+	except Exception as exception:
+		msg = str(exception)
+		Log(msg)		
+		title1 = "Fehler: %s" % msg
+		summ	= 'zur Sender Auswahl'
+		# bei Fehlschlag gibt PHT die message aus (im Gegensatz zu oben):
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Info', message=title1)
+		oc.add(DirectoryObject(key=Callback(TVLiveRecordSender, title=title),  		
+				title=title1, thumb=R('icon-error.png'), summary=summ))
+		
+	
 	return oc
 #-----------------------------
 def get_sort_playlist():								# sortierte Playliste der TV-Livesender
@@ -2467,8 +2640,8 @@ def SenderLiveResolution(path, title, thumb, include_container=False):
 				
 		# Auswertung *.m3u8-Datei  (lokal oder extern), Auffüllung Container mit Auflösungen. geoblock bei 
 		# TV-Live nicht verwendet:	
-		oc = Parseplaylist(oc, url_m3u8, thumb, geoblock='')
-		return oc							# (-> CreateVideoStreamObject pro Auflösungstufe)
+		oc = Parseplaylist(oc, url_m3u8, thumb, geoblock='')	# (-> CreateVideoStreamObject pro Auflösungstufe)
+		return oc							
 	else:	# keine oder unbekannte Extension - Format unbekannt
 		return ObjectContainer(header='SenderLiveResolution: ', message='unbekanntes Format in ' + url_m3u8)
 
@@ -2952,9 +3125,9 @@ def PlayAudio(url, location=None, includeBandwidths=None, autoAdjustQuality=None
 #	Anzahl Suchergebnisse: 25 - nicht beeinflussbar
 # def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
-#	query = urllib2.quote(query, "utf-8")
 	query = query.strip()
 	query = query.replace(' ', '+')		# Leer-Trennung bei ZDF-Suche mit +
+	query = urllib2.quote(query, "utf-8")
 	Log('ZDF_Search'); Log(query); Log(pagenr); Log(s_type)
 
 	ID='Search'

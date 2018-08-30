@@ -1,18 +1,24 @@
 # -*- coding: utf-8 -*-
 # Pod_content.py	- Aufruf durch __init__.py/PodFavoritenListe 
 #
-# Die Funktionen dienen der Auswertung von Podcasts außerhalb www.ardmediathek.de/radio
+# Die Funktionen dienen der Auswertung von Radio-Podcasts der Regionalsender. Zusätzlich
+#	stehen die angezeigten Dateien für Downloads zur Verfügung (einzeln und gesamte Liste)
 # Basis ist die Liste podcast-favorits.txt (Default/Muster im Ressourcenverzeichnis), die
 # 	Liste enthält weitere  Infos zum Format und zu bereits unterstützten Podcast-Seiten
 # 	- siehe nachfolgende Liste Podcast_Scheme_List
+#
+# Die Kurzform 'Podcast-Suche' deckt auch www.ardmediathek.de/radio ab - diese Funktion
+#	macht die Radio-Podcasts aus dem Hauptmenü für Downloads verfügbar. Ein Beispiel
+#	ist in der podcast-favorits.txt enthalten (s. Podcast-Suche: Quarks - Wissenschaft und mehr).
 
 
 Podcast_Scheme_List = [		# Liste vorhandener Auswertungs-Schemata
+# fehlendes http / https wird in Auswertungsschemata ersetzt
 	'http://www.br-online.de', 'https://www.br.de',  
 	'http://www.deutschlandfunk.de', 'http://mediathek.rbb-online.de',
-	'http://www.ardmediathek.de', 'http://www1.wdr.de/mediathek/podcast',
+	'//www.ardmediathek.de', 'http://www1.wdr.de/mediathek/podcast',
 	'www1.wdr.de/mediathek/audio', 'http://www.ndr.de',
-	'www.swr3.de']	
+	'www.swr3.de', 'Podcast-Suche:']	
 
 PREFIX 			= '/video/ardmediathek2016/Pod_content'			
 
@@ -23,10 +29,10 @@ def PodFavoriten(title, path, offset=0):
 			
 	rec_per_page = 24							# Anzahl pro Seite (www.br.de 24, ndr 10)
 	title_org = title
-
+	
 	Scheme = ''
 	for s in Podcast_Scheme_List:				# Prüfung: Schema für path vorhanden?
-		# Log(s); Log(path[:80])
+		Log(s); Log(path[:80])
 		if path.find(s) >= 0:
 			Scheme = s
 			Log(Scheme)
@@ -41,6 +47,10 @@ def PodFavoriten(title, path, offset=0):
 	#			5. Dauer, 6. Größe, 7. Titel (zusammengesetzt), 8. Bild	, 9. Tagline
 	#			10. PageControl
 	POD_rec = get_pod_content(url=path, rec_per_page=rec_per_page, baseurl=Scheme, offset=offset)
+	Log(len(POD_rec))
+	if len(POD_rec) == 0:					# z.B. Fehlschlag bei Podcast-Suche 
+		msg='Leider kein Treffer.'	
+		return ObjectContainer(header='Error', message=msg)
 	if 'Seite nicht' in POD_rec:			# error_txt aus get_page, einschl. path
 		msg=POD_rec	
 		msg = msg.decode(encoding="utf-8", errors="ignore")
@@ -77,7 +87,7 @@ def PodFavoriten(title, path, offset=0):
 		title = unescape(title)
 		url_list.append(url)
 		img = R(ICON_NOTE)	
-		Log(title); Log(summ[:40]); Log(url); Log(DLMultiple)
+		# Log(title); Log(summ[:40]); Log(url); Log(DLMultiple) # bei Bedarf
 		if rec[8]:
 			img = rec[8]
 		if rec[10]:										# Schemata mit Seitenkontrolle?
@@ -224,6 +234,16 @@ def DownloadMultiple(key_url_list, key_POD_rec):						# Sammeldownloads
 def get_pod_content(url, rec_per_page, baseurl, offset):
 	Log('get_pod_content'); Log(rec_per_page); Log(baseurl); Log(offset);
 
+	if baseurl.startswith('Podcast-Suche:'):		# Kurzform Podcast-Suche -> Link erzeugen
+		query = url.split(':')[1]
+		query = query.strip()
+		query = query.replace(' ', '+')			# Leer-Trennung = UND-Verknüpfung bei Podcast-Suche 
+		query = urllib2.quote(query, "utf-8")
+		Log('query: %s' %  query)
+		path =  BASE_URL  + POD_SEARCH
+		url = path % query
+		baseurl = BASE_URL						# 'http://www.ardmediathek.de'
+		
 	url = unescape(url)							# einige url enthalten html-escapezeichen
 	if baseurl == 'https://www.br.de':			# Umlenkung auf API-Seite beim
 		if int(offset) == 0:					# 	ersten Aufruf - Erzeugung Seiten-Urls in Scheme_br_online
@@ -254,7 +274,7 @@ def get_pod_content(url, rec_per_page, baseurl, offset):
 	if baseurl == 'http://www.ndr.de':
 		return Scheme_ndr(page, rec_per_page, offset)
 		
-	if baseurl == 'http://www.ardmediathek.de':
+	if '//www.ardmediathek.de' in baseurl:
 		return Scheme_ARD(page, rec_per_page, offset, baseurl)
 		
 #------------------------
@@ -741,36 +761,36 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 	Log('Scheme_ARD'); Log(offset);
 
 	POD_rec = []			# Datensaetze gesamt (1. Dim.)
-	page = stringextract('class="section onlyWithJs sectionA">', '<!--googleoff: snippet-->', page)
 	
-	pages = blockextract('class="entry"', page)			# Seiten-Urls für Seitenkontrolle
-	max_len = len(pages)
-	Log(max_len)
-	if pages:											# Seiten ohne Seitenkontrolle möglich
-		page_href = baseurl + stringextract('href="', '">', pages[0])
-		if page_href.find('mcontents=page.') > 0:			# ..mcontents=page.1
-			entry_type = 'mcontents=page.'
-		if page_href.find('mcontent=page.') > 0:			# ..mcontent=page.1
-			entry_type = 'mcontent=page.'
-		page_href = page_href.split(entry_type)[0]			# Basis-url ohne Seitennummer
-		Log(entry_type)
-	tagline = ''; pagecontrol= '';
+	# Bsp. ['"/suche?searchText=quarks+wissenschaft&amp;sort=date&amp;pod&amp;source=radio&amp;mresults']:
+	pages =  re.findall(r'<a href=(.*?)=page.', page)
+	max_len = len(pages)								# max_len=letzte Seitennr.							
+	Log(len(pages))
+	if pages:	
+		page_href = pages[0].replace('"', '')			# Pfad aus 1. Pagelink ermitteln
+		page_href = page_href.replace('+', '%2B')		# ARD-Fehler in Links: %2B (Leerz.) wird durch + ersetzt
+		Log(page_href)
 
+	if baseurl.startswith('http') == False:				# https ergänzen (http bei ard obsolet)
+		baseurl = 'https:' + baseurl
+		
+	tagline = ''; pagecontrol= '';
 	# für Seiten mit offset=0 aber ohne Seitenkontrolle direkt weiter bei sendungen
 	if offset == '0' and pages:							# 1. Durchlauf - Seitenkontrolle
 		pagenr = 1
 		for p in pages:
 			single_rec = []								# Datensatz einzeln (2. Dim.)
 			max_len = 0									# -> POD_rec[0][0] 	-> title2 in PodFavoriten
-			url = page_href + entry_type + str(pagenr)	 # url mit Seitennr. ergänzen
+			url = baseurl + page_href + "=page.%d" % pagenr	 # url mit Seitennr. ergänzen
 			url = unescape(url)
+			url = url.replace('+', '%2B')				# ARD-Fehler in Links: %2B (Leerz.) wird durch + ersetzt
 			title = 'Weiter zu Seite %s' % pagenr
 			img = '';						
 			pagecontrol= 'htmlpages';				# 'PageControl' steuert 
 			summ = ''; title_org = ''; datum = ''; dauer = ''; groesse = ''; 
 			pagenr = pagenr + 1
 			
-			Log(title); Log(url); 
+			Log(title); Log('url: %s' % url); 
 			title=title.decode(encoding="utf-8", errors="ignore")
 			summ=summ.decode(encoding="utf-8", errors="ignore")
 			
@@ -789,7 +809,7 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 	sendungen = blockextract('class="teaser"', page)  # Struktur für Podcasts + Videos ähnlich
 	img_src_header=''; img_alt_header=''; teasertext=''
 	max_len = len(sendungen)					# Gesamtzahl gefundener Sätze dieser Seite
-	# Log('sendungen[0]; ' + sendungen[0])		# bei Bedarf
+	#Log('sendungen[0]: ' + sendungen[0])		# bei Bedarf
 	if sendungen[0].find('urlScheme') >= 0:								# [0] = Episodendach
 		text = stringextract('urlScheme', '/noscript', sendungen[0])
 		img_src_header, img_alt_header = img_urlScheme(text, 320, ID='PODCAST') 
@@ -797,13 +817,9 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 		max_len = str(max_len - 1)				# sonst klappt's nicht mit 'Mehr'-Anzeige
 		Log(img_src_header);Log(img_alt_header);Log(teasertext);
 	
-	Log('max_len: ' + max_len)
+	Log('max_len: ' + str(max_len))
 	
 	for i in range(len(sendungen)):
-		# cnt = int(i) 		# + int(offset) Offset entfällt (pro Seite Ausgabe aller Sätze)
-		# Log(cnt); Log(i)
-		# if int(cnt) >= max_len:		# Gesamtzahl überschritten? - entf. hier
-		# s = sendungen[cnt]
 		s = sendungen[i]
 		Log(len(s));    # Log(s)
 		
@@ -867,7 +883,7 @@ def Scheme_ARD(page, rec_per_page, offset,baseurl):		# Schema ARD = www.ardmedia
 		single_rec.append(tagline); single_rec.append(pagecontrol); single_rec.append('skip_more');
 		POD_rec.append(single_rec)
 		
-	Log(len(POD_rec))	
+	Log(len(POD_rec))
 	return POD_rec	
 		
 #----------------------------------------------------------------  
