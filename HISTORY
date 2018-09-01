@@ -3,6 +3,12 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------				gelöschte Releases: älter als  2.5.1	
 
 
+01.09.2018 3.6.3	Modul Pod_content, Funktion DownloadMultiple: Anpassungen gegen ungewollten Wiedereintritt
+			wie in DownloadExtern / LiveRecord.
+			DownloadExtern / LiveRecord / DownloadMultiple: Code angeglichen.
+			Recording TV-Live: zusätzliche Aufnahmezeiten 1:30 und 1:45 Stunden.
+			LiveRecord: utf-Decode für PHT-Info (title1).
+
 30.08.2018 3.6.2	Option "Recording TV-Live": Menübutton in TV-Livestreams, Einträge in Einstellungen
 			(Ein/Aus, Aufnahmedauer, ffmpeg-Parameter), Funktionen: TVLiveRecordSender,  LiveRecord.
 			Anpassungen in DownloadsList (Bearbeiten-Button, Icon).
@@ -13,7 +19,7 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 			Anpassungen für PHT in LiveRecord und DownloadExtern.			
 			Eintrag index_1500_av-p.m3u8 in LiveTV_ntv.m3u8 entfernt (nicht mehr verfügbar)
 
-not on Github		Podcast-Favoriten | podcast-favorits.txt: Kurzform für Podcast-Suche eingeführt (Suche
+not on Github 3.6.1	Podcast-Favoriten | podcast-favorits.txt: Kurzform für Podcast-Suche eingeführt (Suche
 			in www.ardmediathek.de/radio).
 			Podcast-Suche: "WDR 5 Quarks - Wissenschaft und mehr" ergänzt.
 			Pod_Content.py: Schema ARD für Podcast-Suche in Favoriten angepasst.

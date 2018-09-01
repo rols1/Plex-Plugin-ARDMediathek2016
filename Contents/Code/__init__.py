@@ -21,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.2'		# Wechsel: update_single_files löschen/leeren
-VDATE = '30.08.2018'
+VERSION =  '3.6.3'		# Wechsel: update_single_files löschen/leeren
+VDATE = '01.09.2018'
 
 # 
 #	
@@ -1457,6 +1457,8 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 		title1 = 'curl/wget: Download erfolgreich gestartet'
 		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
 			return ObjectContainer(header='Info', message=title1)
+		#oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Download-Tools', summary=summary, 
+		#	thumb=R(ICON_OK), tagline=tagline))						
 		return DownloadsTools()
 
 	oc = ObjectContainer(view_group="InfoList", title1='curl/wget-Download', art=ICON)
@@ -1540,7 +1542,8 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 			summary = summary.decode(encoding="utf-8", errors="ignore")	
 			# PHT springt hier zurück an den Funktionskopf - Info dort
 			#if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
-			#	return ObjectContainer(header='Info', message=msgH)
+			#return ObjectContainer(header='Info', message=msgH)
+			# für andere Player: DirectoryObject wird nicht immer ausgeführt
 			oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Download-Tools', summary=summary, 
 				thumb=R(ICON_OK), tagline=tagline))						
 			return oc				
@@ -1548,14 +1551,13 @@ def DownloadExtern(url, title, dest_path, key_detailtxt):  # Download mittels cu
 			raise Exception('Start von curl/wget fehlgeschlagen')
 			
 	except Exception as exception:
-		msgH = 'Fehler'; 
 		summary = str(exception)
 		summary = summary.decode(encoding="utf-8", errors="ignore")
 		Log(summary)		
 		tagline='Download fehlgeschlagen'
 		# bei Fehlschlag gibt PHT die message aus (im Gegensatz zu oben):
 		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
-			return ObjectContainer(header='Info', message=tagline)
+			return ObjectContainer(header='Fehler', message=tagline)
 		oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Fehler', summary=summary, 
 				thumb=R(ICON_CANCEL), tagline=tagline))		
 		return oc
@@ -2214,8 +2216,8 @@ def EPG_Sender(title):
 #	Liste aller TV-Sender wie EPG_Sender, hier mit Aufnahme-Button
 def TVLiveRecordSender(title):
 	Log('TVLiveRecordSender')
-	Log('PID: %s' % Dict['PID'])
 	Log(Prefs['pref_LiveRecord_ffmpegCall'])
+	# Log('PID-Liste: %s' % Dict['PID'])		# PID-Liste, Initialisierung in Main
 		
 	oc = ObjectContainer(view_group="InfoList", title1='Recording TV-Live', title2='Sender Auswahl', art = ICON)	
 	oc = home(cont=oc, ID=NAME)				# Home-Button	
@@ -2259,7 +2261,7 @@ def TVLiveRecordSender(title):
 #			"GetDirectory failed" aus (keine Abhilfe bisher). Der ungewollte Wiedereintritt findet trotzdem
 #			statt.
 #
-#	Siehe auch verwandtes Problem in TuneIn2017 mit subprocess.Popen für streamripper:
+#	Siehe auch verwandtes Problem in TuneIn2017 mit https://forums.plex.tv/t/calling-an-external-program/126055/2?u=rols1 für streamripper:
 #		https://forums.plex.tv/t/pht-problem-wrong-jump-after-after-os-functions-in-combination-with-writing-to-dict/212656
 #		Nach den Tests in diesem Plugin scheint die Ursache aber nicht im Dict-Gebrauch zu liegen. Vermutung: Framework-
 #			Problem im Umgang mit subprocess.Popen (Thread-Konflikt?).
@@ -2275,6 +2277,7 @@ def LiveRecord(url, title, duration, laenge):
 		Dict['PIDffmpeg'] = ''							# löschen für manuellen Aufruf 
 		# Für PHT Info erst hier nach autom. Wiedereintritt nach Popen möglich:
 		title1 = 'Aufnahme gestartet: %s' % title
+		title1 	= title1.decode(encoding="utf-8")		
 		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
 			return ObjectContainer(header='Info', message=title1)
 		return TVLiveRecordSender(title)
@@ -2313,11 +2316,11 @@ def LiveRecord(url, title, duration, laenge):
 
 	try:
 		Dict['PIDffmpeg'] = ''
-		call = subprocess.Popen(args, shell=False)
-		Log('call: ' + str(call))
+		sp = subprocess.Popen(args, shell=False)
+		Log('sp: ' + str(sp))
 
-		if str(call).find('object at') > 0:  			# subprocess.Popen object OK
-			Dict['PIDffmpeg'] = call.pid				# PID zum Abgleich gegen Wiederholung sichern
+		if str(sp).find('object at') > 0:  			# subprocess.Popen object OK
+			Dict['PIDffmpeg'] = sp.pid				# PID zum Abgleich gegen Wiederholung sichern
 			Log('PIDffmpeg neu: %s' % Dict['PIDffmpeg'])
 			title1 = 'Aufnahme gestartet: %s' % dfname
 			summ	= 'zur Sender Auswahl'
@@ -2333,12 +2336,14 @@ def LiveRecord(url, title, duration, laenge):
 		msg = str(exception)
 		Log(msg)		
 		title1 = "Fehler: %s" % msg
+		title1 = title1.decode(encoding="utf-8")
 		summ	= 'zur Sender Auswahl'
+		tagline='Aufnahme fehlgeschlagen'
 		# bei Fehlschlag gibt PHT die message aus (im Gegensatz zu oben):
 		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
-			return ObjectContainer(header='Info', message=title1)
+			return ObjectContainer(header='Fehler', message=title1)
 		oc.add(DirectoryObject(key=Callback(TVLiveRecordSender, title=title),  		
-				title=title1, thumb=R('icon-error.png'), summary=summ))
+				title=title1, thumb=R('icon-error.png'), summary=summ, tagline=tagline))
 		
 	
 	return oc

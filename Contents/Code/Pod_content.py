@@ -150,8 +150,11 @@ def PodFavoriten(title, path, offset=0):
 # Rücksprung-Problem: der Button DownloadsTools ruft zwar die Funktion DownloadsTools auf, führt aber vorher
 #	noch einmal den Curl-Aufruf aus mit kompl. Download - keine Abhilfe mit no_cache=True im ObjectContainer
 #	oder Parameter time=time.time() für dem Callback DownloadsTools.
-#	
-
+#
+#	01.09.2018: s.a. Doku in LiveRecord. Die Lösungen / Anpassungen für PHT  wurden hier analog umgesetzt. 
+#		PHT: bei Plugin-Timeout zeigt PHT zuerst den Callback-Button und sprint anschließend wieder zum 
+#			Funktionskopf.
+#		
 def DownloadMultiple(key_url_list, key_POD_rec):						# Sammeldownloads
 	Log('DownloadMultiple'); 
 	import shlex											# Parameter-Expansion
@@ -159,6 +162,16 @@ def DownloadMultiple(key_url_list, key_POD_rec):						# Sammeldownloads
 	url_list = Dict[key_url_list]
 	POD_rec = Dict[key_POD_rec]
 	
+	if Dict['PIDcurlPOD']:								# ungewollten Wiedereintritt abweisen 
+		Log('PIDcurlPOD: %s' % Dict['PIDcurlPOD'])
+		Log('PIDcurlPOD = %s | Blocking DownloadMultiple' % Dict['PIDcurlPOD'])
+		Dict['PIDcurlPOD'] = ''						# löschen für manuellen Aufruf 
+		# Für PHT Info erst hier nach autom. Wiedereintritt nach Popen möglich:
+		title1 = 'curl/wget: Download erfolgreich gestartet'
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Info', message=title1)
+		return DownloadsTools()
+
 	oc = ObjectContainer(view_group="InfoList", title1='Favoriten', title2='Sammel-Downloads', 
 		art = ObjectContainer.art, no_cache=True)
 	oc = home(cont=oc, ID='PODCAST')						# Home-Button
@@ -203,29 +216,39 @@ def DownloadMultiple(key_url_list, key_POD_rec):						# Sammeldownloads
 		args = cmd
 	else:
 		args = shlex.split(cmd)								# ValueError: No closing quotation (1 x, Ursache n.b.)
-	Log(len(args))
-
+	Log(len(args))											# hier Ende Log-Ausgabe bei Plugin-Timeout, Download
+															#	läuft aber weiter.
 	try:
-		call = subprocess.Popen(args, shell=False)			# shell=True entf. hier nach shlex-Nutzung	
-		output,error = call.communicate()					#  output,error = None falls Aufruf OK
-		Log('call = ' + str(call))	
-		if str(call).find('object at') > 0:  				# Bsp.: <subprocess.Popen object at 0x7fb78361a210>
-			title = 'curl: Download erfolgreich gestartet'	# trotzdem Fehlschlag möglich, z.B. ohne Schreibrecht								
+		Dict['PIDcurlPOD'] = ''
+		sp = subprocess.Popen(args, shell=False)			# shell=True entf. hier nach shlex-Nutzung	
+		output,error = sp.communicate()						#  output,error = None falls Aufruf OK
+		Log('call = ' + str(sp))	
+		if str(sp).find('object at') > 0:  				# Bsp.: <subprocess.Popen object at 0x7fb78361a210>
+			Dict['PIDcurlPOD'] = sp.pid					# PID zum Abgleich gegen Wiederholung sichern
+			Log('PIDcurlPOD neu: %s' % Dict['PIDcurlPOD'])
+			msgH = 'curl: Download erfolgreich gestartet'	# trotzdem Fehlschlag möglich, z.B. ohne Schreibrecht
+			Log(msgH)								
 			summary = 'Anzahl der Podcast: %s' % rec_len
 			tagline = 'zurück zu den Download-Tools'.decode(encoding="utf-8", errors="ignore")
-			oc.add(DirectoryObject(key = Callback(DownloadsTools), title=title, summary=summary, 
+			# PHT springt hier zurück an den Funktionskopf - Info dort. Bei Plugin-Timeout zeigt PHT zuerst
+			#	den Callback-Button und sprint anschließend wieder zum Funktionskopf.
+			oc.add(DirectoryObject(key = Callback(DownloadsTools), title='Download-Tools', summary=summary, 
 				tagline=tagline, thumb=R(ICON_OK)))		
 			return oc				
 		else:
 			raise Exception('Start von curl fehlgeschlagen')			
 	except Exception as exception:
-		msgH = 'Fehler'; 
-		summary = str(exception)
-		summary = summary.decode(encoding="utf-8", errors="ignore")
-		Log(summary)		
-		tagline='Exception: Download fehlgeschlagen | '.decode(encoding="utf-8", errors="ignore") 
-		oc.add(DirectoryObject(key = Callback(DownloadsTools), title = 'Fehler', summary=summary, 
-				tagline=tagline, thumb=R(ICON_CANCEL), tagline=tagline))		
+		msg = str(exception)
+		Log(msg)		
+		title1 = "Fehler: %s" % msg
+		title1 = title1.decode(encoding="utf-8")
+		summ	= 'zur Sender Auswahl'
+		tagline='Download fehlgeschlagen'
+		# bei Fehlschlag gibt PHT die message aus (im Gegensatz zu oben):
+		if 'Home Theater' in str(Client.Platform):	# GetDirectory failed nach Info
+			return ObjectContainer(header='Fehler', message=title1)
+		oc.add(DirectoryObject(key = Callback(DownloadsTools), title=title1, 
+				 thumb=R('icon-error.png'), summary=summ, tagline=tagline))		
 		return oc
 		
 	return oc
