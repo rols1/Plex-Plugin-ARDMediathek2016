@@ -66,6 +66,7 @@ Funktionen ab Version 2.2.0:
 #### Downloadoption ab Version 2.6.7 (cURL oder wget eforderlich)
 - Download von Videos im ARD-Bereich
 - Download von Videos im ZDF-Bereich
+- Download von Podcasts - bei Podcast-Favoriten zusätzlich Sammeldownloads 
 - Tools zum Bearbeiten des Download-Verzeichnisses (Verzeichnisse festlegen, Verschieben, Löschen)
 
 #### Update-Modul
