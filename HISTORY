@@ -1,7 +1,15 @@
 CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 --------------	Releases: 	https://github.com/rols1/Plex-Plugin-ARDMediathek2016/releases/latest
---------------				gelöschte Releases: älter als  2.5.1	
+--------------				gelöschte Releases: älter als  2.5.1
+		Hinweis:	Nachfolgeplugin ist ARDundZDF, Download:
+				https://github.com/rols1/ARDundZDF/releases/latest
 
+
+18.09.2018 3.6.4	Modul ARD_Bildgalerie, Funktion Hub: Seitenanforderung via get_page (HTTP.Requests
+			werden mit SSL-Fehler abgewiesen).	
+			get_page (bisher nur HTTP.Request) um 2. Alternative mit urllib2.Request +  ssl.SSLContext
+			erweitert.
+			Info-Button: Hinweis auf Nachfolge-Plugin.
 
 01.09.2018 3.6.3	Modul Pod_content, Funktion DownloadMultiple: Anpassungen gegen ungewollten Wiedereintritt
 			wie in DownloadExtern / LiveRecord.

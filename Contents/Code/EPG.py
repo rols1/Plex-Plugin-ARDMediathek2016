@@ -170,7 +170,7 @@ def transl_wtag(tag):	# Wochentage engl./deutsch wg. Problemen mit locale-Settin
 			break
 	return wt_ret
 #----------------------------------------------------------------  
-def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content
+def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content - s. Erweiterung in init.py
 	Log('get_page');
 	msg = ''; page = ''				
 	try:

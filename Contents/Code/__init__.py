@@ -21,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.3'		# Wechsel: update_single_files löschen/leeren
-VDATE = '01.09.2018'
+VERSION =  '3.6.4'		# Wechsel: update_single_files löschen/leeren
+VDATE = '18.09.2018'
 
 # 
 #	
@@ -297,9 +297,11 @@ def Main():
 			title=title, summary=summary, tagline=tagline, thumb=R(ICON_MAIN_UPDATER)))
 
 	# Menü Einstellungen (obsolet) ersetzt durch Info-Button
-	summary = 'Störungsmeldungen an Forum oder rols1@gmx.de'.decode(encoding="utf-8")
-	tagline = 'Forum: https://forums.plex.tv/discussion/213947/rel-plex-plugin-ardmediathek2016#latest'
-	oc.add(DirectoryObject(key = Callback(Main), title = 'Info', summary = summary, thumb = R(ICON_INFO)))
+	title 	= 'Nachfolgeplugin ARDundZDF verfügbar!'.decode(encoding="utf-8")
+	summary = 'Forum: https://forums.plex.tv/t/rel-ardundzdf/309751'
+	tagline = 'Download: https://github.com/rols1/ARDundZDF/releases/latest'
+	oc.add(DirectoryObject(key = Callback(Main), title = title, summary = summary, 
+		tagline=tagline, thumb = R(ICON_INFO)))
 						
 	return oc
 	
@@ -694,12 +696,18 @@ def test_fault(page, path):	# testet geladene ARD-Seite auf ARD-spezif. Error-Te
 		return error_txt
 	else:
 		return ''
+		
 #-----------------------
+# 02.09.2018	erweitert um 2. Alternative mit urllib2.Request +  ssl.SSLContext
+#	Bei Bedarf get_page in EPG-Modul nachrüsten.
+#	S.a. loadPage in Modul zdfmobile.
+#
 def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content, cTimeout für cacheTime
+	Log('get_page')
 	msg = ''; page = ''				
 	try:
 		if cTimeout:					# mit Cachevorgabe
-			page = HTTP.Request(path, cacheTime=int(cTimeout) ).content
+			page = HTTP.Request(path, cacheTime=int(cTimeout) ).content	# 1. Versuch HTTP.Request 
 		else:
 			page = HTTP.Request(path).content
 	except Exception as exception:
@@ -707,12 +715,23 @@ def get_page(path, cTimeout=None):		# holt kontrolliert raw-Content, cTimeout f�
 		summary = summary.decode(encoding="utf-8", errors="ignore")
 		Log(summary)		
 		
-	if page == '':	
+	if page == '':
+		try:
+			req = urllib2.Request(path)									# 2. Versuch urllib2.Request 
+			gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+			gcontext.check_hostname = False
+			r = urllib2.urlopen(req, context=gcontext)
+			page = r.read()			
+		except Exception as exception:
+			summary = str(exception)
+			summary = summary.decode(encoding="utf-8", errors="ignore")
+			Log(summary)		
+			
+	if page == '':
 		error_txt = 'Seite nicht erreichbar oder nicht mehr vorhanden'			 			 	 
 		msgH = 'Fehler'; msg = error_txt + ' | Seite: ' + path
 		Log(msg)
 		msg =  msg.decode(encoding="utf-8", errors="ignore")
-#		err = ObjectContainer(header=msgH, message=msg)
 
 	return page, msg	
 
@@ -2218,7 +2237,7 @@ def TVLiveRecordSender(title):
 	Log('TVLiveRecordSender')
 	Log(Prefs['pref_LiveRecord_ffmpegCall'])
 	# Log('PID-Liste: %s' % Dict['PID'])		# PID-Liste, Initialisierung in Main
-		
+			
 	oc = ObjectContainer(view_group="InfoList", title1='Recording TV-Live', title2='Sender Auswahl', art = ICON)	
 	oc = home(cont=oc, ID=NAME)				# Home-Button	
 	
@@ -2227,7 +2246,7 @@ def TVLiveRecordSender(title):
 	duration = duration.strip()
 
 	sort_playlist = get_sort_playlist()		# Senderliste
-	# Log(sort_playlist)
+	Log('Sender: ' + str(len(sort_playlist)))
 	for rec in sort_playlist:
 		title 	= rec[0].decode(encoding="utf-8", errors="ignore")
 		link 	= rec[3]

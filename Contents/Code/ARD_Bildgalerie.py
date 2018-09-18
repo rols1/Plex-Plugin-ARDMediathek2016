@@ -52,12 +52,18 @@ def page(name, path, offset):
 	return oc
 #-----------------------
 @route(PREFIX + '/Hub')	# einzelne Bilderserie ARD
+# 02.09.2018 SSL-Fehler mit HTTP.Request - Umstellung auf get_page mit urllib2.Request.
+#	Dafür get_page um Alternative mit urllib2.Request + SSLContext erweitert.
+# 
 def Hub(title, path):		
 	Log('Hub: %s' % path)
 	title = title.decode(encoding="utf-8")
 	oc = ObjectContainer(title2=title.decode(encoding="utf-8"), art = ObjectContainer.art)
 	
-	page = HTTP.Request(path).content				# 1. Seite laden
+	page, msg = get_page(path)						# 1. Seite laden	
+	if page == '':	
+		return 	ObjectContainer(header='Error', message=msg)
+									
 	Log(len(page))
 	
 	if '//www.hessenschau.de' in path:			# Schema Hessenschau
