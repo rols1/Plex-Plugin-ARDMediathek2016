@@ -283,7 +283,7 @@
 	</item>
 	<item>
 		<title>DAF</title>
-		<link>rtmp://fms.daf.tmt.de/live/flv:dafstream100</link>
+		<link>https://58de7a369a9c4.streamlock.net/aktionaertv_live/smil:aktionaertv_live_abr.smil/playlist.m3u8</link>
 		<thumbnail>tv-daf.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID></EPG_ID>

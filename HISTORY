@@ -5,6 +5,11 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 				https://github.com/rols1/ARDundZDF/releases/latest
 
 
+01.12.2018 3.6.5	Änderung der ARD-BASE_URL von www.ardmediathek.de zu classic.ardmediathek.de,
+			Änderung der Sparten-Url's auch hinter der BASE_URL.
+			Wegfall der Funktion Update_ARD_Path (Code verbleibt zunächst).
+			livesenderTV.xml: Aktualisierung Link bei DAF (m3u8 statt rtmp).
+
 18.09.2018 3.6.4	Modul ARD_Bildgalerie, Funktion Hub: Seitenanforderung via get_page (HTTP.Requests
 			werden mit SSL-Fehler abgewiesen).	
 			get_page (bisher nur HTTP.Request) um 2. Alternative mit urllib2.Request +  ssl.SSLContext

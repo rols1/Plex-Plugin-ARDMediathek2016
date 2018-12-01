@@ -21,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.4'		# Wechsel: update_single_files löschen/leeren
-VDATE = '18.09.2018'
+VERSION =  '3.6.5'		# Wechsel: update_single_files löschen/leeren
+VDATE = '01.12.2018'
 
 # 
 #	
@@ -137,23 +137,24 @@ ICON_DIR_FAVORITS		= "Dir-favorits.png"
 
 
 
-BASE_URL 		= 'http://www.ardmediathek.de'
+# 01.12.2018 	Änderung der BASE_URL von www.ardmediathek.de zu classic.ardmediathek.de
+#				Änderung der Sparten-Url's auch hinter der BASE_URL
+#				ARD-Podcasts bisher ohne Änderung
+BASE_URL 		= 'https://classic.ardmediathek.de'
 ARD_VERPASST 	= '/tv/sendungVerpasst?tag='								# ergänzt mit 0, 1, 2 usw.
 ARD_AZ 			= '/tv/sendungen-a-z?buchstabe='							# ergänzt mit 0-9, A, B, usw.
 ARD_Suche 		= '/tv/suche?searchText=%s&words=and&source=tv&sort=date'	# Vorgabe UND-Verknüpfung
 ARD_Live 		= '/tv/live'
 
-# Aktualisierung der ARD-ID's in Update_ARD_Path
-ARD_Rubriken 	= 'http://www.ardmediathek.de/tv/Rubriken/mehr?documentId=21282550'
-ARD_Themen 		= 'http://www.ardmediathek.de/tv/Themen/mehr?documentId=21301810'
-ARD_Serien 		= 'http://www.ardmediathek.de/tv/Serien/mehr?documentId=26402940'
-ARD_Dokus 		= 'http://www.ardmediathek.de/tv/Ausgew%C3%A4hlte-Dokus/mehr?documentId=33649086'
-ARD_DokusAll	= 'http://www.ardmediathek.de/tv/Alle-Dokus-Reportagen/mehr?documentId=29897594'
-ARD_Filme 		= 'http://www.ardmediathek.de/tv/Ausgew%C3%A4hlte-Filme/mehr?documentId=33649088'
-ARD_FilmeAll 	= 'http://www.ardmediathek.de/tv/Alle-Filme/mehr?documentId=31610076'
-ARD_Meist 		= 'http://www.ardmediathek.de/tv/Meistabgerufene-Videos/mehr?documentId=23644244'
-ARD_Neu 		= 'http://www.ardmediathek.de/tv/Neueste-Videos/mehr?documentId=21282466'
-ARD_Best 		= 'http://www.ardmediathek.de/tv/Am-besten-bewertet/mehr?documentId=21282468'
+# Aktualisierung der ARD-ID's in Update_ARD_Path (entfällt ab 01.12.2018)
+ARD_Rubriken 	= 'https://classic.ardmediathek.de/tv/Rubriken/mehr?documentId=21282550'
+ARD_Serien 		= 'https://classic.ardmediathek.de/tv/Komplette-Staffeln/mehr?documentId=56477862'
+ARD_Dokus 		= 'https://classic.ardmediathek.de/tv/Doku-Tipps-der-Redaktion/mehr?documentId=33649086'
+ARD_DokusAll	= 'https://classic.ardmediathek.de/tv/dokus'
+ARD_Filme 		= 'https://classic.ardmediathek.de/tv/Film-Tipps-der-Redaktion/mehr?documentId=33649088'
+ARD_FilmeAll 	= 'https://classic.ardmediathek.de/tv/filme'
+ARD_Neu 		= 'https://classic.ardmediathek.de/tv/Neueste-Videos/mehr?documentId=21282466'
+ARD_Best 		= 'https://classic.ardmediathek.de/tv/Am-besten-bewertet/mehr?documentId=21282468'
 ARD_RadioAll 	= 'http://www.ardmediathek.de/radio/live?genre=Alle+Genres&kanal=Alle'
 
 # ARD-Podcasts
@@ -341,18 +342,12 @@ def Main_ARD(name):
 	title = 'Alle Dokus'
 	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_DokusAll, next_cbKey='SingleSendung', ID='ARD', 
 		mode='Sendereihen'), title=title,summary=title, tagline='TV', thumb=R(ICON_ARD_DokusAll)))
-	title = 'Themen'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Themen, next_cbKey='SinglePage', ID='ARD', 
-		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Themen)))
 	title = 'Serien'
 	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Serien, next_cbKey='SinglePage', ID='ARD', 
 		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_Serien)))
 	title = 'Rubriken'
 	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Rubriken, next_cbKey='SinglePage', ID='ARD', 
 		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_RUBRIKEN)))
-	title = 'Meist Gesehen'
-	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Meist, next_cbKey='SingleSendung', ID='ARD', 
-		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_MEIST)))
 	title = 'neueste Videos'
 	oc.add(DirectoryObject(key=Callback(ARDMore, title=title, morepath=ARD_Neu, next_cbKey='SingleSendung', ID='ARD', 
 		mode = 'Sendereihen'), title=title, summary=title, tagline='TV', thumb=R(ICON_ARD_NEUESTE)))
@@ -920,7 +915,8 @@ def ARDMore(title, morepath, next_cbKey, ID, mode):
 	oc = home(cont=oc, ID=ID)							# Home-Button
 					 
 	path = morepath
-	path = Update_ARD_Path(morepath)		# Pfad aktualisieren - bei Podcast i.d.R. unverändert
+	# Update_ARD_Path entfällt ab 01.12.0218 (Webseiten geändert)
+	# path = Update_ARD_Path(morepath)		# Pfad aktualisieren - bei Podcast i.d.R. unverändert
 	page = HTTP.Request(path).content
 	err = test_fault(page, path)			# ARD-spezif. Error-Test: 'Leider liegt eine..'
 	if err:
@@ -959,6 +955,7 @@ def ARDMore(title, morepath, next_cbKey, ID, mode):
 	return oc
 
 #------------------------	
+# 01.12.2018 entfällt 
 def Update_ARD_Path(path):		# aktualisiert den Zugriffspfad fallls mötig, z.B. für "Alle Filme"
 	Log('Update_ARD_Path old: ' + path)	
 	
