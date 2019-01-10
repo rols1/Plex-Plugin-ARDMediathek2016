@@ -5,6 +5,12 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 				https://github.com/rols1/ARDundZDF/releases/latest
 
 
+
+10.01.2019 3.6.7	ZDF_get_content: Prüfung auf Einzelvideo auf Mehrfachseiten.
+			ZDF_get_content: Code für vorgezogene Bilderserien-Auswertung entfernt.
+08.12.2018 3.6.6	Search: HTTP-Header 'User-Agent' + 'Accept' hinzugefügt (ohne Seiten unvollständig).
+			test_fault (ARD-spezif. Error-Test) entfernt - nicht mehr anwendbar.
+ 	
 01.12.2018 3.6.5	Änderung der ARD-BASE_URL von www.ardmediathek.de zu classic.ardmediathek.de,
 			Änderung der Sparten-Url's auch hinter der BASE_URL.
 			Wegfall der Funktion Update_ARD_Path (Code verbleibt zunächst).

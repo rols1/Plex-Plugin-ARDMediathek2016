@@ -21,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.5'		# Wechsel: update_single_files löschen/leeren
-VDATE = '01.12.2018'
+VERSION =  '3.6.7'		# Wechsel: update_single_files löschen/leeren
+VDATE = '10.01.2019'
 
 # 
 #	
@@ -612,13 +612,11 @@ def Search(query=None, title=L('Search'), channel='ARD', s_type=None, offset=0, 
 		path = path % query
 		ID=channel
 	Log(path) 
-	page = HTTP.Request(path).content
+	headers={'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36", \
+		'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8"}
+	page = HTTP.Request(path, headers=headers).content
 	Log(len(page))
 	
-	err = test_fault(page, path)		# ARD-spezif. Error-Test
-	if err:
-		return ObjectContainer(header='Fehler', message=err)	
-		
 	if page.find('<strong>keine Treffer</strong') >= 0:
 		msg_notfound = 'Leider kein Treffer.'
 		title = msg_notfound.decode(encoding="utf-8", errors="ignore")
@@ -676,22 +674,7 @@ def Search(query=None, title=L('Search'), channel='ARD', s_type=None, offset=0, 
 			oc = PageControl(title=name, path=path, cbKey=next_cbKey, mode='Suche', ID=ID) 	# wir springen direkt
 	 
 	return oc
- 
-#-----------------------
-def test_fault(page, path):	# testet geladene ARD-Seite auf ARD-spezif. Error-Test
-	Log('test_fault')
-	
- 	error_txt = '<title>Leider liegt eine Störung vor | ARD Mediathek</title>'	
-	if page.find(error_txt) >= 0:
-		error_txt = 'Leider liegt eine Störung vor | ARD Mediathek | interne Serverprobleme'			 			 	 
-		msgH = 'Fehler'; msg = error_txt + ' | Seite: ' + path
-		Log(msg)
-		msg =  msg.decode(encoding="utf-8", errors="ignore")
-		# return ObjectContainer(header=msgH, message=msg)		# muss Aufrufer erledigen
-		return error_txt
-	else:
-		return ''
-		
+ 		
 #-----------------------
 # 02.09.2018	erweitert um 2. Alternative mit urllib2.Request +  ssl.SSLContext
 #	Bei Bedarf get_page in EPG-Modul nachrüsten.
@@ -918,9 +901,6 @@ def ARDMore(title, morepath, next_cbKey, ID, mode):
 	# Update_ARD_Path entfällt ab 01.12.0218 (Webseiten geändert)
 	# path = Update_ARD_Path(morepath)		# Pfad aktualisieren - bei Podcast i.d.R. unverändert
 	page = HTTP.Request(path).content
-	err = test_fault(page, path)			# ARD-spezif. Error-Test: 'Leider liegt eine..'
-	if err:
-		return ObjectContainer(header='Fehler', message=err)	
 							
 	pagenr_path =  re.findall("=page.(\d+)", page) # Mehrfachseiten?
 	Log(pagenr_path)
@@ -3503,20 +3483,6 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):
 		ID='DEFAULT'											# Sätze ohne aufnehmen														
 	
 	img_alt = teilstring(page, 'class=\"m-desktop', '</picture>') # Bildsätze für b-playerbox
-	title = ''
-	if page.find('class=\"content-box gallery-slider-box') >= 0: 	# Bildgalerie (hier aus Folgeseiten)
-		title = stringextract('\"big-headline\"  itemprop=\"name\" >', '</h1>', page)
-		title = unescape(title)
-		Log(title)
-		oc = ZDF_Bildgalerie(oc=oc, page=page, mode='is_gallery', title=title)
-		page_cnt = len(oc)
-		return oc, offset, page_cnt 
-	if page.find('name headline mainEntityOfPage') >= 0:  # spez. Bildgalerie, hier Bares für Rares
-		headline = stringextract('name headline mainEntityOfPage\" >', '</h1>', page)
-		if headline[0:7] == 'Objekte':		# Bsp.: Objekte vom 6. Dezember 2016
-			oc = ZDF_Bildgalerie(oc=oc, page=page, mode='pics_in_accordion-panels', title=headline)
-			page_cnt = len(oc)
-			return oc, offset, page_cnt  		 	
 		
 	page_title = stringextract('<title>', '</title>', page)  # Seitentitel
 	page_title = page_title.strip()
@@ -3538,13 +3504,14 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):
 	Log('content_Blocks: ' + str(page_cnt));
 	
 	if page_cnt == 0:											# kein Ergebnis oder allg. Fehler
-		s = 'Es ist leider ein Fehler aufgetreten.'				# ZDF-Meldung Server-Problem
-		if page.find('\"title\">' + s) >= 0:
-			msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
-		else:
-			msg_notfound = 'Leider keine Inhalte verfügbar.' 	# z.B. bei A-Z für best. Buchstaben 
-			if page_title:
-				msg_notfound = 'Leider keine Inhalte verfügbar zu: ' + page_title
+		if 'class="b-playerbox' not in page and 'class="item-caption' not in page: # Einzelvideo?
+			s = 'Es ist leider ein Fehler aufgetreten.'				# ZDF-Meldung Server-Problem
+			if page.find('\"title\">' + s) >= 0:
+				msg_notfound = s + ' Bitte versuchen Sie es später noch einmal.'
+			else:
+				msg_notfound = 'Leider keine Inhalte verfügbar.' 	# z.B. bei A-Z für best. Buchstaben 
+				if page_title:
+					msg_notfound = 'Leider keine Inhalte verfügbar zu: ' + page_title
 			
 		Log('msg_notfound: ' + str(page_cnt))
 		# kann entfallen - Blockbildung mit class="content-box" inzw. möglich. Modul zdfneo.py entfernt.
@@ -3579,7 +3546,8 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):
 			
 		if ID <> 'DEFAULT':					 			# DEFAULT: Übersichtsseite ohne Videos, Bsp. Sendungen A-Z
 			if 'title-icon icon-502_play' not in rec:  	# Videobeitrag?
-				continue		
+				if '>Videolänge:<' not in rec : 
+					continue		
 		multi = False			# steuert Mehrfachergebnisse 
 		
 		meta_image = stringextract('<meta itemprop=\"image\"', '>', rec)
