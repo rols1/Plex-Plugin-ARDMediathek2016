@@ -20,6 +20,7 @@ Podcast_Scheme_List = [		# Liste vorhandener Auswertungs-Schemata
 	'www1.wdr.de/mediathek/audio', 'http://www.ndr.de',
 	'www.swr3.de', 'Podcast-Suche:']	
 
+BASE_URL		= 'https://classic.ardmediathek.de'
 PREFIX 			= '/video/ardmediathek2016/Pod_content'			
 
 ####################################################################################################
@@ -297,7 +298,7 @@ def get_pod_content(url, rec_per_page, baseurl, offset):
 	if baseurl == 'http://www.ndr.de':
 		return Scheme_ndr(page, rec_per_page, offset)
 		
-	if '//www.ardmediathek.de' in baseurl:
+	if '//classic.ardmediathek.de' in baseurl:	# vor Mediathek-Neu www.ardmediathek.de
 		return Scheme_ARD(page, rec_per_page, offset, baseurl)
 		
 #------------------------

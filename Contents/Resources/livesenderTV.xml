@@ -4,7 +4,7 @@
   <genre>TV</genre>
   <description>Livestreams http://www.ardmediathek.de/tv/live</description>
   <thumbnail></thumbnail>
-   <date>24.01.2018 rols1</date>
+   <date>017.05.2019 rols1</date>
   <credits>Grafiken @Arauco (Plex-Forum)</credits>
  </channels_info>
  
@@ -15,11 +15,11 @@
 <items>
 	<item>
 		<title>Das Erste</title>
-		<link>http://daserste_live-lh.akamaihd.net/i/daserste_de@91204/master.m3u8</link>
+		<link>https://daserstehdut-lh.akamaihd.net/i/daserstehd_ut_de@629193/master.m3u8</link>
 		<thumbnail>tv-das-erste.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>ARD</EPG_ID>
-		<date>01.10.2016</date>
+		<date>017.05.2019</date>
 		<epg_url></epg_url>
 	</item>
 	<item>
@@ -93,6 +93,17 @@
 		<epg_url></epg_url>
 		<geoblock>ja</geoblock>
 	</item>
+	<item>			
+		<title>ARDSportschau Livestream</title>
+		<hrefsender></hrefsender>
+		<link>https://ardevent2.akamaized.net/hls/live/681512/ardevent2_geo/master.m3u8</link>
+		<thumbnail>tv-ard-sportschau.png</thumbnail>
+		<genre>TV</genre>
+		<EPG_ID></EPG_ID>
+		<date>16.04.2019</date>
+		<epg_url></epg_url>
+		<geoblock>ja</geoblock>
+	</item>
 	<item>
 		<title>ARD-Alpha</title>
 		<link>http://livestreams.br.de/i/bralpha_germany@119899/master.m3u8</link>
@@ -123,7 +134,7 @@
 	</item>
 	<item>
 		<title>Deutsche Welle</title>
-		<link>http://dwstream6-lh.akamaihd.net/i/dwstream6_live@124409/master.m3u8</link>
+		<link>https://dwstream72-lh.akamaihd.net/i/dwstream72_live@123556/master.m3u8</link>
 		<thumbnail>tv-deutsche-welle.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>DWTV</EPG_ID>
@@ -282,28 +293,12 @@
 		<date>11.12.2016</date>
 	</item>
 	<item>
-		<title>DAF</title>
-		<link>https://58de7a369a9c4.streamlock.net/aktionaertv_live/smil:aktionaertv_live_abr.smil/playlist.m3u8</link>
-		<thumbnail>tv-daf.png</thumbnail>
-		<genre>TV</genre>
-		<EPG_ID></EPG_ID>
-		<date>25.02.2015</date>
-	</item>
-	<item>
 		<title>Welt / N24-Live</title>
 		<link>https://live2weltcms-lh.akamaihd.net/i/Live2WeltCMS_1@444563/index_3_av-b.m3u8?sd=10&dw=0&rebase=on</link>
 		<thumbnail>tv-n24.png</thumbnail>
 		<genre>TV</genre>
 		<EPG_ID>WELT</EPG_ID>
 		<date>30.01.2018</date>
-	</item>
-	<item>
-		<title>n-tv</title>
-		<link>LiveTV_ntv.m3u8</link>
-		<thumbnail>tv-ntv.png</thumbnail>
-		<genre>TV</genre>
-		<EPG_ID>NTV</EPG_ID>
-		<date>11.03.2017</date>
 	</item>
 	<item>
 		<title>QVC</title>

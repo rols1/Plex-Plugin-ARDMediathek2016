@@ -21,8 +21,8 @@ import update_single
 
 # +++++ ARD Mediathek 2016 Plugin for Plex +++++
 
-VERSION =  '3.6.7'		# Wechsel: update_single_files löschen/leeren
-VDATE = '10.01.2019'
+VERSION =  '3.6.8'		# Wechsel: update_single_files löschen/leeren
+VDATE = '17.05.2019'
 
 # 
 #	
@@ -3174,7 +3174,7 @@ def ZDF_Search(query=None, title=L('Search'), s_type=None, pagenr='', **kwargs):
 	path = ZDF_Search_PATH % (query, pagenr)
 	Log(pagenr); Log(path)
 	page = HTTP.Request(path, cacheTime=1).content
-	content =  blockextract('class="artdirect"', page)
+	content =  blockextract('class="artdirect " >', page)
 	if len(content) > 0:
 		title = "Weitere Beiträge".decode(encoding="utf-8", errors="ignore")
 		oc.add(DirectoryObject(key=Callback(ZDF_Search, query=query, s_type=s_type, pagenr=pagenr), 
@@ -3497,7 +3497,7 @@ def ZDF_get_content(oc, page, ref_path, offset=0, ID=None):
 	if pos >= 0:
 		page = page[pos:]
 				
-	content =  blockextract('class="artdirect"', page)
+	content =  blockextract('class="artdirect " >', page)
 	if ID == 'NeuInMediathek':									# letztes Element entfernen (Verweis Sendung verpasst)
 		content.pop()	
 	page_cnt = len(content)

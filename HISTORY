@@ -5,10 +5,16 @@ CHANGE HISTORY 	Plex-Plugin-ARDMediathek2016
 				https://github.com/rols1/ARDundZDF/releases/latest
 
 
+17.05.2019 3.6.8	ZDF (ZDF_Sendungen, ZDF_get_content, ZDF_Search, SearchARDundZDF, SportLive): 
+			Anpassung nach Änderung der Webseite (Blockbildung via 'class="artdirect " >' 
+			statt 'class="artdirect">').
+			TV-Livesender: Aktualisierung Streamlinks, n-tv + DAF entfernt, Livestream
+			ARDSportschau eingefügt (einschl. Bild). 
 
-10.01.2019 3.6.7	ZDF_get_content: Prüfung auf Einzelvideo auf Mehrfachseiten.
+10.01.2019 3.6.7	ZDF_get_content: Prüfung auf Einzelvideo auf Mehrfachseiten (Videos fehlten).
 			ZDF_get_content: Code für vorgezogene Bilderserien-Auswertung entfernt.
-08.12.2018 3.6.6	Search: HTTP-Header 'User-Agent' + 'Accept' hinzugefügt (ohne Seiten unvollständig).
+			
+not on Github 3.6.6	Search: HTTP-Header 'User-Agent' + 'Accept' hinzugefügt (ohne Seiten unvollständig).
 			test_fault (ARD-spezif. Error-Test) entfernt - nicht mehr anwendbar.
  	
 01.12.2018 3.6.5	Änderung der ARD-BASE_URL von www.ardmediathek.de zu classic.ardmediathek.de,
