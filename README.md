@@ -1,6 +1,6 @@
 ﻿Plex-Plugin-ARDMediathek2016
 ===================
-#### 26.06.2019 Nachfolgeplugins sind [ARDundZDF](https://github.com/rols1/ARDundZDF/releases/latest) (Support ist eingestellt) und [Kodi-Version](https://github.com/rols1/Kodi-Addon-ARDundZDF/releases/latest)
+#### 26.06.2019 Nachfolgeplugins sind [ARDundZDF](https://github.com/rols1/ARDundZDF/releases/latest) (Support ist eingestellt) und [Kodi-Addon-ARDundZDF](https://github.com/rols1/Kodi-Addon-ARDundZDF/releases/latest)
 
 #### 30.05.2019 bitte den ARD-Hinweis zur Abschaltung beachten. Mit der Abschaltung entfällt derSupport für Plex-Plugin-ARDMediathek2016. Das Repo bleibt voraussichtlich noch ca. für ein Jahr danach aktiv und wird danach gelöscht.
 
